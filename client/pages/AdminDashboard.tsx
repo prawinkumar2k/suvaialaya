@@ -265,13 +265,127 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* Placeholders for other admin tabs */}
-            {activeTab !== "overview" && (
-              <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-primary/20 rounded-xl bg-primary/5">
-                <Settings className="h-16 w-16 text-primary/30 mb-6" />
-                <h3 className="font-display text-3xl font-bold text-primary">Module Under Construction</h3>
+            {activeTab === "bookings" && (
+              <div className="space-y-8 max-w-7xl mx-auto">
+                <div>
+                  <h1 className="font-display text-4xl font-bold text-primary">All Bookings</h1>
+                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Master Ledger</p>
+                </div>
+                <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
+                  <div className="p-6 border-b border-primary/10 flex justify-between items-center bg-primary/5">
+                    <h2 className="font-display font-bold text-xl text-primary">Complete Ledger</h2>
+                    <button onClick={handleExportCSV} className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded hover:bg-primary/20 transition-colors">
+                      Export Full CSV
+                    </button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                      <thead className="text-[10px] text-primary/60 uppercase tracking-widest bg-primary/5 border-b border-primary/10">
+                        <tr>
+                          <th className="px-6 py-4 font-bold">Booking ID</th>
+                          <th className="px-6 py-4 font-bold">Guest Name</th>
+                          <th className="px-6 py-4 font-bold">Slot</th>
+                          <th className="px-6 py-4 font-bold text-center">Pax</th>
+                          <th className="px-6 py-4 font-bold">Status</th>
+                          <th className="px-6 py-4 font-bold text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-primary/10">
+                        {bookings.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
+                              No bookings found in database
+                            </td>
+                          </tr>
+                        )}
+                        {[...bookings].reverse().map((b) => (
+                          <tr key={b._id} className="hover:bg-primary/5 transition-colors">
+                            <td className="px-6 py-5 font-bold text-primary">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
+                            <td className="px-6 py-5 text-foreground/80 font-medium">{b.user?.name || b.guestDetails?.fullName || "Guest"}</td>
+                            <td className="px-6 py-5 text-primary/70">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
+                            <td className="px-6 py-5 text-center font-bold text-primary">{b.numberOfGuests}</td>
+                            <td className="px-6 py-5">
+                              <span className={`px-3 py-1.5 rounded border text-[9px] font-bold uppercase tracking-widest
+                                ${b.bookingStatus === 'Confirmed' ? 'bg-accent/10 text-accent border-accent/20' : 
+                                  b.bookingStatus === 'Pending' ? 'bg-warning/10 text-warning border-warning/20' : 
+                                  'bg-destructive/10 text-destructive border-destructive/20'}`}>
+                                {b.bookingStatus}
+                              </span>
+                            </td>
+                            <td className="px-6 py-5 text-right">
+                              <button className="text-primary/50 hover:text-primary transition-colors p-2">
+                                <MoreVertical size={18} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "events" && (
+              <div className="space-y-8 max-w-7xl mx-auto">
+                <div>
+                  <h1 className="font-display text-4xl font-bold text-primary">Events & Slots</h1>
+                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Manage your venue schedule</p>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {[1,2,3,4,5,6,7,8,9].map((day) => (
+                    <div key={day} className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm group">
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-display text-xl font-bold text-primary">August 0{day}, 2026</h3>
+                        <span className="text-xs font-bold bg-accent/20 text-accent px-2 py-1 rounded">Active</span>
+                      </div>
+                      <div className="space-y-3">
+                        {['11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM', '07:00 PM', '09:00 PM'].map((slot) => (
+                          <div key={slot} className="flex justify-between items-center text-sm border-b border-primary/10 pb-2 last:border-0">
+                            <span className="text-primary/70">{slot}</span>
+                            <span className="font-bold text-primary">0 / 70 Booked</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "settings" && (
+              <div className="space-y-8 max-w-4xl mx-auto">
+                <div>
+                  <h1 className="font-display text-4xl font-bold text-primary">Platform Settings</h1>
+                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Configure your restaurant platform</p>
+                </div>
+                <div className="bg-background border border-primary/20 rounded-xl p-8 shadow-sm">
+                  <h2 className="font-display text-2xl font-bold text-primary mb-6">General Information</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Platform Name</label>
+                      <input type="text" className="w-full border border-primary/20 rounded-md px-4 py-3 bg-primary/5 focus:outline-none focus:border-accent text-primary font-medium" defaultValue="Suvaialaya Event Management System" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Admin Notification Email</label>
+                      <input type="email" className="w-full border border-primary/20 rounded-md px-4 py-3 bg-primary/5 focus:outline-none focus:border-accent text-primary font-medium" defaultValue="admin@suvaialaya.com" />
+                    </div>
+                    <div className="pt-4 border-t border-primary/10">
+                      <button className="bg-primary text-primary-foreground font-bold uppercase tracking-widest text-xs px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
+                        Save Changes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "analytics" && (
+              <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-primary/20 rounded-xl bg-primary/5 max-w-7xl mx-auto">
+                <BarChart3 className="h-16 w-16 text-primary/30 mb-6" />
+                <h3 className="font-display text-3xl font-bold text-primary">Analytics Engine Syncing</h3>
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary/60 mt-4 max-w-md">
-                  The {activeTab} management module will be wired up to MongoDB in subsequent phases.
+                  We are aggregating enough booking data to generate your insights. Check back after your first 100 bookings.
                 </p>
               </div>
             )}
