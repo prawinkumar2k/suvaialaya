@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  # The Node.js Application (Express API + Vite React Build)
+  sems-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sems-production
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya?replicaSet=rs0
+      - JWT_SECRET=${JWT_SECRET:-your_super_secret_jwt_key_for_production}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+    depends_on:
+      sems-db:
+        condition: service_healthy
+    networks:
+      - sems-network
+
+  # MongoDB Instance (Configured as a Replica Set for transactions if needed)
+  sems-db:
+    image: mongo:6.0
+    container_name: sems-db
+    restart: always
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - sems-db-data:/data/db
+    healthcheck:
+      test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+    networks:
+      - sems-network
+
+volumes:
+  sems-db-data:
+    name: sems-database-volume
+
+networks:
+  sems-network:
+    name: sems-internal-network
+    driver: bridge

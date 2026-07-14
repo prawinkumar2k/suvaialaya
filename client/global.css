@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Poppins:wght@300;400;500;600;700&family=Noto+Serif+Tamil:wght@400;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Menu Card Cream Background: #F0E8D5 */
+    --background: 41 44% 89%;
+    /* Deep Heritage Green from the Menu Card: #184A38 */
+    --foreground: 158 51% 19%;
+    
+    /* White/Cream Card */
+    --card: 41 44% 92%;
+    --card-foreground: 158 51% 19%;
+    --popover: 41 44% 92%;
+    --popover-foreground: 158 51% 19%;
+    
+    /* Primary Deep Green */
+    --primary: 158 51% 19%;
+    --primary-foreground: 41 44% 89%;
+    
+    /* Secondary (Slightly darker cream/tan) */
+    --secondary: 41 30% 82%;
+    --secondary-foreground: 158 51% 19%;
+    
+    /* Muted (For subtle text/borders) */
+    --muted: 158 30% 35%;
+    --muted-foreground: 158 30% 35%;
+    
+    /* Accent (If gold is used, otherwise matching menu card greens) */
+    --accent: 158 40% 25%;
+    --accent-foreground: 41 44% 89%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Borders match the deep green */
+    --border: 158 51% 19%;
+    --input: 158 51% 19%;
+    --ring: 158 51% 19%;
+    --radius: 0.5rem;
+
+    /* Status Colors */
+    --success: 142.1 76.2% 36.3%;
+    --success-foreground: 355.7 100% 97.3%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
+  }
+
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; }
+  body { @apply bg-background font-sans text-foreground antialiased; }
+  button, input { font: inherit; }
+  button { -webkit-tap-highlight-color: transparent; }
+}
