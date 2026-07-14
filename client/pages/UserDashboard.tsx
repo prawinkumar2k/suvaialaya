@@ -337,13 +337,111 @@ export default function UserDashboard() {
             </div>
           )}
 
-          {["billing", "preferences"].includes(activeTab) && (
-            <div className="flex flex-col items-center justify-center py-32 text-center border-2 border-dashed border-primary/20 rounded-xl bg-primary/5">
-              <Settings className="h-12 w-12 text-primary/40 mb-6" />
-              <h3 className="font-display text-2xl font-bold text-primary">Under Construction</h3>
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary/60 mt-3 max-w-sm">
-                This enterprise feature will be unlocked in upcoming phases.
-              </p>
+          {activeTab === "billing" && (
+            <div className="space-y-8">
+              <div>
+                <h1 className="font-display text-4xl font-bold text-primary">Billing & Invoices</h1>
+                <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Manage your payment history</p>
+              </div>
+              
+              <div className="bg-background border border-primary/20 rounded-xl p-8 shadow-sm">
+                <div className="flex items-center justify-between mb-8 pb-6 border-b border-primary/10">
+                  <div>
+                    <h2 className="font-display text-2xl font-bold text-primary">Payment History</h2>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-primary/60 mt-1">Receipts for your event bookings</p>
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="text-[10px] text-primary/60 uppercase tracking-widest bg-primary/5 border-b border-primary/10">
+                      <tr>
+                        <th className="px-6 py-4 font-bold">Invoice ID</th>
+                        <th className="px-6 py-4 font-bold">Date Paid</th>
+                        <th className="px-6 py-4 font-bold">Event</th>
+                        <th className="px-6 py-4 font-bold">Amount</th>
+                        <th className="px-6 py-4 font-bold text-right">Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-primary/10">
+                      {bookings.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
+                            No billing history found
+                          </td>
+                        </tr>
+                      ) : (
+                        bookings.map((booking) => (
+                          <tr key={booking._id} className="hover:bg-primary/5 transition-colors">
+                            <td className="px-6 py-5 font-bold text-primary">INV-{booking._id.substring(booking._id.length - 6).toUpperCase()}</td>
+                            <td className="px-6 py-5 text-primary/70">{new Date(booking.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</td>
+                            <td className="px-6 py-5 text-foreground/80 font-medium">{booking.event?.title || "Event Booking"}</td>
+                            <td className="px-6 py-5 font-bold text-primary">₹{booking.totalAmount.toLocaleString("en-IN")}</td>
+                            <td className="px-6 py-5 text-right">
+                              <button className="text-[10px] font-bold uppercase tracking-widest text-accent hover:text-primary transition-colors flex items-center justify-end gap-1 ml-auto">
+                                <Download size={14} /> PDF
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "preferences" && (
+            <div className="space-y-8">
+              <div>
+                <h1 className="font-display text-4xl font-bold text-primary">Preferences</h1>
+                <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Customize your platform experience</p>
+              </div>
+              
+              <div className="bg-background border border-primary/20 rounded-xl p-8 shadow-sm">
+                <h2 className="font-display text-2xl font-bold text-primary mb-6">Notifications</h2>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between p-4 border border-primary/10 rounded-lg bg-primary/5">
+                    <div>
+                      <h4 className="font-bold text-primary">Email Notifications</h4>
+                      <p className="text-xs text-primary/70 mt-1">Receive booking confirmations and updates via email.</p>
+                    </div>
+                    <div className="w-12 h-6 bg-accent rounded-full relative cursor-pointer shadow-inner">
+                      <div className="absolute right-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 border border-primary/10 rounded-lg bg-primary/5">
+                    <div>
+                      <h4 className="font-bold text-primary">SMS Alerts</h4>
+                      <p className="text-xs text-primary/70 mt-1">Receive text messages for day-of-event reminders.</p>
+                    </div>
+                    <div className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer shadow-inner border border-primary/10">
+                      <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm" />
+                    </div>
+                  </div>
+                </div>
+                
+                <h2 className="font-display text-2xl font-bold text-primary mt-12 mb-6">Dietary Requirements</h2>
+                <div className="space-y-4">
+                  <p className="text-sm text-primary/70 mb-4">Set your default dietary preferences for future bookings.</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    {["Vegetarian", "Vegan", "Gluten-Free", "Nut-Free"].map((diet) => (
+                      <label key={diet} className="flex items-center gap-3 p-3 border border-primary/10 rounded-lg cursor-pointer hover:bg-primary/5 transition-colors">
+                        <input type="checkbox" className="accent-accent w-4 h-4" />
+                        <span className="text-sm font-semibold text-primary">{diet}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="pt-8 mt-8 border-t border-primary/10 flex justify-end">
+                  <button className="px-6 py-3 rounded-md text-xs font-bold uppercase tracking-widest text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-md">
+                    Save Preferences
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </motion.div>
