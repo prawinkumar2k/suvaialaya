@@ -13,12 +13,6 @@
 **An enterprise-grade, high-concurrency event ticketing and restaurant reservation platform.**<br>
 Built with the modern MERN stack, offering real-time capacity locking, automated PDF ticket generation, integrated payment gateways, and advanced QR-code event check-ins.
 
-## 🎥 Complete Platform Demo
-
-<p align="center">
-  <img src="./public/demo.webp" alt="Suvaialaya Event Management System Demo" width="100%">
-</p>
-
 ---
 
 ## 🐳 Docker — One-Command Setup
