@@ -1,49 +1,82 @@
-version: "3.8"
+version: "3.9"
 
 services:
-  # The Node.js Application (Express API + Vite React Build)
+
+  # ─────────────────────────────────────────────
+  #  MongoDB Database
+  # ─────────────────────────────────────────────
+  sems-db:
+    image: mongo:6.0
+    container_name: sems-database
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - sems-db-data:/data/db
+    networks:
+      - sems-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ─────────────────────────────────────────────
+  #  Database Seeder (runs once on first boot)
+  # ─────────────────────────────────────────────
+  sems-seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sems-seeder
+    command: ["node", "-e", "require('./dist/server/node-build.mjs')"]
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya
+      - JWT_SECRET=${JWT_SECRET:-suvaialaya_super_secret_jwt_key_2026}
+    depends_on:
+      sems-db:
+        condition: service_healthy
+    networks:
+      - sems-network
+    restart: "no"
+
+  # ─────────────────────────────────────────────
+  #  Main Application (Express + React SPA)
+  # ─────────────────────────────────────────────
   sems-app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sems-production
+    container_name: sems-application
     restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
       - NODE_ENV=production
       - PORT=8080
-      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya?replicaSet=rs0
-      - JWT_SECRET=${JWT_SECRET:-your_super_secret_jwt_key_for_production}
-      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
-      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya
+      - JWT_SECRET=${JWT_SECRET:-suvaialaya_super_secret_jwt_key_2026}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
     depends_on:
       sems-db:
         condition: service_healthy
     networks:
       - sems-network
 
-  # MongoDB Instance (Configured as a Replica Set for transactions if needed)
-  sems-db:
-    image: mongo:6.0
-    container_name: sems-db
-    restart: always
-    command: ["--replSet", "rs0", "--bind_ip_all"]
-    ports:
-      - "27017:27017"
-    volumes:
-      - sems-db-data:/data/db
-    healthcheck:
-      test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo --quiet) -eq 1
-      interval: 10s
-      start_period: 30s
-    networks:
-      - sems-network
-
+# ─────────────────────────────────────────────
+#  Persistent Storage
+# ─────────────────────────────────────────────
 volumes:
   sems-db-data:
     name: sems-database-volume
 
+# ─────────────────────────────────────────────
+#  Internal Network
+# ─────────────────────────────────────────────
 networks:
   sems-network:
     name: sems-internal-network

@@ -7,10 +7,28 @@
 [![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?logo=nodedotjs&logoColor=white)](#)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.x-47A248?logo=mongodb&logoColor=white)](#)
 [![Razorpay](https://img.shields.io/badge/Razorpay-Integrated-02042B?logo=razorpay&logoColor=white)](#)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](#-docker-one-command-setup)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **An enterprise-grade, high-concurrency event ticketing and restaurant reservation platform.**<br>
 Built with the modern MERN stack, offering real-time capacity locking, automated PDF ticket generation, integrated payment gateways, and advanced QR-code event check-ins.
+
+---
+
+## 🐳 Docker — One-Command Setup
+
+> **No Node.js. No MongoDB. No setup. Just Docker.**
+
+```bash
+git clone https://github.com/prawinkumar2k/suvaialaya.git
+cd suvaialaya
+cp .env.example .env
+docker-compose up --build
+```
+
+**Open → http://localhost:8080** &nbsp;|&nbsp; Admin: `admin@suvaialaya.com` / `admin123` &nbsp;|&nbsp; [Full Docker Guide →](DOCKER.md)
+
+---
 
 [Features](#-features) • [Architecture](#-system-architecture) • [API Design](#-api-design) • [Installation](#%EF%B8%8F-installation--setup-universal--foolproof) • [Database](#%EF%B8%8F-database-design)
 

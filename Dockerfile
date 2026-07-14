@@ -1,49 +1,53 @@
+# ================================
+# Stage 1: Build the application
+# ================================
 FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally
+RUN npm install -g pnpm@10
 
-# Copy package files
+# Copy package manifests first (better layer caching)
 COPY package.json pnpm-lock.yaml ./
-COPY client/package.json ./client/
-COPY server/package.json ./server/
-COPY shared/package.json ./shared/
 
-# Install dependencies
+# Install ALL dependencies (including devDeps needed to build)
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
+# Copy the rest of the source code
 COPY . .
 
-# Build the application
+# Build the React frontend + Express server bundle
 RUN pnpm build
 
-# --- Production Image ---
+# ================================
+# Stage 2: Lean production image
+# ================================
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm globally
+RUN npm install -g pnpm@10
 
-# Copy necessary files from builder
+# Copy only what is needed for production
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
-COPY --from=builder /app/node_modules ./node_modules
 
-# Copy server build and production modules
-COPY --from=builder /app/server/package.json ./server/
-COPY --from=builder /app/server/dist ./server/dist
-COPY --from=builder /app/server/node_modules ./server/node_modules
+# Install only production dependencies
+RUN pnpm install --prod --frozen-lockfile
 
-# Copy client build
-COPY --from=builder /app/client/dist ./client/dist
+# Copy built client assets
+COPY --from=builder /app/dist ./dist
 
-# Expose port
+# Copy the built server bundle
+COPY --from=builder /app/dist ./dist
+
+# Expose the application port
 EXPOSE 8080
 
-# Start the server
+# Set production environment
 ENV NODE_ENV=production
-CMD ["node", "server/dist/index.js"]
+ENV PORT=8080
+
+# Start the production server
+CMD ["node", "dist/server/node-build.mjs"]
