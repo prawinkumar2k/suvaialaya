@@ -46,13 +46,19 @@ async function seedDatabase() {
       description: "An authentic Madurai style non-veg feast showcasing our rich culinary heritage.",
       venue: "Suvaialaya Restaurant, Madurai",
       basePrice: 1499,
-      dates: ["2026-08-06", "2026-08-07", "2026-08-08"],
+      dates: [
+        "2026-08-01", "2026-08-02", "2026-08-03", 
+        "2026-08-04", "2026-08-05", "2026-08-06", 
+        "2026-08-07", "2026-08-08", "2026-08-09"
+      ],
       isActive: true,
       slots: [
         { time: "11:00 AM", capacity: 70, booked: 20 },
         { time: "01:00 PM", capacity: 70, booked: 65 }, // Filling fast simulation
         { time: "03:00 PM", capacity: 70, booked: 5 },
         { time: "05:00 PM", capacity: 70, booked: 70 }, // Sold out simulation
+        { time: "07:00 PM", capacity: 70, booked: 40 },
+        { time: "09:00 PM", capacity: 70, booked: 10 },
       ]
     });
     console.log("Events seeded.");
