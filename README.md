@@ -15,6 +15,16 @@ Built with the modern MERN stack, offering real-time capacity locking, automated
 
 ---
 
+## 🎥 Complete Platform Demo
+
+> **Note:** Watch the full platform walkthrough below to see the Admin Dashboard, User Dashboard, and Booking Flow in action.
+> 
+> *(Drop your demo video URL or MP4 file here!)*
+
+<br/>
+
+---
+
 ## 🐳 Docker — One-Command Setup
 
 > **No Node.js. No MongoDB. No setup. Just Docker.**
