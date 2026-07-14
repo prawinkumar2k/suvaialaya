@@ -76,6 +76,9 @@ export default function Index() {
             ))}
           </nav>
           <div className="hidden items-center gap-5 md:flex">
+            <Link to="/login" className="text-sm font-semibold tracking-wide text-primary/80 transition-colors hover:text-accent">
+              Sign In
+            </Link>
             <Link to="/slots" className="rounded-md border border-accent bg-primary px-6 py-2.5 text-sm font-bold tracking-wide text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:shadow-lg">
               Book Now
             </Link>
@@ -91,6 +94,9 @@ export default function Index() {
                 {item.label}
               </button>
             ))}
+            <Link to="/login" className="block w-full py-3 text-left text-sm font-bold text-primary border-t border-border/50 mt-2 pt-4">
+              Sign In
+            </Link>
             <Link to="/slots" className="mt-4 block w-full rounded-md bg-primary py-3 text-center text-sm font-bold text-primary-foreground">
               Book Now
             </Link>
