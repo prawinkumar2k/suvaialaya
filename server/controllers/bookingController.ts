@@ -317,6 +317,12 @@ export const cancelBooking = async (req: Request, res: Response, next: NextFunct
       return res.status(400).json({ success: false, error: "Cannot cancel a checked-in booking" });
     }
 
+    // ─── Enforce Time Restriction: Up to the day before ──────────────────────
+    const todayIST = new Date().toLocaleString("sv-SE", { timeZone: "Asia/Kolkata" }).split(" ")[0];
+    if (todayIST >= booking.date) {
+      return res.status(400).json({ success: false, error: "Cancellations are only permitted up to the day before the booking." });
+    }
+
     // ─── Atomic seat release ───────────────────────────────────────────────
     await Event.findOneAndUpdate(
       { _id: booking.event, "slots.time": booking.slotTime },
