@@ -270,10 +270,10 @@ export default function Index() {
           
           <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { name: "MUTTON ELUMBU SOUP", subtitle: "Traditional Welcome", description: "The warmth of traditional Madurai hospitality, distilled into a rich bone broth.", image: "/images/food/mutton_elumbu_soup.png" },
-              { name: "CHICKEN KARI DOSA", subtitle: "Signature Masterpiece", description: "Where every layer of perfectly spiced meat and golden dosa tells a story.", image: "/images/food/chicken_kari_dosa.png" },
-              { name: "MADURAI HALWA", subtitle: "1920 Heritage", description: "The slow-cooked, ghee-dripping sweetness of Madurai's living heritage.", image: "/images/food/madurai_halwa.png" },
-              { name: "MADURAI JIGARTHANDA", subtitle: "Silky Legend", description: "The cool, creamy king of Madurai's summer, built to soothe and delight.", image: "/images/food/madurai_jigarthanda.png" }
+              { name: "MUTTON BRIYANI", subtitle: "Seeraga Samba", description: "Authentic Madurai style briyani cooked with aromatic seeraga samba rice and tender mutton.", image: "/images/food/mutton_elumbu_soup.png" },
+              { name: "KARAIKUDI MUTTON ROAST", subtitle: "Signature Masterpiece", description: "Fiery Karaikudi spices blended with rich ghee roast.", image: "/images/food/chicken_kari_dosa.png" },
+              { name: "BUN PAROTTA", subtitle: "Tawa Breads", description: "Madurai's famous fluffy, layered bun parotta, perfect for rich gravies.", image: "/images/food/madurai_halwa.png" },
+              { name: "ELANEER PAYASAM", subtitle: "Silky Legend", description: "Tender coconut sweet pudding, built to soothe and delight.", image: "/images/food/madurai_jigarthanda.png" }
             ].map((dish, index) => (
               <motion.article 
                 key={dish.name} 
