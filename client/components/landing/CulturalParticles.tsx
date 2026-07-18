@@ -13,8 +13,8 @@ export function CulturalParticles() {
   const [particles, setParticles] = useState<{ id: number; x: number; delay: number; size: number; duration: number }[]>([]);
 
   useEffect(() => {
-    // Generate 15 floating particles
-    const generated = Array.from({ length: 15 }).map((_, i) => ({
+    // Generate 40 floating jasmine flowers for a lush, elegant shower
+    const generated = Array.from({ length: 40 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100, // random x position (percentage)
       delay: Math.random() * 5, // random start delay
@@ -25,15 +25,15 @@ export function CulturalParticles() {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden">
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute text-background drop-shadow-md opacity-40"
+          className="absolute text-background opacity-60 mix-blend-screen"
           style={{ left: `${p.x}%`, bottom: "-50px" }}
           animate={{
             y: [0, -window.innerHeight - 100],
-            x: [0, Math.random() * 100 - 50, Math.random() * 100 - 50],
+            x: [0, Math.random() * 150 - 75, Math.random() * 150 - 75],
             rotate: [0, 180, 360],
           }}
           transition={{
@@ -43,7 +43,7 @@ export function CulturalParticles() {
             ease: "linear",
           }}
         >
-          <JasmineFlower className="text-white/80" style={{ width: p.size, height: p.size }} />
+          <JasmineFlower className="text-white drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]" style={{ width: p.size, height: p.size }} />
         </motion.div>
       ))}
       

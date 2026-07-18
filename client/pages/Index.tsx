@@ -4,7 +4,6 @@ import { ArrowDown, ArrowRight, CalendarDays, Clock3, MapPin, Menu, Minus, Plus,
 import { Link } from "react-router-dom";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { MaduraiPreloader } from "@/components/landing/MaduraiPreloader";
-import { Festival3DDecorations } from "@/components/landing/Festival3DDecorations";
 import { faqs, festival, menuHighlights, testimonials } from "@/data/madurai-festival";
 
 function Countdown() {
@@ -66,7 +65,6 @@ export default function Index() {
   return (
     <main className="overflow-hidden bg-background text-foreground selection:bg-accent/30">
       {!preloaderComplete && <MaduraiPreloader onComplete={() => setPreloaderComplete(true)} />}
-      <Festival3DDecorations />
       {/* Decorative Top Border */}
       <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
 
