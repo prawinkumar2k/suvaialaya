@@ -53,7 +53,13 @@
 
   * { @apply border-border; }
   html { scroll-behavior: smooth; }
-  body { @apply bg-background font-sans text-foreground antialiased; }
-  button, input { font: inherit; }
+  body { 
+    @apply bg-background font-sans text-foreground antialiased; 
+    cursor: none !important; 
+  }
+  button, input, a, select, textarea { 
+    font: inherit; 
+    cursor: none !important; 
+  }
   button { -webkit-tap-highlight-color: transparent; }
 }

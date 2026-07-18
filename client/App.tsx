@@ -29,6 +29,7 @@ import KitchenDashboard from "@/pages/KitchenDashboard";
 
 import { AudioProvider } from "@/contexts/AudioContext";
 import { CulturalParticles } from "@/components/landing/CulturalParticles";
+import { BananaCursor } from "@/components/shared/BananaCursor";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ export default function App() {
     <TooltipProvider>
       <AudioProvider>
         <CulturalParticles />
+        <BananaCursor />
         <Toaster />
         <Sonner />
         <BrowserRouter>
