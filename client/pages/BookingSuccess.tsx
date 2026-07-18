@@ -7,15 +7,16 @@ import { useAudio } from "@/contexts/AudioContext";
 import { Button } from "@/components/ui/button";
 
 export default function BookingSuccess() {
-  const [location] = useLocation();
-  const searchParams = new URLSearchParams(window.location.search);
+  const location = useLocation();
+  const state = location.state as { bookingId?: string; date: string; slotTime: string; numberOfGuests: number; finalTotal: number } | null;
   const { playSoundEffect } = useAudio();
 
-  const bookingId = searchParams.get('id') || "MKV-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-  const bookingDate = searchParams.get('date') || "Thu, Aug 6, 2026";
-  const slotTime = searchParams.get('time') || "11:00 AM";
-  const numberOfGuests = searchParams.get('guests') || "2";
-  const finalTotal = searchParams.get('total') || "1799";
+  // Fallback if accessed directly
+  const bookingDate = state ? new Date(state.date).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : "Thu, Aug 6, 2026";
+  const slotTime = state ? state.slotTime : "11:00 AM";
+  const bookingId = state?.bookingId || "MKV-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+  const numberOfGuests = state?.numberOfGuests || 2;
+  const finalTotal = state?.finalTotal || 1799;
 
   useEffect(() => {
     playSoundEffect("nadaswaram");
