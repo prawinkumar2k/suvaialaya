@@ -12,16 +12,67 @@ export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("bookings");
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigate = useNavigate();
 
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
   const token = localStorage.getItem("token");
 
+  const [profileName, setProfileName] = useState(user?.name || "");
+  const [profilePhone, setProfilePhone] = useState(user?.phone || "");
+  const [prefs, setPrefs] = useState({
+    notifications: user?.preferences?.notifications ?? true,
+    marketingEmails: user?.preferences?.marketingEmails ?? false,
+    dietary: user?.preferences?.dietary || []
+  });
+
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsUpdating(true);
+    try {
+      const response = await axios.put("/api/auth/profile", { name: profileName, phone: profilePhone }, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        toast.success("Profile updated successfully");
+        localStorage.setItem("user", JSON.stringify(response.data.data));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to update profile");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleUpdatePreferences = async () => {
+    setIsUpdating(true);
+    try {
+      const response = await axios.put("/api/auth/profile", { preferences: prefs }, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        toast.success("Preferences saved successfully");
+        localStorage.setItem("user", JSON.stringify(response.data.data));
+      }
+    } catch (error: any) {
+      toast.error("Failed to update preferences");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   useEffect(() => {
     if (!token || !user) {
       toast.error("Please login to access your dashboard.");
       navigate("/login");
+      return;
+    }
+
+    if (user.role === "admin" || user.role === "owner") {
+      navigate("/admin");
+      return;
+    } else if (user.role === "kitchen_staff") {
+      navigate("/kitchen");
+      return;
+    } else if (user.role === "scanner" || user.role === "receptionist") {
+      navigate("/scanner");
       return;
     }
 
@@ -53,6 +104,22 @@ export default function UserDashboard() {
     localStorage.removeItem("user");
     navigate("/");
     toast.success("Logged out successfully");
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    if (!window.confirm("Are you sure you want to cancel this booking? Refunds may take 5-7 business days.")) return;
+    
+    try {
+      const response = await axios.put(`/api/bookings/${bookingId}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        toast.success("Booking cancelled successfully");
+        setBookings(bookings.map(b => b._id === bookingId ? { ...b, bookingStatus: "Cancelled" } : b));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to cancel booking");
+    }
   };
 
   const handleDownloadTicket = async (booking: any) => {
@@ -92,60 +159,89 @@ export default function UserDashboard() {
     doc.setFontSize(14);
     doc.text(booking.event?.title?.toUpperCase() || "MADURAI KARI VIRUNTHU", 50, 42, { align: "center" });
 
+    const guestName = booking.guestDetails?.fullName || user?.name || "Guest";
+
     doc.setFillColor(15, 59, 40);
-    doc.rect(10, 52, 80, 60, "F");
+    doc.rect(10, 48, 80, 70, "F");
 
     doc.setTextColor(255, 255, 255);
     
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("DATE", 15, 62);
+    doc.text("GUEST NAME", 15, 56);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text(bookingDate, 15, 68);
-
-    doc.setFontSize(7);
-    doc.setFont("helvetica", "normal");
-    doc.text("TIME", 60, 62);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text(booking.slotTime, 60, 68);
+    doc.text(guestName.toUpperCase(), 15, 62);
 
     doc.setDrawColor(255, 255, 255);
-    doc.line(15, 75, 85, 75);
+    doc.line(15, 66, 85, 66);
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("GUESTS", 15, 85);
+    doc.text("DATE", 15, 74);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text(`${booking.numberOfGuests} PAX`, 15, 91);
+    doc.text(bookingDate, 15, 80);
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("PAID", 60, 85);
+    doc.text("TIME", 60, 74);
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.text(`INR ${booking.totalAmount}`, 60, 91);
+    doc.text(booking.slotTime, 60, 80);
+
+    doc.line(15, 86, 85, 86);
+
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.text("GUESTS", 15, 94);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${booking.numberOfGuests} PAX`, 15, 100);
+
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "normal");
+    doc.text("PAID", 60, 94);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.text(`INR ${booking.totalAmount}`, 60, 100);
     
-    doc.line(15, 98, 85, 98);
+    doc.line(15, 106, 85, 106);
 
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
-    doc.text("TICKET ID", 15, 107);
-    doc.setFontSize(9);
+    doc.text("TICKET ID", 15, 114);
+    doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text(booking._id, 50, 107, { align: "center" });
+    doc.text(booking._id, 65, 114, { align: "center" });
+
+    try {
+      const QRCode = await import("qrcode");
+      const verifyUrl = `${window.location.origin}/ticket/${booking._id}`;
+      const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
+        color: {
+          dark: primaryGreen,
+          light: "#00000000" // transparent
+        },
+        margin: 0
+      });
+      doc.addImage(qrDataUrl, "PNG", 35, 122, 30, 30);
+    } catch (err) {
+      console.error("QR Code generation failed", err);
+    }
 
     doc.setTextColor(primaryGreen);
     doc.setFontSize(8);
-    doc.text("VENUE", 50, 125, { align: "center" });
+    doc.text("VENUE", 50, 156, { align: "center" });
     doc.setFontSize(10);
-    doc.text(booking.event?.venue || "Suvaialaya Restaurant", 50, 131, { align: "center" });
+    doc.text(booking.event?.venue || "Suvaialaya Restaurant", 50, 162, { align: "center" });
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text("123 Heritage Road, Madurai", 50, 167, { align: "center" });
 
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(6);
-    doc.text("Please present this E-Ticket at the entrance.", 50, 160, { align: "center" });
+    doc.text("Please present this E-Ticket at the entrance.", 50, 174, { align: "center" });
 
     doc.save(`Suvaialaya-Ticket-${booking._id.substring(booking._id.length - 8).toUpperCase()}.pdf`);
   };
@@ -284,12 +380,20 @@ export default function UserDashboard() {
                         <div className="flex flex-col gap-4 md:items-end border-t border-primary/10 pt-6 md:border-t-0 md:pt-0">
                           <div className="text-3xl font-display font-bold text-primary">₹{booking.totalAmount.toLocaleString("en-IN")}</div>
                           {booking.bookingStatus === 'Confirmed' && (
-                            <button 
-                              onClick={() => handleDownloadTicket(booking)}
-                              className="flex items-center justify-center gap-2 rounded-md bg-primary/10 text-primary border border-primary/20 px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all"
-                            >
-                              <Download size={14} /> Download E-Ticket
-                            </button>
+                            <div className="flex gap-2">
+                              <button 
+                                onClick={() => handleCancelBooking(booking._id)}
+                                className="flex items-center justify-center gap-2 rounded-md bg-destructive/10 text-destructive border border-destructive/20 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-destructive hover:text-destructive-foreground transition-all"
+                              >
+                                Cancel
+                              </button>
+                              <button 
+                                onClick={() => handleDownloadTicket(booking)}
+                                className="flex items-center justify-center gap-2 rounded-md bg-primary/10 text-primary border border-primary/20 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all"
+                              >
+                                <Download size={14} /> E-Ticket
+                              </button>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -311,24 +415,25 @@ export default function UserDashboard() {
                 <div className="absolute bottom-0 right-0 p-8 opacity-5">
                   <User size={120} className="text-primary" />
                 </div>
-                <form className="space-y-8 relative z-10" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-8 relative z-10" onSubmit={handleUpdateProfile}>
                   <div className="grid sm:grid-cols-2 gap-8">
                     <div className="space-y-3">
                       <Label htmlFor="name" className="text-primary font-bold uppercase tracking-widest text-xs">Full Name</Label>
-                      <Input id="name" defaultValue={user?.name || ""} className="h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent" />
+                      <Input id="name" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent" />
                     </div>
                     <div className="space-y-3">
                       <Label htmlFor="email" className="text-primary font-bold uppercase tracking-widest text-xs">Email Address</Label>
-                      <Input id="email" type="email" defaultValue={user?.email || ""} className="h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent" />
+                      <Input id="email" type="email" value={user?.email || ""} disabled className="h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent opacity-50 cursor-not-allowed" />
                     </div>
                     <div className="space-y-3 sm:col-span-2">
                       <Label htmlFor="phone" className="text-primary font-bold uppercase tracking-widest text-xs">Phone Number</Label>
-                      <Input id="phone" type="tel" defaultValue={user?.phone || ""} className="h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent" />
+                      <Input id="phone" type="tel" value={profilePhone} onChange={(e) => setProfilePhone(e.target.value)} className="h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent" />
                     </div>
                   </div>
                   
                   <div className="pt-8 border-t border-primary/10 flex justify-end gap-4">
-                    <button type="submit" className="px-6 py-3 rounded-md text-xs font-bold uppercase tracking-widest text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-md">
+                    <button type="submit" disabled={isUpdating} className="px-6 py-3 rounded-md text-xs font-bold uppercase tracking-widest text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-md flex items-center disabled:opacity-50">
+                      {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Save Changes
                     </button>
                   </div>
@@ -407,18 +512,24 @@ export default function UserDashboard() {
                       <h4 className="font-bold text-primary">Email Notifications</h4>
                       <p className="text-xs text-primary/70 mt-1">Receive booking confirmations and updates via email.</p>
                     </div>
-                    <div className="w-12 h-6 bg-accent rounded-full relative cursor-pointer shadow-inner">
-                      <div className="absolute right-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm" />
+                    <div 
+                      onClick={() => setPrefs(prev => ({ ...prev, notifications: !prev.notifications }))}
+                      className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors ${prefs.notifications ? 'bg-accent' : 'bg-primary/20 border border-primary/10'}`}
+                    >
+                      <div className={`absolute top-1 bg-white w-4 h-4 rounded-full shadow-sm transition-all ${prefs.notifications ? 'right-1' : 'left-1'}`} />
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-between p-4 border border-primary/10 rounded-lg bg-primary/5">
                     <div>
-                      <h4 className="font-bold text-primary">SMS Alerts</h4>
-                      <p className="text-xs text-primary/70 mt-1">Receive text messages for day-of-event reminders.</p>
+                      <h4 className="font-bold text-primary">Marketing Emails</h4>
+                      <p className="text-xs text-primary/70 mt-1">Receive news about upcoming events and special offers.</p>
                     </div>
-                    <div className="w-12 h-6 bg-primary/20 rounded-full relative cursor-pointer shadow-inner border border-primary/10">
-                      <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm" />
+                    <div 
+                      onClick={() => setPrefs(prev => ({ ...prev, marketingEmails: !prev.marketingEmails }))}
+                      className={`w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors ${prefs.marketingEmails ? 'bg-accent' : 'bg-primary/20 border border-primary/10'}`}
+                    >
+                      <div className={`absolute top-1 bg-white w-4 h-4 rounded-full shadow-sm transition-all ${prefs.marketingEmails ? 'right-1' : 'left-1'}`} />
                     </div>
                   </div>
                 </div>
@@ -429,7 +540,18 @@ export default function UserDashboard() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {["Vegetarian", "Vegan", "Gluten-Free", "Nut-Free"].map((diet) => (
                       <label key={diet} className="flex items-center gap-3 p-3 border border-primary/10 rounded-lg cursor-pointer hover:bg-primary/5 transition-colors">
-                        <input type="checkbox" className="accent-accent w-4 h-4" />
+                        <input 
+                          type="checkbox" 
+                          className="accent-accent w-4 h-4" 
+                          checked={prefs.dietary.includes(diet)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setPrefs(prev => ({ ...prev, dietary: [...prev.dietary, diet] }));
+                            } else {
+                              setPrefs(prev => ({ ...prev, dietary: prev.dietary.filter(d => d !== diet) }));
+                            }
+                          }}
+                        />
                         <span className="text-sm font-semibold text-primary">{diet}</span>
                       </label>
                     ))}
@@ -437,7 +559,12 @@ export default function UserDashboard() {
                 </div>
                 
                 <div className="pt-8 mt-8 border-t border-primary/10 flex justify-end">
-                  <button className="px-6 py-3 rounded-md text-xs font-bold uppercase tracking-widest text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-md">
+                  <button 
+                    onClick={handleUpdatePreferences}
+                    disabled={isUpdating}
+                    className="px-6 py-3 rounded-md text-xs font-bold uppercase tracking-widest text-primary-foreground bg-primary hover:bg-primary/90 transition-colors shadow-md flex items-center disabled:opacity-50"
+                  >
+                    {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Save Preferences
                   </button>
                 </div>

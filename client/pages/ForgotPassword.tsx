@@ -9,16 +9,30 @@ import { Label } from "@/components/ui/label";
 
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
-  const handleReset = (e: React.FormEvent) => {
+  const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) return;
     setIsLoading(true);
-    // Mock delay
-    setTimeout(() => {
+    
+    try {
+      import("axios").then(async (axios) => {
+        const { toast } = await import("sonner");
+        const response = await axios.default.post("/api/auth/forgot-password", { email });
+        if (response.data.success) {
+          toast.success(response.data.message);
+          navigate("/verify-otp", { state: { email } });
+        }
+      });
+    } catch (error: any) {
+      import("sonner").then(({ toast }) => {
+        toast.error(error.response?.data?.error || "Failed to send reset code");
+      });
+    } finally {
       setIsLoading(false);
-      navigate("/verify-otp"); // usually leads to an OTP or "check your email" screen
-    }, 1500);
+    }
   };
 
   return (
@@ -45,7 +59,17 @@ export default function ForgotPassword() {
               <Label htmlFor="email">Email address</Label>
               <div className="relative mt-2">
                 <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="email" name="email" type="email" autoComplete="email" required className="pl-10" placeholder="you@example.com" />
+                <Input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  autoComplete="email" 
+                  required 
+                  className="pl-10" 
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
             </div>
 

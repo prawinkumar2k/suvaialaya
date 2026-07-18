@@ -1,0 +1,102 @@
+groups:
+  - name: suvaialaya-critical-alerts
+    interval: 30s
+    rules:
+
+      # ─── API Availability ─────────────────────────────────────────────────
+      - alert: APIHighErrorRate
+        expr: |
+          rate(suvaialaya_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API error rate"
+          description: "Error rate {{ $value | humanize }} errors/sec over last 5 minutes"
+
+      # ─── Payment Engine ───────────────────────────────────────────────────
+      - alert: PaymentFailureSpike
+        expr: |
+          increase(suvaialaya_payments_total{status="failed"}[10m]) > 5
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Payment failures spiking"
+          description: "{{ $value }} payment failures in the last 10 minutes"
+
+      # ─── Booking Engine ───────────────────────────────────────────────────
+      - alert: BookingEngineSlowdown
+        expr: |
+          histogram_quantile(0.95, rate(suvaialaya_booking_engine_duration_seconds_bucket[5m])) > 3
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Booking engine p95 latency > 3 seconds"
+          description: "Booking engine is slow: {{ $value }}s p95"
+
+      # ─── QR Generation ───────────────────────────────────────────────────
+      - alert: QRGenerationFailures
+        expr: |
+          increase(suvaialaya_qr_generations_total{status="failed"}[10m]) > 3
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "QR generation failures detected"
+          description: "{{ $value }} QR failures in the last 10 minutes"
+
+      # ─── Dead Letter Queue ────────────────────────────────────────────────
+      - alert: DLQJobsAccumulating
+        expr: |
+          increase(suvaialaya_dlq_jobs_total[30m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Jobs in Dead Letter Queue"
+          description: "{{ $value }} jobs have exhausted retries. Manual intervention required."
+
+      # ─── Queue Backlog ────────────────────────────────────────────────────
+      - alert: NotificationQueueBacklog
+        expr: suvaialaya_bullmq_queue_depth{queue="notifications"} > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Notification queue backlog"
+          description: "{{ $value }} jobs waiting in notification queue"
+
+      # ─── Memory ───────────────────────────────────────────────────────────
+      - alert: HighNodeMemory
+        expr: |
+          (suvaialaya_node_nodejs_heap_used_bytes / suvaialaya_node_nodejs_heap_total_bytes) * 100 > 85
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node.js heap usage > 85%"
+          description: "Memory at {{ $value | humanize }}%. Risk of OOM crash."
+
+      # ─── MongoDB ─────────────────────────────────────────────────────────
+      - alert: MongoDBConnectionPoolExhaustion
+        expr: |
+          suvaialaya_node_nodejs_active_handles_total > 200
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active handles"
+          description: "{{ $value }} active handles — possible connection pool pressure"
+
+      # ─── Revenue Anomaly ──────────────────────────────────────────────────
+      - alert: ZeroRevenueDetected
+        expr: |
+          increase(suvaialaya_revenue_total_inr[1h]) == 0
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "No revenue in last 1 hour"
+          description: "Zero bookings completed in the last hour during expected business hours"

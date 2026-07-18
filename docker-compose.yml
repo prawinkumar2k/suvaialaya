@@ -2,53 +2,59 @@ version: "3.9"
 
 services:
 
-  # ─────────────────────────────────────────────
-  #  MongoDB Database
-  # ─────────────────────────────────────────────
+  # ────────────────────────────────────────────────────
+  #  MongoDB — Replica Set Ready (required for transactions)
+  # ────────────────────────────────────────────────────
   sems-db:
     image: mongo:6.0
     container_name: sems-database
     restart: unless-stopped
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27017:27017"
     volumes:
       - sems-db-data:/data/db
+      - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - sems-network
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: |
+        mongosh --eval "
+          try { rs.status() } catch(e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }
+        "
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ────────────────────────────────────────────────────
+  #  Redis — Session locking, BullMQ queues, caching
+  # ────────────────────────────────────────────────────
+  sems-redis:
+    image: redis:7-alpine
+    container_name: sems-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - sems-redis-data:/data
+    networks:
+      - sems-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
 
-  # ─────────────────────────────────────────────
-  #  Database Seeder (runs once on first boot)
-  # ─────────────────────────────────────────────
-  sems-seeder:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: sems-seeder
-    command: ["node", "-e", "require('./dist/server/node-build.mjs')"]
-    environment:
-      - NODE_ENV=production
-      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya
-      - JWT_SECRET=${JWT_SECRET:-suvaialaya_super_secret_jwt_key_2026}
-    depends_on:
-      sems-db:
-        condition: service_healthy
-    networks:
-      - sems-network
-    restart: "no"
-
-  # ─────────────────────────────────────────────
-  #  Main Application (Express + React SPA)
-  # ─────────────────────────────────────────────
+  # ────────────────────────────────────────────────────
+  #  Main Application (Express + React SPA + BullMQ)
+  # ────────────────────────────────────────────────────
   sems-app:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runner
     container_name: sems-application
     restart: unless-stopped
     ports:
@@ -56,27 +62,118 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=8080
-      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya
-      - JWT_SECRET=${JWT_SECRET:-suvaialaya_super_secret_jwt_key_2026}
-      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID:-}
-      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET:-}
-      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya?replicaSet=rs0
+      - REDIS_HOST=sems-redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://suvaialaya.com,https://www.suvaialaya.com}
+      - LOG_LEVEL=info
+    volumes:
+      - sems-logs:/app/logs
     depends_on:
       sems-db:
         condition: service_healthy
+      sems-redis:
+        condition: service_healthy
+    networks:
+      - sems-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+
+  # ────────────────────────────────────────────────────
+  #  Nginx Reverse Proxy (SSL termination, rate limiting)
+  # ────────────────────────────────────────────────────
+  sems-nginx:
+    image: nginx:1.25-alpine
+    container_name: sems-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - sems-nginx-cache:/var/cache/nginx
+    depends_on:
+      - sems-app
     networks:
       - sems-network
 
-# ─────────────────────────────────────────────
-#  Persistent Storage
-# ─────────────────────────────────────────────
+  # ────────────────────────────────────────────────────
+  #  Prometheus — Metrics collection
+  # ────────────────────────────────────────────────────
+  sems-prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: sems-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - sems-prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-admin-api"
+    networks:
+      - sems-network
+
+  # ────────────────────────────────────────────────────
+  #  Grafana — Dashboards and Alerting
+  # ────────────────────────────────────────────────────
+  sems-grafana:
+    image: grafana/grafana:10.2.0
+    container_name: sems-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=${DOMAIN:-localhost}
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=${SMTP_HOST:-smtp.gmail.com:587}
+      - GF_SMTP_USER=${SMTP_USER}
+      - GF_SMTP_PASSWORD=${SMTP_PASSWORD}
+      - GF_ALERTING_ENABLED=true
+    volumes:
+      - sems-grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - sems-prometheus
+    networks:
+      - sems-network
+
+# ────────────────────────────────────────────────────
+#  Persistent Volumes
+# ────────────────────────────────────────────────────
 volumes:
   sems-db-data:
     name: sems-database-volume
+  sems-redis-data:
+    name: sems-redis-volume
+  sems-logs:
+    name: sems-logs-volume
+  sems-prometheus-data:
+    name: sems-prometheus-volume
+  sems-grafana-data:
+    name: sems-grafana-volume
+  sems-nginx-cache:
+    name: sems-nginx-cache-volume
 
-# ─────────────────────────────────────────────
+# ────────────────────────────────────────────────────
 #  Internal Network
-# ─────────────────────────────────────────────
+# ────────────────────────────────────────────────────
 networks:
   sems-network:
     name: sems-internal-network

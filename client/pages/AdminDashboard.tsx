@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2 } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { toast } from "sonner";
 import axios from "axios";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [bookings, setBookings] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -23,13 +26,21 @@ export default function AdminDashboard() {
       return;
     }
 
-    const fetchBookings = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("/api/bookings", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data.success) {
-          setBookings(response.data.data);
+        const [bookingsRes, analyticsRes, eventsRes] = await Promise.all([
+          axios.get("/api/bookings", { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get("/api/analytics/business", { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get("/api/events")
+        ]);
+        if (bookingsRes.data.success) {
+          setBookings(bookingsRes.data.data);
+        }
+        if (analyticsRes.data.success) {
+          setAnalytics(analyticsRes.data.data);
+        }
+        if (eventsRes.data.success) {
+          setEvents(eventsRes.data.data);
         }
       } catch (error: any) {
         if (error.response?.status === 401) {
@@ -45,14 +56,77 @@ export default function AdminDashboard() {
       }
     };
 
-    fetchBookings();
-  }, [navigate, token, user]);
+    fetchData();
+  }, [navigate, token, userString]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
     toast.success("Logged out successfully");
+  };
+
+  const handleUpdateBookingStatus = async (bookingId: string, action: 'check-in' | 'cancel') => {
+    try {
+      const endpoint = action === 'check-in' ? `/api/bookings/${bookingId}/check-in` : `/api/bookings/${bookingId}/cancel`;
+      const response = await axios.put(endpoint, {}, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        toast.success(`Booking ${action === 'check-in' ? 'checked in' : 'cancelled'} successfully`);
+        setBookings(prev => prev.map(b => b._id === bookingId ? { ...b, bookingStatus: action === 'check-in' ? 'Checked In' : 'Cancelled' } : b));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || `Failed to ${action} booking`);
+    }
+  };
+
+  const handleUpdateEvent = async (eventId: string, updateData: any) => {
+    try {
+      const response = await axios.put(`/api/events/${eventId}`, updateData, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        toast.success("Event updated successfully");
+        setEvents(events.map(e => e._id === eventId ? response.data.data : e));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to update event");
+    }
+  };
+
+  const handleRemoveDate = (event: any, dateToRemove: string) => {
+    if (confirm(`Are you sure you want to remove ${dateToRemove}?`)) {
+      const updatedDates = event.dates.filter((d: string) => d !== dateToRemove);
+      handleUpdateEvent(event._id, { dates: updatedDates });
+    }
+  };
+
+  const handleRemoveSlot = (event: any, slotIdx: number) => {
+    if (confirm("Are you sure you want to remove this slot?")) {
+      const updatedSlots = event.slots.filter((_: any, idx: number) => idx !== slotIdx);
+      handleUpdateEvent(event._id, { slots: updatedSlots });
+    }
+  };
+
+  const handleAddDate = (event: any) => {
+    const newDate = prompt("Enter new date (YYYY-MM-DD):");
+    if (newDate) {
+      if (isNaN(new Date(newDate).getTime())) {
+        toast.error("Invalid date format. Use YYYY-MM-DD");
+        return;
+      }
+      handleUpdateEvent(event._id, { dates: [...(event.dates || []), newDate].sort() });
+    }
+  };
+
+  const handleAddSlot = (event: any) => {
+    const time = prompt("Enter slot time (e.g., 10:00 AM):");
+    const capacityStr = prompt("Enter slot capacity (e.g., 70):", "70");
+    if (time && capacityStr) {
+      const capacity = parseInt(capacityStr);
+      if (isNaN(capacity) || capacity <= 0) {
+        toast.error("Invalid capacity");
+        return;
+      }
+      handleUpdateEvent(event._id, { slots: [...(event.slots || []), { time, capacity }] });
+    }
   };
 
   if (isLoading) {
@@ -65,10 +139,10 @@ export default function AdminDashboard() {
   }
 
   // Calculate dynamic stats
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
-  const totalBookings = bookings.length;
-  const guestsExpected = bookings.reduce((sum, b) => sum + (b.numberOfGuests || 0), 0);
-  const confirmedBookings = bookings.filter(b => b.bookingStatus === "Confirmed").length;
+  const totalRevenue = analytics?.revenue?.netRevenue || 0;
+  const totalBookings = analytics?.bookings?.total || bookings.length;
+  const guestsExpected = analytics?.guests?.total || bookings.reduce((sum, b) => sum + (b.numberOfGuests || 0), 0);
+  const confirmedBookings = analytics?.bookings?.confirmed || bookings.filter(b => b.bookingStatus === "Confirmed").length;
 
   const dynamicStats = [
     { label: "Total Revenue", value: `₹${totalRevenue.toLocaleString("en-IN")}`, increase: "+Live", icon: IndianRupee },
@@ -251,10 +325,32 @@ export default function AdminDashboard() {
                                 {b.bookingStatus}
                               </span>
                             </td>
-                            <td className="px-6 py-5 text-right">
-                              <button className="text-primary/50 hover:text-primary transition-colors p-2">
-                                <MoreVertical size={18} />
-                              </button>
+                            <td className="px-6 py-5 text-right relative">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button className="text-primary/50 hover:text-primary transition-colors p-2 outline-none">
+                                    <MoreVertical size={18} />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48 bg-background border-primary/20">
+                                  <DropdownMenuLabel className="text-primary font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator className="bg-primary/10" />
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-xs font-semibold text-primary focus:bg-primary/10 focus:text-primary gap-2"
+                                    onClick={() => handleUpdateBookingStatus(b._id, 'check-in')}
+                                    disabled={b.bookingStatus === 'Checked In' || b.bookingStatus === 'Cancelled'}
+                                  >
+                                    <CheckSquare size={14} className="text-success" /> Mark Checked In
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-xs font-semibold text-destructive focus:bg-destructive/10 focus:text-destructive gap-2"
+                                    onClick={() => handleUpdateBookingStatus(b._id, 'cancel')}
+                                    disabled={b.bookingStatus === 'Cancelled'}
+                                  >
+                                    <XCircle size={14} /> Cancel Booking
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))}
@@ -312,10 +408,32 @@ export default function AdminDashboard() {
                                 {b.bookingStatus}
                               </span>
                             </td>
-                            <td className="px-6 py-5 text-right">
-                              <button className="text-primary/50 hover:text-primary transition-colors p-2">
-                                <MoreVertical size={18} />
-                              </button>
+                            <td className="px-6 py-5 text-right relative">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button className="text-primary/50 hover:text-primary transition-colors p-2 outline-none">
+                                    <MoreVertical size={18} />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48 bg-background border-primary/20">
+                                  <DropdownMenuLabel className="text-primary font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator className="bg-primary/10" />
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-xs font-semibold text-primary focus:bg-primary/10 focus:text-primary gap-2"
+                                    onClick={() => handleUpdateBookingStatus(b._id, 'check-in')}
+                                    disabled={b.bookingStatus === 'Checked In' || b.bookingStatus === 'Cancelled'}
+                                  >
+                                    <CheckSquare size={14} className="text-success" /> Mark Checked In
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-xs font-semibold text-destructive focus:bg-destructive/10 focus:text-destructive gap-2"
+                                    onClick={() => handleUpdateBookingStatus(b._id, 'cancel')}
+                                    disabled={b.bookingStatus === 'Cancelled'}
+                                  >
+                                    <XCircle size={14} /> Cancel Booking
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </td>
                           </tr>
                         ))}
@@ -333,22 +451,72 @@ export default function AdminDashboard() {
                   <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Manage your venue schedule</p>
                 </div>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {[1,2,3,4,5,6,7,8,9].map((day) => (
-                    <div key={day} className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm group">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="font-display text-xl font-bold text-primary">August 0{day}, 2026</h3>
-                        <span className="text-xs font-bold bg-accent/20 text-accent px-2 py-1 rounded">Active</span>
-                      </div>
-                      <div className="space-y-3">
-                        {['11:00 AM', '01:00 PM', '03:00 PM', '05:00 PM', '07:00 PM', '09:00 PM'].map((slot) => (
-                          <div key={slot} className="flex justify-between items-center text-sm border-b border-primary/10 pb-2 last:border-0">
-                            <span className="text-primary/70">{slot}</span>
-                            <span className="font-bold text-primary">0 / 70 Booked</span>
-                          </div>
-                        ))}
-                      </div>
+                  {events.length === 0 ? (
+                    <div className="col-span-full text-center py-20 border border-dashed border-primary/20 rounded-xl bg-primary/5">
+                      <p className="text-primary/60 uppercase tracking-widest font-bold">No Events Found</p>
                     </div>
-                  ))}
+                  ) : (
+                    events.map((event) => (
+                      <div key={event._id} className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm group relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                          <CalendarDays size={80} className="text-primary" />
+                        </div>
+                        <div className="flex justify-between items-start mb-4 relative z-10">
+                          <div>
+                            <h3 className="font-display text-xl font-bold text-primary">{event.title}</h3>
+                            <p className="text-[10px] uppercase tracking-widest text-primary/60 mt-1">{event.venue}</p>
+                          </div>
+                          <span className="text-xs font-bold bg-accent/20 text-accent px-2 py-1 rounded">₹{event.basePrice}</span>
+                        </div>
+                        <div className="space-y-4 relative z-10">
+                          <div className="flex justify-between items-center bg-primary/10 p-2 rounded-lg mb-2">
+                            <span className="text-xs font-bold uppercase tracking-widest text-primary">Manage Schedule</span>
+                            <div className="flex gap-2">
+                              <button onClick={() => handleAddDate(event)} className="bg-primary text-primary-foreground text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest hover:bg-primary/90 flex items-center gap-1">
+                                <Plus size={12} /> Date
+                              </button>
+                              <button onClick={() => handleAddSlot(event)} className="bg-primary text-primary-foreground text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest hover:bg-primary/90 flex items-center gap-1">
+                                <Plus size={12} /> Slot
+                              </button>
+                            </div>
+                          </div>
+                          {event.dates?.map((dateObj: any, index: number) => (
+                            <div key={index} className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+                              <div className="font-bold text-primary mb-2 border-b border-primary/10 pb-2 flex justify-between items-center">
+                                {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                <button onClick={() => handleRemoveDate(event, dateObj)} className="text-xs text-destructive hover:bg-destructive/10 p-1 rounded transition-colors" title="Remove Date">
+                                  <XCircle size={14} />
+                                </button>
+                              </div>
+                              <div className="space-y-2">
+                                {event.slots?.map((slot: any, slotIdx: number) => {
+                                  const booked = slot.booked || 0;
+                                  const total = slot.capacity;
+                                  const percentage = Math.round((booked / total) * 100);
+                                  return (
+                                    <div key={slotIdx} className="flex justify-between items-center text-xs group/slot">
+                                      <div className="flex items-center gap-2">
+                                        <button onClick={() => handleRemoveSlot(event, slotIdx)} className="text-destructive/50 hover:text-destructive transition-colors opacity-0 group-hover/slot:opacity-100 p-0.5 rounded hover:bg-destructive/10">
+                                          <XCircle size={12} />
+                                        </button>
+                                        <span className="text-primary/70">{slot.time}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <div className="w-20 h-1.5 bg-primary/10 rounded-full overflow-hidden">
+                                          <div className="h-full bg-accent" style={{ width: `${percentage}%` }} />
+                                        </div>
+                                        <span className="font-bold text-primary w-12 text-right">{booked} / {total}</span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}
@@ -380,13 +548,96 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {activeTab === "analytics" && (
-              <div className="flex flex-col items-center justify-center py-40 text-center border-2 border-dashed border-primary/20 rounded-xl bg-primary/5 max-w-7xl mx-auto">
-                <BarChart3 className="h-16 w-16 text-primary/30 mb-6" />
-                <h3 className="font-display text-3xl font-bold text-primary">Analytics Engine Syncing</h3>
-                <p className="text-xs font-semibold uppercase tracking-widest text-primary/60 mt-4 max-w-md">
-                  We are aggregating enough booking data to generate your insights. Check back after your first 100 bookings.
-                </p>
+            {activeTab === "analytics" && analytics && (
+              <div className="space-y-8 max-w-7xl mx-auto">
+                <div>
+                  <h1 className="font-display text-4xl font-bold text-primary">Detailed Analytics</h1>
+                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Comprehensive business intelligence</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Revenue Summary */}
+                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Net Revenue</h3>
+                    <p className="font-display text-3xl font-bold text-primary">₹{(analytics.revenue.netRevenue || 0).toLocaleString("en-IN")}</p>
+                    <p className="text-xs font-semibold text-primary/50 mt-2">Expected: ₹{(analytics.revenue.expected || 0).toLocaleString("en-IN")}</p>
+                  </div>
+                  
+                  {/* Customer Intel */}
+                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Unique Customers</h3>
+                    <p className="font-display text-3xl font-bold text-primary">{analytics.customers.unique || 0}</p>
+                    <p className="text-xs font-semibold text-primary/50 mt-2">Repeat Rate: {analytics.customers.repeatRate || "0%"}</p>
+                  </div>
+                  
+                  {/* Performance Rates */}
+                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Check-in Rate</h3>
+                    <p className="font-display text-3xl font-bold text-primary">{analytics.rates.checkInRate || "0%"}</p>
+                    <p className="text-xs font-semibold text-primary/50 mt-2">No-show: {analytics.rates.noShowRate || "0%"}</p>
+                  </div>
+                  
+                  {/* Volume */}
+                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Total Guests</h3>
+                    <p className="font-display text-3xl font-bold text-primary">{analytics.guests.total || 0}</p>
+                    <p className="text-xs font-semibold text-primary/50 mt-2">Checked In: {analytics.guests.checkedIn || 0}</p>
+                  </div>
+                </div>
+
+                <div className="grid lg:grid-cols-2 gap-8">
+                  {/* Top Slots */}
+                  <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-primary/10 bg-primary/5">
+                      <h2 className="font-display font-bold text-xl text-primary">Top Performing Slots</h2>
+                    </div>
+                    <div className="p-6">
+                      <div className="space-y-4">
+                        {(analytics.slotInsights.slots || []).slice(0, 5).map((slot: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between border-b border-primary/5 pb-2 last:border-0 last:pb-0">
+                            <div>
+                              <div className="font-bold text-primary">{slot._id}</div>
+                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{slot.bookings} Bookings</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-accent">₹{(slot.revenue || 0).toLocaleString("en-IN")}</div>
+                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{slot.totalGuests} Guests</div>
+                            </div>
+                          </div>
+                        ))}
+                        {(!analytics.slotInsights.slots || analytics.slotInsights.slots.length === 0) && (
+                          <div className="text-center text-primary/50 py-4 text-xs font-bold uppercase tracking-widest">No slot data available</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Revenue Trend */}
+                  <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-primary/10 bg-primary/5">
+                      <h2 className="font-display font-bold text-xl text-primary">Daily Revenue Trend</h2>
+                    </div>
+                    <div className="p-6">
+                      <div className="space-y-4">
+                        {(analytics.dailyTrend || []).slice(-5).map((day: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between border-b border-primary/5 pb-2 last:border-0 last:pb-0">
+                            <div>
+                              <div className="font-bold text-primary">{new Date(day._id).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{day.bookings} Bookings</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold text-primary">₹{(day.revenue || 0).toLocaleString("en-IN")}</div>
+                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{day.guests} Guests</div>
+                            </div>
+                          </div>
+                        ))}
+                        {(!analytics.dailyTrend || analytics.dailyTrend.length === 0) && (
+                          <div className="text-center text-primary/50 py-4 text-xs font-bold uppercase tracking-widest">No trend data available</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

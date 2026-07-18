@@ -11,7 +11,14 @@ import axios from "axios";
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  const handleAutoFill = (e: string, p: string) => {
+    setEmail(e);
+    setPassword(p);
+  };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,8 +36,13 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(response.data.data));
         
         // Redirect based on role
-        if (response.data.data.role === "admin") {
+        const role = response.data.data.role;
+        if (role === "admin" || role === "owner") {
           navigate("/admin");
+        } else if (role === "kitchen_staff") {
+          navigate("/kitchen");
+        } else if (role === "scanner" || role === "receptionist") {
+          navigate("/scanner");
         } else {
           navigate("/dashboard");
         }
@@ -76,7 +88,7 @@ export default function Login() {
               <Label htmlFor="email" className="text-primary font-bold uppercase tracking-widest text-xs">Email address</Label>
               <div className="relative">
                 <Mail className="absolute left-4 top-3 h-4 w-4 text-primary/60" />
-                <Input id="email" name="email" type="email" autoComplete="email" required className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="john@example.com" />
+                <Input id="email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="john@example.com" />
               </div>
             </div>
 
@@ -84,7 +96,7 @@ export default function Login() {
               <Label htmlFor="password" className="text-primary font-bold uppercase tracking-widest text-xs">Password</Label>
               <div className="relative">
                 <Lock className="absolute left-4 top-3 h-4 w-4 text-primary/60" />
-                <Input id="password" name="password" type="password" autoComplete="current-password" required className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="••••••••" />
+                <Input id="password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="••••••••" />
               </div>
             </div>
 
@@ -117,9 +129,19 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="mt-6 flex flex-col gap-2 text-xs text-center font-mono bg-primary/5 p-4 rounded-md border border-primary/10 text-primary/80">
-              <p>Admin: admin@suvaialaya.com / admin123</p>
-              <p>User: john@example.com / password123</p>
+            <div className="mt-4 grid grid-cols-2 gap-2 text-[10px] font-bold uppercase tracking-widest">
+              <button type="button" onClick={() => handleAutoFill('admin@suvaialaya.com', 'admin123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
+                Fill Admin
+              </button>
+              <button type="button" onClick={() => handleAutoFill('kitchen@suvaialaya.com', 'kitchen123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
+                Fill Kitchen
+              </button>
+              <button type="button" onClick={() => handleAutoFill('scanner@suvaialaya.com', 'scanner123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
+                Fill Scanner
+              </button>
+              <button type="button" onClick={() => handleAutoFill('john@example.com', 'password123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
+                Fill Guest
+              </button>
             </div>
           </div>
         </div>

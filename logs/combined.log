@@ -1,0 +1,12 @@
+{"level":"info","message":"Prometheus metrics registry initialized","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.340Z"}
+{"level":"info","message":"BullMQ queues initialized","queues":["notifications","qr-generation","seat-release","waitlist"],"service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.384Z"}
+{"level":"info","message":"All BullMQ workers initialized","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.428Z"}
+{"level":"info","message":"SRE memory watchdog started (30s interval, 500MB threshold)","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.431Z"}
+{"level":"info","message":"SRE queue monitor started (60s interval)","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.432Z"}
+{"level":"info","message":"SRE waitlist monitor started (120s interval)","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.432Z"}
+{"level":"info","message":"Backup scheduler started (MongoDB every 6h, Redis every 6h)","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.456Z"}
+{"level":"info","message":"SRE NoShow detector started (hourly)","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.457Z"}
+{"level":"info","message":"All SRE background jobs started","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.457Z"}
+{"database":"suvaialaya","host":"127.0.0.1","level":"info","message":"MongoDB connected","poolSize":50,"service":"suvaialaya-api","timestamp":"2026-07-18T08:40:22.620Z"}
+{"count":19,"level":"info","message":"Feature flags seeded","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:25.094Z"}
+{"level":"info","message":"All background services initialized","service":"suvaialaya-api","timestamp":"2026-07-18T08:40:25.096Z"}

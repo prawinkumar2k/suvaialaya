@@ -104,21 +104,36 @@ export default function BookingSuccess() {
     doc.setFont("helvetica", "bold");
     doc.text(bookingId, 50, 107, { align: "center" });
 
-    // 6. QR Code / Barcode Area (Visual placeholder for design)
+    // 6. QR Code / Barcode Area
+    try {
+      const QRCode = await import("qrcode");
+      const verifyUrl = `${window.location.origin}/ticket/${bookingId}`;
+      const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
+        color: {
+          dark: primaryGreen,
+          light: "#00000000" // transparent
+        },
+        margin: 0
+      });
+      doc.addImage(qrDataUrl, "PNG", 35, 115, 30, 30);
+    } catch (err) {
+      console.error("QR Code generation failed", err);
+    }
+
     doc.setTextColor(primaryGreen);
     doc.setFontSize(8);
-    doc.text("VENUE", 50, 125, { align: "center" });
+    doc.text("VENUE", 50, 150, { align: "center" });
     doc.setFontSize(10);
-    doc.text("Suvaialaya Restaurant", 50, 131, { align: "center" });
+    doc.text("Suvaialaya Restaurant", 50, 156, { align: "center" });
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("123 Heritage Road, Madurai", 50, 136, { align: "center" });
+    doc.text("123 Heritage Road, Madurai", 50, 161, { align: "center" });
 
     // Footer
     doc.setTextColor(100, 100, 100);
     doc.setFontSize(6);
-    doc.text("Please present this E-Ticket at the entrance.", 50, 160, { align: "center" });
-    doc.text("Valid for one-time entry only.", 50, 164, { align: "center" });
+    doc.text("Please present this E-Ticket at the entrance.", 50, 168, { align: "center" });
+    doc.text("Valid for one-time entry only.", 50, 172, { align: "center" });
 
     // Save
     doc.save(`Suvaialaya-Ticket-${bookingId}.pdf`);

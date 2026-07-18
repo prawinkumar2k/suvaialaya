@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
@@ -11,6 +11,14 @@ export default function VerifyOTP() {
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(30);
   const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email;
+
+  useEffect(() => {
+    if (!email) {
+      navigate("/forgot-password");
+    }
+  }, [email, navigate]);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -19,21 +27,40 @@ export default function VerifyOTP() {
     }
   }, [countdown]);
 
-  const handleVerify = (e: React.FormEvent) => {
+  const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp.length !== 6) return;
+    if (otp.length !== 6 || !email) return;
     
     setIsLoading(true);
-    // Mock verification delay
-    setTimeout(() => {
+    try {
+      import("axios").then(async (axios) => {
+        const { toast } = await import("sonner");
+        const response = await axios.default.post("/api/auth/verify-otp", { email, otp });
+        if (response.data.success) {
+          toast.success("OTP verified successfully");
+          navigate("/reset-password", { state: { resetToken: response.data.resetToken } });
+        }
+      });
+    } catch (error: any) {
+      import("sonner").then(({ toast }) => {
+        toast.error(error.response?.data?.error || "Invalid OTP");
+      });
+    } finally {
       setIsLoading(false);
-      navigate("/dashboard");
-    }, 1500);
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setCountdown(30);
-    // Mock resend logic
+    try {
+      import("axios").then(async (axios) => {
+        const { toast } = await import("sonner");
+        await axios.default.post("/api/auth/forgot-password", { email });
+        toast.success("OTP resent successfully");
+      });
+    } catch (error) {
+      // Ignore
+    }
   };
 
   return (

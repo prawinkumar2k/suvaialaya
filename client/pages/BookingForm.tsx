@@ -21,7 +21,7 @@ function OrnamentalDivider() {
 export default function BookingForm() {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { eventId: string; date: string; slotTime: string; basePrice: number } | null;
+  const state = location.state as { eventId: string; eventTitle: string; date: string; slotTime: string; basePrice: number } | null;
 
   const [numberOfGuests, setNumberOfGuests] = useState(1);
 
@@ -30,7 +30,7 @@ export default function BookingForm() {
     return null;
   }
 
-  const { eventId, date, slotTime, basePrice } = state;
+  const { eventId, eventTitle, date, slotTime, basePrice } = state;
   const totalAmount = basePrice * numberOfGuests;
 
   const handleContinue = (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,6 +41,7 @@ export default function BookingForm() {
     navigate("/payment", {
       state: {
         eventId,
+        eventTitle,
         date,
         slotTime,
         guestDetails,
@@ -117,11 +118,18 @@ export default function BookingForm() {
                   <Input id="phone" name="phone" type="tel" required className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="+91 98765 43210" />
                 </div>
               </div>
-              <div className="space-y-3 sm:col-span-2">
+              <div className="space-y-3 sm:col-span-1">
                 <Label htmlFor="city" className="text-primary font-bold uppercase tracking-widest text-xs">City of Residence</Label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-3 h-4 w-4 text-primary/60" />
                   <Input id="city" name="city" required className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="e.g. Madurai" />
+                </div>
+              </div>
+              <div className="space-y-3 sm:col-span-1">
+                <Label htmlFor="emergency" className="text-primary font-bold uppercase tracking-widest text-xs">Emergency Contact</Label>
+                <div className="relative">
+                  <HeartPulse className="absolute left-4 top-3 h-4 w-4 text-primary/60" />
+                  <Input id="emergency" name="emergency" type="tel" required className="pl-11 h-12 bg-primary/5 border-primary/20 focus-visible:ring-accent rounded-md" placeholder="Family / Friend phone" />
                 </div>
               </div>
             </div>
@@ -150,7 +158,7 @@ export default function BookingForm() {
             </div>
             
             <h2 className="font-display font-bold text-2xl text-primary mb-2">Booking Summary</h2>
-            <p className="text-xs font-bold uppercase tracking-widest text-accent mb-8">Madurai Kari Virunthu</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-accent mb-8">{eventTitle || "Booking Event"}</p>
             
             <div className="space-y-6 text-sm relative z-10">
               <div className="flex justify-between items-center pb-4 border-b border-primary/10">

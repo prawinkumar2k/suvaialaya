@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock, Users, Leaf, Check, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
+import { toast } from "sonner";
 import axios from "axios";
 
 function OrnamentalDivider() {
@@ -25,6 +26,21 @@ export default function SlotSelection() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      const user = JSON.parse(userString);
+      if (user.role === "admin" || user.role === "owner") {
+        navigate("/admin");
+        return;
+      } else if (user.role === "kitchen_staff") {
+        navigate("/kitchen");
+        return;
+      } else if (user.role === "scanner" || user.role === "receptionist") {
+        navigate("/scanner");
+        return;
+      }
+    }
+
     const fetchEvent = async () => {
       try {
         const res = await axios.get("/api/events");
@@ -47,10 +63,16 @@ export default function SlotSelection() {
   }, []);
 
   const handleContinue = () => {
+    if (!localStorage.getItem("token")) {
+      toast.error("Please login to continue booking.");
+      navigate("/login");
+      return;
+    }
     if (selectedSlot && eventData) {
       navigate("/booking-form", {
         state: {
           eventId: eventData._id,
+          eventTitle: eventData.title,
           date: selectedDate,
           slotTime: selectedSlot.time,
           basePrice: eventData.basePrice,
@@ -95,14 +117,29 @@ export default function SlotSelection() {
       {/* Top Header */}
       <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
       <header className="sticky top-0 z-50 border-b border-primary/20 bg-background/95 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-          <Link to="/" className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary/70 hover:text-primary transition-colors">
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Cancel</span>
-          </Link>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <BrandMark />
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 relative">
+          <BrandMark />
+          <div className="flex items-center gap-4 relative z-10">
+            {localStorage.getItem("token") ? (
+              <>
+                <span className="text-xs font-bold text-primary mr-2 hidden sm:block">
+                  {localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!).name : ""}
+                </span>
+                <Link to={localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")!).role === "admin" ? "/admin" : "/dashboard"} className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary/5 transition-all">
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary/5 transition-all">
+                  Sign In
+                </Link>
+                <Link to="/register" className="text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground border-2 border-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary/90 transition-all">
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
-          <div className="w-16"></div>
         </div>
       </header>
 

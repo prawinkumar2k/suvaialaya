@@ -4,10 +4,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import Index from "@/pages/Index";
 import PlaceholderPage from "@/pages/PlaceholderPage";
 import NotFound from "@/pages/NotFound";
 
+import Index from "@/pages/Index";
 import About from "@/pages/About";
 import Menu from "@/pages/Menu";
 import Gallery from "@/pages/Gallery";
@@ -15,6 +15,7 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
 import VerifyOTP from "@/pages/VerifyOTP";
+import ResetPassword from "@/pages/ResetPassword";
 
 import SlotSelection from "@/pages/SlotSelection";
 import BookingForm from "@/pages/BookingForm";
@@ -23,6 +24,8 @@ import BookingSuccess from "@/pages/BookingSuccess";
 import UserDashboard from "@/pages/UserDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import QRScanner from "@/pages/QRScanner";
+import TicketVerification from "@/pages/TicketVerification";
+import KitchenDashboard from "@/pages/KitchenDashboard";
 
 const queryClient = new QueryClient();
 
@@ -35,8 +38,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* Overwrite organisers placeholder with slot selection to connect landing page */}
-          <Route path="/organizers" element={<SlotSelection />} /> 
+          <Route path="/organizers" element={<PlaceholderPage />} /> 
           <Route path="/events/:eventId" element={<PlaceholderPage />} />
           
           <Route path="/about" element={<About />} />
@@ -48,6 +50,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-otp" element={<VerifyOTP />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Booking Flow UI */}
           <Route path="/slots" element={<SlotSelection />} />
@@ -58,7 +61,9 @@ export default function App() {
           {/* Dashboards */}
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/kitchen" element={<KitchenDashboard />} />
           <Route path="/scanner" element={<QRScanner />} />
+          <Route path="/ticket/:id" element={<TicketVerification />} />
           
           <Route path="/contact" element={<PlaceholderPage />} />
           <Route path="/faq" element={<PlaceholderPage />} />

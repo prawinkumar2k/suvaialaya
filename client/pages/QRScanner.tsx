@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Maximize, CheckCircle2, XCircle, Search, Ticket, Leaf, Loader2 } from "lucide-react";
+import { ArrowLeft, Maximize, CheckCircle2, XCircle, Search, Ticket, Leaf, Loader2, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export default function QRScanner() {
   const user = userString ? JSON.parse(userString) : null;
 
   useEffect(() => {
-    if (!token || !user || user.role !== "admin") {
+    if (!token || !user || !["admin", "scanner", "receptionist", "owner"].includes(user.role)) {
       toast.error("Unauthorized access.");
       navigate("/login");
     }
@@ -29,12 +29,18 @@ export default function QRScanner() {
     if (e) e.preventDefault();
     if (!manualCode.trim()) return;
 
+    // Extract ID if the scanned value is a URL
+    let bookingId = manualCode.trim();
+    if (bookingId.includes("/ticket/")) {
+      bookingId = bookingId.split("/ticket/")[1].split("/")[0].split("?")[0];
+    }
+
     setScanState("loading");
     setErrorMessage("");
 
     try {
       const response = await axios.put(
-        `/api/bookings/${manualCode}/check-in`,
+        `/api/bookings/${bookingId}/check-in`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -52,6 +58,13 @@ export default function QRScanner() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+    toast.success("Logged out successfully");
+  };
+
   const resetScanner = () => {
     setScanState("scanning");
     setManualCode("");
@@ -67,13 +80,19 @@ export default function QRScanner() {
       <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
       <header className="sticky top-0 z-50 border-b border-primary/20 bg-background/95 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex h-20 items-center justify-between px-5 sm:px-8 relative z-10">
-          <Link to="/admin" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary/70 hover:text-primary transition-colors">
+          <Link to="/" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary/70 hover:text-primary transition-colors">
             <ArrowLeft size={16} /> <span className="hidden sm:inline">Exit Scanner</span>
           </Link>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <BrandMark />
           </div>
-          <div className="w-24"></div>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-destructive border-2 border-destructive/20 hover:bg-destructive/10 px-3 py-2 rounded-md transition-colors"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:inline">Sign Out</span>
+          </button>
         </div>
       </header>
 

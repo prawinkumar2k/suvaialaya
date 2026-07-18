@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { ArrowLeft, CreditCard, Landmark, QrCode, ShieldCheck, Loader2, Leaf } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
@@ -11,7 +11,7 @@ export default function Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { eventId: string; date: string; slotTime: string; numberOfGuests: number; totalAmount: number; guestDetails: any } | null;
+  const state = location.state as { eventId: string; eventTitle?: string; date: string; slotTime: string; numberOfGuests: number; totalAmount: number; guestDetails: any } | null;
 
   useEffect(() => {
     // Basic check for auth, if not logged in, prompt them
@@ -24,11 +24,10 @@ export default function Payment() {
   }, [navigate]);
 
   if (!state) {
-    navigate("/slots");
-    return null;
+    return <Navigate to="/slots" replace />;
   }
 
-  const { eventId, numberOfGuests, totalAmount, date, slotTime, guestDetails } = state;
+  const { eventId, eventTitle, numberOfGuests, totalAmount, date, slotTime, guestDetails } = state;
   // Calculate a mock tax breakdown
   const tax = Math.round(totalAmount * 0.18);
   const finalTotal = totalAmount + tax;
@@ -106,7 +105,7 @@ export default function Payment() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "Suvaialaya",
-        description: "Madurai Kari Virunthu Reservation",
+        description: `${eventTitle || "Event"} Reservation`,
         order_id: orderData.id,
         handler: async function (response: any) {
           try {
@@ -249,7 +248,7 @@ export default function Payment() {
             </div>
             
             <h2 className="font-display font-bold text-2xl text-primary mb-2">Order Summary</h2>
-            <p className="text-xs font-bold uppercase tracking-widest text-accent mb-8">Madurai Kari Virunthu</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-accent mb-8">{eventTitle || "Booking Event"}</p>
             
             <div className="space-y-6 text-sm relative z-10">
               <div className="flex justify-between items-center pb-4 border-b border-primary/10">

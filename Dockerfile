@@ -1,53 +1,74 @@
-# ================================
-# Stage 1: Build the application
-# ================================
-FROM node:20-alpine AS builder
-
+# ==========================================
+# Stage 1: Dependency Installation
+# ==========================================
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm@10
+# Install pnpm
+RUN npm install -g pnpm@10 --quiet
 
-# Copy package manifests first (better layer caching)
+# Copy manifests only (maximize layer cache hit)
 COPY package.json pnpm-lock.yaml ./
 
-# Install ALL dependencies (including devDeps needed to build)
-RUN pnpm install --frozen-lockfile
+# Install ALL deps (dev included — needed for build)
+RUN pnpm install --frozen-lockfile --prefer-offline
 
-# Copy the rest of the source code
-COPY . .
-
-# Build the React frontend + Express server bundle
-RUN pnpm build
-
-# ================================
-# Stage 2: Lean production image
-# ================================
-FROM node:20-alpine AS runner
-
+# ==========================================
+# Stage 2: Build
+# ==========================================
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm@10
+RUN npm install -g pnpm@10 --quiet
 
-# Copy only what is needed for production
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build React SPA + Express server bundle
+RUN pnpm build
+
+# ==========================================
+# Stage 3: Production runner (minimal image)
+# ==========================================
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Security: Run as non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 appuser && \
+    mkdir -p /app/logs && \
+    chown -R appuser:nodejs /app
+
+RUN npm install -g pnpm@10 --quiet
+
+# Copy manifests and install ONLY production dependencies
 COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile --prefer-offline
 
-# Install only production dependencies
-RUN pnpm install --prod --frozen-lockfile
-
-# Copy built client assets
+# Copy built artifacts
 COPY --from=builder /app/dist ./dist
 
-# Copy the built server bundle
-COPY --from=builder /app/dist ./dist
+# Create logs directory with correct permissions
+RUN chown -R appuser:nodejs /app/logs
 
-# Expose the application port
+# Switch to non-root user
+USER appuser
+
+# Expose port
 EXPOSE 8080
 
-# Set production environment
+# Install PM2 for Node.js clustering
+RUN npm install -g pm2 --quiet
+
+# Environment
 ENV NODE_ENV=production
 ENV PORT=8080
 
-# Start the production server
-CMD ["node", "dist/server/node-build.mjs"]
+# Kubernetes health check support
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget -qO- http://localhost:8080/api/health || exit 1
+
+# Graceful shutdown support (SIGTERM for K8s rolling updates)
+STOPSIGNAL SIGTERM
+
+CMD ["pm2-runtime", "start", "dist/server/node-build.mjs", "-i", "max", "--name", "suvaialaya-api"]

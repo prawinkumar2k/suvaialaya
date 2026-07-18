@@ -9,8 +9,20 @@ const port = process.env.PORT || 3000;
 const __dirname = import.meta.dirname;
 const distPath = path.join(__dirname, "../spa");
 
-// Serve static files
-app.use(express.static(distPath));
+// Serve static files with aggressive caching for 100k+ concurrent users
+app.use(
+  express.static(distPath, {
+    maxAge: "1y",
+    setHeaders: (res, filepath) => {
+      if (filepath.endsWith(".html")) {
+        // Never cache HTML so new deployments are picked up immediately
+        res.setHeader("Cache-Control", "no-cache");
+      } else {
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      }
+    },
+  })
+);
 
 // Handle React Router - serve index.html for all non-API routes
 app.get("*", (req, res) => {

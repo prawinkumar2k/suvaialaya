@@ -1,0 +1,49 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: production
+    project: suvaialaya
+
+# ─── Alerting rules ────────────────────────────────────────────────────────────
+rule_files:
+  - "alerts/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+# ─── Scrape configurations ─────────────────────────────────────────────────────
+scrape_configs:
+  # Node.js App metrics (requires prom-client instrumentation)
+  - job_name: "suvaialaya-api"
+    static_configs:
+      - targets: ["sems-app:8080"]
+    metrics_path: "/api/metrics"
+    scrape_interval: 15s
+
+  # MongoDB metrics
+  - job_name: "mongodb"
+    static_configs:
+      - targets: ["mongodb-exporter:9216"]
+
+  # Redis metrics
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+
+  # Nginx metrics
+  - job_name: "nginx"
+    static_configs:
+      - targets: ["nginx-exporter:9113"]
+
+  # Docker host metrics
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # Prometheus self-monitoring
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

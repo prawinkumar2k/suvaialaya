@@ -7,7 +7,7 @@ import { Booking } from "./models/Booking";
 
 async function seedDatabase() {
   try {
-    const mongoURI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/madurai-kari-virundhu";
+    const mongoURI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/suvaialaya";
     await mongoose.connect(mongoURI);
     console.log("Connected to MongoDB for seeding...");
 
@@ -24,6 +24,24 @@ async function seedDatabase() {
       phone: "9876543210",
       password: "admin123", // Mongoose 'pre-save' hook will hash this automatically
       role: "admin",
+    });
+
+    // Create Kitchen User
+    await User.create({
+      name: "Head Chef",
+      email: "kitchen@suvaialaya.com",
+      phone: "9876543211",
+      password: "kitchen123",
+      role: "kitchen_staff",
+    });
+
+    // Create Scanner User
+    await User.create({
+      name: "Security Guard",
+      email: "scanner@suvaialaya.com",
+      phone: "9876543212",
+      password: "scanner123",
+      role: "scanner",
     });
 
     // Create standard user
