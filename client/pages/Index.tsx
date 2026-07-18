@@ -396,7 +396,7 @@ export default function Index() {
           <p className="mt-6 text-lg text-primary-foreground/80">Save your seat at the feast.</p>
           <div className="mt-10">
             <Link to="/slots" className="inline-flex items-center justify-center gap-3 rounded-md bg-accent px-10 py-5 text-sm font-bold uppercase tracking-widest text-primary shadow-xl transition-all hover:bg-accent/90 hover:scale-105">
-              Book for ₹{eventData.price} <ArrowRight size={18} />
+              Book for ₹{festival.price} <ArrowRight size={18} />
             </Link>
           </div>
         </div>
