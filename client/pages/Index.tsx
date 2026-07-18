@@ -146,7 +146,7 @@ export default function Index() {
                 initial={{ opacity: 0, letterSpacing: "0.4em" }}
                 animate={{ opacity: 1, letterSpacing: "0.15em" }}
                 transition={{ delay: 0.3, duration: 1.2 }}
-                className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
+                className="text-4xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
               >
                 SUVAIALAYA
               </motion.h1>
@@ -154,7 +154,7 @@ export default function Index() {
                 initial={{ opacity: 0, letterSpacing: "0.4em" }}
                 animate={{ opacity: 1, letterSpacing: "0.15em" }}
                 transition={{ delay: 0.5, duration: 1.2 }}
-                className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
+                className="text-4xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
               >
                 RESTAURANT
               </motion.h1>
@@ -162,7 +162,7 @@ export default function Index() {
                 initial={{ opacity: 0, letterSpacing: "0.4em" }}
                 animate={{ opacity: 1, letterSpacing: "0.15em" }}
                 transition={{ delay: 0.7, duration: 1.2 }}
-                className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
+                className="text-4xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
               >
                 BANGALORE
               </motion.h1>
@@ -301,7 +301,7 @@ export default function Index() {
             transition={{ duration: 1 }}
             className="mt-20 text-center py-16 px-6 border-y border-accent/20 bg-primary-foreground/[0.02] relative overflow-hidden"
           >
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none font-display font-extrabold text-[8rem] md:text-[14rem] text-primary-foreground leading-none overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none font-display font-extrabold text-7xl sm:text-[8rem] md:text-[14rem] text-primary-foreground leading-none overflow-hidden">
               SUVAIALAYA
             </div>
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-temple-gold uppercase leading-[1.2] relative z-10 drop-shadow-md">
