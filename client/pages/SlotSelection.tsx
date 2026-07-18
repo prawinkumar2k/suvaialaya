@@ -165,7 +165,7 @@ export default function SlotSelection() {
             <h2>Choose Date</h2>
           </div>
           
-          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x justify-start sm:justify-center">
+          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x justify-start">
             {formattedDates.map((d: any) => {
               const isSelected = selectedDate === d.full;
               return (
