@@ -24,8 +24,8 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    // Royalty-free traditional Indian instrumental/Nadaswaram vibe
-    const audio = new Audio("https://cdn.pixabay.com/download/audio/2022/10/25/audio_2d8b5a033a.mp3?filename=indian-meditation-122421.mp3");
+    // Using reliable Google Actions sounds for ambient restaurant vibe
+    const audio = new Audio("https://actions.google.com/sounds/v1/ambiences/restaurant_interior.ogg");
     audio.loop = true;
     audio.volume = 0.3; // Soft ambient volume
     audioRef.current = audio;
@@ -37,12 +37,12 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const playSoundEffect = (type: SoundType) => {
-    // Map of sound URLs (using royalty free pixabay URLs for demo)
+    // Map of reliable sound URLs
     const sounds = {
-      bell: "https://cdn.pixabay.com/download/audio/2021/08/04/audio_9b61d33190.mp3?filename=temple-bell-11814.mp3",
-      conch: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_24a2c07ef5.mp3?filename=conch-shell-blow-96020.mp3",
-      veena: "https://cdn.pixabay.com/download/audio/2022/10/24/audio_34b3f2ccab.mp3?filename=indian-flute-and-veena-121966.mp3",
-      nadaswaram: "https://cdn.pixabay.com/download/audio/2022/11/24/audio_e40c660706.mp3?filename=indian-wedding-music-125950.mp3"
+      bell: "https://actions.google.com/sounds/v1/alarms/dinner_bell.ogg",
+      conch: "https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg",
+      veena: "https://actions.google.com/sounds/v1/instruments/acoustic_guitar_strum.ogg",
+      nadaswaram: "https://actions.google.com/sounds/v1/instruments/flute_trill.ogg"
     };
     
     if (sounds[type]) {
