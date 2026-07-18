@@ -312,8 +312,8 @@ export default function Index() {
           </motion.div>
           
           <div className="mt-16 flex justify-center">
-            <Link to="/menu" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-accent hover:text-accent/80 transition-colors pb-1 border-b border-accent/30 hover:border-accent">
-              See the full 23-dish lineup <ArrowRight size={16} />
+            <Link to="/menu" className="inline-flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.2em] text-temple-gold hover:text-temple-gold/80 transition-all pb-1 border-b-2 border-temple-gold/50 hover:border-temple-gold drop-shadow-lg z-20 relative">
+              See the full Suvaialaya Menu <ArrowRight size={18} />
             </Link>
           </div>
         </div>
