@@ -6,41 +6,35 @@
 
 @layer base {
   :root {
-    /* Menu Card Cream Background: #F0E8D5 */
-    --background: 41 44% 89%;
-    /* Deep Heritage Green from the Menu Card: #184A38 */
-    --foreground: 158 51% 19%;
+    /* Festive Warm White/Cream */
+    --background: 45 100% 98%;
+    /* Deep Maroon/Plum for Text */
+    --foreground: 320 60% 15%;
     
-    /* White/Cream Card */
-    --card: 41 44% 92%;
-    --card-foreground: 158 51% 19%;
-    --popover: 41 44% 92%;
-    --popover-foreground: 158 51% 19%;
+    /* Vibrant Festival Magenta */
+    --primary: 330 85% 45%;
+    --primary-foreground: 0 0% 100%;
     
-    /* Primary Deep Green */
-    --primary: 158 51% 19%;
-    --primary-foreground: 41 44% 89%;
+    /* Bright Festival Gold/Yellow */
+    --secondary: 45 95% 55%;
+    --secondary-foreground: 320 60% 15%;
     
-    /* Secondary (Slightly darker cream/tan) */
-    --secondary: 41 30% 82%;
-    --secondary-foreground: 158 51% 19%;
+    /* Subtle Peach/Pink for Muted */
+    --muted: 330 30% 92%;
+    --muted-foreground: 320 30% 40%;
     
-    /* Muted (For subtle text/borders) */
-    --muted: 158 30% 35%;
-    --muted-foreground: 158 30% 35%;
-    
-    /* Accent (If gold is used, otherwise matching menu card greens) */
-    --accent: 158 40% 25%;
-    --accent-foreground: 41 44% 89%;
+    /* Bright Temple Orange for Accents */
+    --accent: 25 95% 55%;
+    --accent-foreground: 0 0% 100%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    /* Borders match the deep green */
-    --border: 158 51% 19%;
-    --input: 158 51% 19%;
-    --ring: 158 51% 19%;
-    --radius: 0.5rem;
+    /* Borders match a subtle pink */
+    --border: 330 30% 85%;
+    --input: 330 30% 85%;
+    --ring: 330 85% 45%;
+    --radius: 1rem; /* More rounded, bubbly look */
 
     /* Status Colors */
     --success: 142.1 76.2% 36.3%;

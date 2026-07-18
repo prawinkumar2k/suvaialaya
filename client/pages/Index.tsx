@@ -241,14 +241,29 @@ export default function Index() {
               { number: "02", title: "Pick a slot", text: "Ten relaxed hours each day." }, 
               { number: "03", title: "Come hungry", text: "We'll have your place ready." }
             ].map((step) => (
-              <div key={step.number} className="relative overflow-hidden rounded-xl border border-primary/20 bg-background p-8 shadow-sm transition-all hover:shadow-md group">
-                <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <Leaf size={100} className="text-primary" />
+            ].map((step, idx) => (
+              <motion.div 
+                key={step.number} 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.2 }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  rotateY: 15, 
+                  rotateX: -15, 
+                  boxShadow: "0 30px 60px -12px rgba(230,0,92,0.6)" 
+                }}
+                className="relative overflow-visible rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-background via-white to-primary/10 p-8 shadow-2xl transition-all group backdrop-blur-xl transform-gpu perspective-[1000px]"
+              >
+                <div className="absolute -right-4 -top-4 opacity-10 group-hover:opacity-30 group-hover:rotate-45 group-hover:scale-150 transition-all duration-500 z-0">
+                  <Leaf size={120} className="text-primary drop-shadow-[0_0_15px_rgba(230,0,92,0.8)]" />
                 </div>
-                <span className="font-display text-4xl font-bold text-accent">{step.number}</span>
-                <h3 className="mt-6 font-display text-2xl font-bold text-primary">{step.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/70">{step.text}</p>
-              </div>
+                <span className="font-display text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent to-temple-maroon drop-shadow-md relative z-10">{step.number}</span>
+                <h3 className="mt-6 font-display text-2xl font-bold text-primary relative z-10">{step.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/80 font-medium relative z-10">{step.text}</p>
+                <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-transparent via-transparent to-temple-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              </motion.div>
             ))}
           </div>
         </div>
@@ -269,26 +284,34 @@ export default function Index() {
             ].map((dish, index) => (
               <motion.article 
                 key={dish.name} 
-                initial={{ opacity: 0, y: 20 }} 
-                whileInView={{ opacity: 1, y: 0 }} 
+                initial={{ opacity: 0, scale: 0.8, rotate: -5 }} 
+                whileInView={{ opacity: 1, scale: 1, rotate: 0 }} 
                 viewport={{ once: true }} 
-                transition={{ delay: index * 0.1, duration: 0.8 }} 
-                className="group relative rounded-xl border border-accent/20 bg-primary-foreground/5 overflow-hidden transition-all hover:bg-primary-foreground/10 hover:border-accent/40 flex flex-col justify-between min-h-[350px] shadow-lg"
+                transition={{ delay: index * 0.1, duration: 0.8, type: "spring" }} 
+                whileHover={{
+                  scale: 1.08,
+                  rotateY: -15,
+                  rotateX: 15,
+                  zIndex: 50,
+                  boxShadow: "0 40px 80px -15px rgba(255,69,0,0.8)"
+                }}
+                className="group relative rounded-3xl border-2 border-accent bg-primary-foreground/5 overflow-hidden flex flex-col justify-between min-h-[350px] shadow-2xl transform-gpu perspective-[1000px] cursor-pointer"
               >
-                <div className="absolute inset-0 z-0 opacity-40 group-hover:opacity-70 transition-opacity duration-700">
-                  <img src={dish.image} alt={dish.name} className="w-full h-full object-cover mix-blend-overlay" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent" />
+                <div className="absolute inset-0 z-0 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
+                  <img src={dish.image} alt={dish.name} className="w-full h-full object-cover mix-blend-screen" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
                 </div>
                 
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity z-10 pointer-events-none">
-                  <Leaf size={60} className="text-accent" />
+                <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-50 group-hover:rotate-90 transition-all duration-500 z-10 pointer-events-none">
+                  <Leaf size={80} className="text-temple-gold drop-shadow-[0_0_20px_rgba(255,215,0,0.8)]" />
                 </div>
                 
                 <div className="relative z-20 mt-auto p-6 bg-gradient-to-t from-primary to-transparent pt-12 flex flex-col justify-end h-full">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent/80 block mb-2 drop-shadow-md">{dish.subtitle}</span>
-                  <h3 className="font-display text-2xl font-bold leading-snug text-primary-foreground tracking-wide drop-shadow-lg">{dish.name}</h3>
-                  <p className="mt-3 text-xs leading-relaxed text-primary-foreground/90 font-sans drop-shadow-md">{dish.description}</p>
+                  <span className="text-[12px] font-extrabold uppercase tracking-[0.25em] text-temple-gold block mb-2 drop-shadow-[0_0_10px_rgba(255,215,0,1)]">{dish.subtitle}</span>
+                  <h3 className="font-display text-3xl font-black leading-snug text-primary-foreground tracking-wide drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]">{dish.name}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-primary-foreground/90 font-bold drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)]">{dish.description}</p>
                 </div>
+                <div className="absolute inset-0 rounded-3xl border-4 border-transparent group-hover:border-temple-gold/50 transition-colors duration-500 pointer-events-none" />
               </motion.article>
             ))}
           </div>

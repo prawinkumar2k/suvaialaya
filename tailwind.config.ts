@@ -23,10 +23,12 @@ export default {
         muted: { DEFAULT: "hsl(var(--muted))", foreground: "hsl(var(--muted-foreground))" },
         accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
         temple: {
-          orange: "#FF7A00", // Temple Lamp Orange
-          maroon: "#800000", // Deep Maroon
-          copper: "#B87333", // Copper Bronze
-          gold: "#D4AF37", // Temple Gold
+          orange: "#FF4500", // Bright Orange Red
+          maroon: "#E6005C", // Vivid Magenta/Pink
+          copper: "#FF1493", // Deep Pink
+          gold: "#FFD700", // Luminous Gold
+          teal: "#00E5FF", // Neon Teal
+          yellow: "#FFFF00", // Festival Yellow
         },
         popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
         card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
