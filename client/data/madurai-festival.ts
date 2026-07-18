@@ -5,7 +5,7 @@ export const festival = {
   eyebrow: "Something Grand is Coming Soon",
   dates: "Coming Soon",
   hours: "11:00 AM — 11:00 PM",
-  venue: "From the heart of Madurai to the soul of Bangalore",
+  venue: "N, 256/B, nearby Narayana Hrudayalaya Hospital, Bommasandra Industrial Area, Bommasandra, Karnataka 560099",
   price: 499, // Special launch ticket / Mutton combo
   capacity: "Pre-book your exclusive table",
   description: "Experience the grand opening of Suvaialaya Restaurant in Bangalore. An exclusive event bringing the authentic flavors, culture, and hospitality of Madurai directly to your table.",

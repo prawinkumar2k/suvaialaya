@@ -323,12 +323,13 @@ export default function Index() {
       <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10">
         <div className="grid gap-16 lg:grid-cols-2 items-center">
           <div>
-            <SectionHeading eyebrow="The venue" title="Somewhere special in Bangalore." copy="The exact venue details will be shared with your booking confirmation. Think warm light, authentic Madurai aromas, and the sound of good conversation." />
+            <SectionHeading eyebrow="The venue" title="Bommasandra, Bangalore." copy="Join us at our new flagship location. Think warm light, authentic Madurai aromas, and the sound of good conversation." />
             <div className="mt-10 flex items-center justify-center gap-4 text-sm font-semibold border p-6 rounded-xl border-primary/20 bg-primary/5">
-              <MapPin size={24} className="text-accent" />
+              <MapPin size={32} className="text-accent flex-shrink-0" />
               <div className="text-left">
-                <p className="text-primary font-bold">Bangalore, Karnataka</p>
-                <a href="https://share.google/lMg8g7DHS0wRBuZn0" target="_blank" rel="noopener noreferrer" className="text-xs text-primary/70 hover:text-primary transition-colors mt-1 block">View on Google Maps &rarr;</a>
+                <p className="text-primary font-bold">N, 256/B, nearby Narayana Hrudayalaya Hospital,</p>
+                <p className="text-primary/80 text-xs mt-1">Bommasandra Industrial Area, Bommasandra, Karnataka 560099</p>
+                <a href="https://share.google/lMg8g7DHS0wRBuZn0" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:text-accent transition-colors mt-2 block font-bold">View on Google Maps &rarr;</a>
               </div>
             </div>
           </div>
