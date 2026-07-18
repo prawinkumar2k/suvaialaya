@@ -15,9 +15,24 @@ function OrnamentalDivider() {
 }
 
 export default function Menu() {
-  const categoryOrder = ["Welcome", "Sweet", "Soups", "Starters", "Main Course", "Dessert"];
+  const categoryOrder = [
+    "Suvaialaya Briyani",
+    "Special Combo",
+    "Meals",
+    "Mutton Starters",
+    "Chicken Starters",
+    "Seafood Starters",
+    "Tawa Breads",
+    "Parotta",
+    "Non-veg Tiffin",
+    "Desserts"
+  ];
   const categories = Array.from(new Set(menuHighlights.map(item => item.category)))
-    .sort((a, b) => categoryOrder.indexOf(a) - categoryOrder.indexOf(b));
+    .sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a);
+      const indexB = categoryOrder.indexOf(b);
+      return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
 
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-accent/30 relative">
@@ -59,15 +74,20 @@ export default function Menu() {
               </div>
               <div className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2">
                 {menuHighlights.filter(item => item.category === category).map((dish) => (
-                  <div key={dish.name} className="group flex flex-col justify-between rounded-xl border border-primary/10 bg-primary/5 p-6 transition-all hover:bg-primary/10 hover:border-primary/30 relative overflow-hidden">
-                    <div className="absolute -right-6 -bottom-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                      <Leaf size={100} className="text-primary" />
+                  <motion.div 
+                    key={dish.name} 
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className="group flex flex-col justify-between rounded-xl border border-primary/20 bg-background p-6 shadow-sm transition-all hover:shadow-xl hover:shadow-accent/10 hover:border-accent/40 relative overflow-hidden"
+                  >
+                    <div className="absolute -right-6 -bottom-6 opacity-5 group-hover:opacity-20 group-hover:rotate-12 transition-all duration-500">
+                      <Leaf size={100} className="text-accent" />
                     </div>
                     <div className="relative z-10">
-                      <h3 className="font-display font-bold text-2xl text-primary">{dish.name}</h3>
-                      <p className="mt-3 text-sm text-foreground/75 leading-relaxed">{dish.description}</p>
+                      <h3 className="font-display font-bold text-2xl text-primary group-hover:text-accent transition-colors">{dish.name}</h3>
+                      <p className="mt-3 text-sm text-foreground/75 leading-relaxed font-medium">{dish.description}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
