@@ -149,7 +149,7 @@ export function createServer() {
     ? new RedisStore({
         sendCommand: (...args: string[]) => {
           const client = getRedisClient();
-          return client.call(args[0], ...args.slice(1));
+          return client.call(args[0], ...args.slice(1)) as any;
         },
       })
     : undefined; // undefined falls back to default MemoryStore
