@@ -276,10 +276,10 @@ export default function Index() {
           
           <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { name: "MUTTON BRIYANI", subtitle: "Seeraga Samba", description: "Authentic Madurai style briyani cooked with aromatic seeraga samba rice and tender mutton.", image: "/images/food/mutton_elumbu_soup.png" },
-              { name: "KARAIKUDI MUTTON ROAST", subtitle: "Signature Masterpiece", description: "Fiery Karaikudi spices blended with rich ghee roast.", image: "/images/food/chicken_kari_dosa.png" },
-              { name: "BUN PAROTTA", subtitle: "Tawa Breads", description: "Madurai's famous fluffy, layered bun parotta, perfect for rich gravies.", image: "/images/food/madurai_halwa.png" },
-              { name: "ELANEER PAYASAM", subtitle: "Silky Legend", description: "Tender coconut sweet pudding, built to soothe and delight.", image: "/images/food/madurai_jigarthanda.png" }
+              { name: "MUTTON BRIYANI", subtitle: "Seeraga Samba", description: "Authentic Madurai style briyani cooked with aromatic seeraga samba rice and tender mutton.", image: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=800" },
+              { name: "KARAIKUDI MUTTON ROAST", subtitle: "Signature Masterpiece", description: "Fiery Karaikudi spices blended with rich ghee roast.", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc0?q=80&w=800" },
+              { name: "BUN PAROTTA", subtitle: "Tawa Breads", description: "Madurai's famous fluffy, layered bun parotta, perfect for rich gravies.", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800" },
+              { name: "ELANEER PAYASAM", subtitle: "Silky Legend", description: "Tender coconut sweet pudding, built to soothe and delight.", image: "https://images.unsplash.com/photo-1605197136006-25f0fcb7e416?q=80&w=800" }
             ].map((dish, index) => (
               <motion.article 
                 key={dish.name} 
@@ -404,6 +404,40 @@ export default function Index() {
               )}
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* 10-Image Masonry Gallery */}
+      <section className="bg-background py-24 border-t border-primary/10">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <SectionHeading eyebrow="Gallery" title="A feast for the eyes." copy="Get a glimpse of the authentic Madurai culinary experience waiting for you at Suvaialaya Restaurant Bangalore." />
+          
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[150px] sm:auto-rows-[200px]">
+            {[
+              "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800",
+              "https://images.unsplash.com/photo-1589302168068-964664d93cb0?q=80&w=800",
+              "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800",
+              "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?q=80&w=800",
+              "https://images.unsplash.com/photo-1610192244261-3f33de7155e2?q=80&w=800",
+              "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=800",
+              "https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?q=80&w=800",
+              "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800",
+              "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=800",
+              "https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?q=80&w=800"
+            ].map((img, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: (i % 4) * 0.1, duration: 0.6 }}
+                className={`rounded-2xl overflow-hidden group relative shadow-md ${i === 0 || i === 4 || i === 7 ? 'col-span-2 row-span-2' : ''}`}
+              >
+                <img src={img} alt="Restaurant Food" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 

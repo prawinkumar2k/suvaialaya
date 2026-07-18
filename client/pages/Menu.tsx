@@ -34,6 +34,19 @@ export default function Menu() {
       return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
     });
 
+  const categoryImages: Record<string, string> = {
+    "Suvaialaya Briyani": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=1200",
+    "Special Combo": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=1200",
+    "Meals": "https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?q=80&w=1200",
+    "Mutton Starters": "https://images.unsplash.com/photo-1631452180519-c014fe946bc0?q=80&w=1200",
+    "Chicken Starters": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?q=80&w=1200",
+    "Seafood Starters": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1200",
+    "Tawa Breads": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200",
+    "Parotta": "https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?q=80&w=1200",
+    "Non-veg Tiffin": "https://images.unsplash.com/photo-1610192244261-3f33de7155e2?q=80&w=1200",
+    "Desserts": "https://images.unsplash.com/photo-1605197136006-25f0fcb7e416?q=80&w=1200"
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground selection:bg-accent/30 relative">
       <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none" />
@@ -52,7 +65,7 @@ export default function Menu() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-4xl px-5 py-24 sm:px-8 lg:py-32 relative z-10">
+      <div className="mx-auto max-w-4xl px-5 py-12 sm:px-8 lg:py-20 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center flex flex-col items-center">
           <UtensilsCrossed size={40} className="text-accent mb-6" />
           <p className="text-sm font-bold uppercase tracking-[0.3em] text-primary">The Official Menu</p>
@@ -65,13 +78,25 @@ export default function Menu() {
           <OrnamentalDivider />
         </motion.div>
 
-        <div className="mt-16 space-y-24">
+        <div className="mt-8 space-y-20">
           {categories.map((category) => (
             <motion.div key={category} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}>
-              <div className="text-center mb-10">
-                <h2 className="font-display text-4xl font-bold text-accent">{category}</h2>
-                <div className="h-0.5 w-16 bg-accent/40 mx-auto mt-4 rounded-full" />
-              </div>
+              
+              {categoryImages[category as keyof typeof categoryImages] ? (
+                <div className="mb-8 overflow-hidden rounded-2xl shadow-xl border-4 border-primary/10 h-48 sm:h-64 w-full relative group">
+                  <img src={categoryImages[category as keyof typeof categoryImages]} alt={category} className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <h2 className="font-display text-3xl sm:text-4xl font-bold text-white drop-shadow-md">{category}</h2>
+                    <div className="h-0.5 w-16 bg-accent mt-3 rounded-full" />
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center mb-10">
+                  <h2 className="font-display text-4xl font-bold text-accent">{category}</h2>
+                  <div className="h-0.5 w-16 bg-accent/40 mx-auto mt-4 rounded-full" />
+                </div>
+              )}
               <div className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2">
                 {menuHighlights.filter(item => item.category === category).map((dish) => (
                   <motion.div 
