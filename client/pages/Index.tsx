@@ -240,7 +240,6 @@ export default function Index() {
               { number: "01", title: "Choose your day", text: "Nine days of shared tables." }, 
               { number: "02", title: "Pick a slot", text: "Ten relaxed hours each day." }, 
               { number: "03", title: "Come hungry", text: "We'll have your place ready." }
-            ].map((step) => (
             ].map((step, idx) => (
               <motion.div 
                 key={step.number} 
