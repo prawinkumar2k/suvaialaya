@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, CalendarDays, Clock3, MapPin, Menu, Minus, Plus, Star, Users, X, Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
 import { BrandMark } from "@/components/landing/BrandMark";
+import { MaduraiPreloader } from "@/components/landing/MaduraiPreloader";
 import { faqs, festival, menuHighlights, testimonials } from "@/data/madurai-festival";
 
 function Countdown() {
@@ -57,11 +58,13 @@ function SectionHeading({ eyebrow, title, copy, light = false }: { eyebrow: stri
 export default function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
+  const [preloaderComplete, setPreloaderComplete] = useState(false);
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   const navItems = [{ label: "The Experience", id: "experience" }, { label: "The Menu", id: "menu" }, { label: "Good to know", id: "faq" }];
 
   return (
     <main className="overflow-hidden bg-background text-foreground selection:bg-accent/30">
+      {!preloaderComplete && <MaduraiPreloader onComplete={() => setPreloaderComplete(true)} />}
       {/* Decorative Top Border */}
       <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { toast } from "sonner";
 import axios from "axios";
+import { useAudio } from "@/contexts/AudioContext";
 
 function OrnamentalDivider() {
   return (
@@ -24,6 +25,7 @@ export default function SlotSelection() {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<any | null>(null);
   const navigate = useNavigate();
+  const { playSoundEffect } = useAudio();
 
   useEffect(() => {
     const userString = localStorage.getItem("user");
@@ -69,6 +71,7 @@ export default function SlotSelection() {
       return;
     }
     if (selectedSlot && eventData) {
+      playSoundEffect("conch");
       navigate("/booking-form", {
         state: {
           eventId: eventData._id,
@@ -196,22 +199,33 @@ export default function SlotSelection() {
               const statusColor = isFull ? "text-destructive" : remaining < 15 ? "text-accent" : "text-primary/70";
               const isSelected = selectedSlot?.time === slot.time;
               
+              const timeStories: Record<string, { tamil: string, sub: string }> = {
+                "11:00 AM": { tamil: "மதிய விருந்து", sub: "Temple Blessings Await You" },
+                "12:00 PM": { tamil: "அருசுவை அனுபவம்", sub: "Taste The Heritage Of Madurai" },
+                "01:00 PM": { tamil: "சுவை திருவிழா", sub: "Celebrate Tradition Together" },
+                "02:00 PM": { tamil: "விருந்து நேரம்", sub: "A Feast Beyond Food" }
+              };
+              
+              const story = timeStories[slot.time] || { tamil: "விருந்து", sub: "Madurai Feast" };
+              
               return (
                 <button
                   key={slot.time}
                   disabled={isFull}
                   onClick={() => setSelectedSlot(slot)}
-                  className={`relative flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all overflow-hidden
+                  className={`relative flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all overflow-hidden text-center
                     ${isFull ? 'opacity-50 cursor-not-allowed bg-primary/5 border-primary/10' : 
                       isSelected ? 'border-primary bg-primary/10 scale-105 shadow-md' : 'bg-background border-primary/20 hover:border-primary/50 shadow-sm'}`}
                 >
                   {isSelected && <div className="absolute top-0 right-0 p-2"><Check size={16} className="text-accent" /></div>}
-                  <span className={`font-display font-bold text-xl ${isFull ? 'text-foreground/50' : 'text-primary'}`}>{slot.time}</span>
+                  <span className={`font-tamil font-bold text-xl mb-1 ${isFull ? 'text-foreground/50' : 'text-temple-orange'}`}>{story.tamil}</span>
+                  <span className={`font-display font-bold text-lg ${isFull ? 'text-foreground/50' : 'text-primary'}`}>{slot.time}</span>
+                  <span className={`text-[10px] italic mt-1 ${isFull ? 'text-foreground/50' : 'text-foreground/70'}`}>{story.sub}</span>
                   <div className={`mt-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${statusColor}`}>
                     <Users size={12} />
                     <span>{statusText}</span>
                   </div>
-                  {!isFull && <span className="absolute bottom-2 text-[9px] font-bold uppercase tracking-widest text-primary/50">{remaining} Seats</span>}
+                  {!isFull && <span className="absolute bottom-1 right-2 text-[9px] font-bold uppercase tracking-widest text-primary/40">{remaining} Seats left</span>}
                 </button>
               );
             })}

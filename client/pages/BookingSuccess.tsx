@@ -1,17 +1,25 @@
 import { Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { ArrowRight, Download, Calendar, MapPin, Clock, Leaf } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
+import { useAudio } from "@/contexts/AudioContext";
 import { Button } from "@/components/ui/button";
 
 export default function BookingSuccess() {
-  const location = useLocation();
-  const state = location.state as { bookingId?: string; date: string; slotTime: string; numberOfGuests: number; finalTotal: number } | null;
+  const [location] = useLocation();
+  const searchParams = new URLSearchParams(window.location.search);
+  const { playSoundEffect } = useAudio();
 
-  // Fallback if accessed directly
-  const bookingDate = state ? new Date(state.date).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : "Thu, Aug 6, 2026";
-  const slotTime = state ? state.slotTime : "11:00 AM";
-  const bookingId = state?.bookingId || "MKV-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+  const bookingId = searchParams.get('id') || "MKV-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+  const bookingDate = searchParams.get('date') || "Thu, Aug 6, 2026";
+  const slotTime = searchParams.get('time') || "11:00 AM";
+  const numberOfGuests = searchParams.get('guests') || "2";
+  const finalTotal = searchParams.get('total') || "1799";
+
+  useEffect(() => {
+    playSoundEffect("nadaswaram");
+  }, [playSoundEffect]);
 
   const handleDownloadTicket = async () => {
     // Dynamic import to keep bundle size small if not used
@@ -125,18 +133,18 @@ export default function BookingSuccess() {
 
     doc.setTextColor(primaryGreen);
     doc.setFontSize(8);
-    doc.text("VENUE", 50, 150, { align: "center" });
+    doc.text("TEMPLE BLESSINGS: RECEIVED", 50, 150, { align: "center" });
     doc.setFontSize(10);
-    doc.text("Suvaialaya Restaurant", 50, 156, { align: "center" });
+    doc.text("Traditional Feast Awaiting You", 50, 156, { align: "center" });
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("123 Heritage Road, Madurai", 50, 161, { align: "center" });
+    doc.text("Madurai Welcomes You", 50, 161, { align: "center" });
 
     // Footer
     doc.setTextColor(15, 59, 40); // Green
     doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
-    doc.text("WE ARE WAITING TO WELCOME YOU.", 50, 170, { align: "center" });
+    doc.text("DIGITAL SOUL OF MADURAI.", 50, 170, { align: "center" });
 
     // Save
     doc.save(`Suvaialaya-Ticket-${bookingId}.pdf`);
@@ -170,16 +178,16 @@ export default function BookingSuccess() {
           </div>
           
           <div className="space-y-6 py-4">
-            <h2 className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">WELCOME TO THE SUVAIYALAYA EXPERIENCE</h2>
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">THE MADURAI VIRUNDHU</h2>
             <div className="h-px w-8 bg-accent/40 mx-auto" />
             <h1 className="font-display text-3xl font-extrabold text-primary tracking-wider uppercase leading-snug">
-              YOUR SEAT <br/> HAS BEEN RESERVED.
+              YOUR SEAT <br/> IS RESERVED.
             </h1>
             <div className="h-px w-16 bg-accent/40 mx-auto" />
             <div className="text-xs font-bold uppercase tracking-[0.2em] text-primary/80 space-y-2">
-              <p>THE BANANA LEAF AWAITS YOU.</p>
-              <p className="text-accent">THE TEMPLE FESTIVAL AWAITS YOU.</p>
-              <p className="text-primary">SEE YOU AT MADURAI.</p>
+              <p>TEMPLE BLESSINGS: <span className="text-accent">RECEIVED</span></p>
+              <p>TRADITIONAL FEAST: <span className="text-accent">AWAITING YOU</span></p>
+              <p className="text-temple-orange mt-2">MADURAI WELCOMES YOU.</p>
             </div>
           </div>
           <p className="mt-4 text-xs font-bold uppercase tracking-widest bg-primary/10 inline-block px-4 py-2 rounded-full text-primary border border-primary/20">Invitation ID: <span className="text-accent">{bookingId}</span></p>

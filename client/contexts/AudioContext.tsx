@@ -2,14 +2,18 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+export type SoundType = 'bell' | 'conch' | 'veena' | 'nadaswaram';
+
 interface AudioContextType {
   isPlaying: boolean;
   toggleAudio: () => void;
+  playSoundEffect: (type: SoundType) => void;
 }
 
 const AudioContext = createContext<AudioContextType>({
   isPlaying: false,
   toggleAudio: () => {},
+  playSoundEffect: () => {},
 });
 
 export const useAudio = () => useContext(AudioContext);
@@ -32,6 +36,22 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  const playSoundEffect = (type: SoundType) => {
+    // Map of sound URLs (using royalty free pixabay URLs for demo)
+    const sounds = {
+      bell: "https://cdn.pixabay.com/download/audio/2021/08/04/audio_9b61d33190.mp3?filename=temple-bell-11814.mp3",
+      conch: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_24a2c07ef5.mp3?filename=conch-shell-blow-96020.mp3",
+      veena: "https://cdn.pixabay.com/download/audio/2022/10/24/audio_34b3f2ccab.mp3?filename=indian-flute-and-veena-121966.mp3",
+      nadaswaram: "https://cdn.pixabay.com/download/audio/2022/11/24/audio_e40c660706.mp3?filename=indian-wedding-music-125950.mp3"
+    };
+    
+    if (sounds[type]) {
+      const effect = new Audio(sounds[type]);
+      effect.volume = 0.5;
+      effect.play().catch(e => console.log("Sound effect prevented:", e));
+    }
+  };
+
   const toggleAudio = () => {
     setHasInteracted(true);
     if (!audioRef.current) return;
@@ -46,7 +66,7 @@ export const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AudioContext.Provider value={{ isPlaying, toggleAudio }}>
+    <AudioContext.Provider value={{ isPlaying, toggleAudio, playSoundEffect }}>
       {children}
       
       {/* Floating Audio Toggle */}
