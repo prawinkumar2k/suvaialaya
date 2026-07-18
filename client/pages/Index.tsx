@@ -396,7 +396,7 @@ export default function Index() {
           <p className="mt-6 text-lg text-primary-foreground/80">Save your seat at the feast.</p>
           <div className="mt-10">
             <Link to="/slots" className="inline-flex items-center justify-center gap-3 rounded-md bg-accent px-10 py-5 text-sm font-bold uppercase tracking-widest text-primary shadow-xl transition-all hover:bg-accent/90 hover:scale-105">
-              Book for ₹1,499 <ArrowRight size={18} />
+              Book for ₹{eventData.price} <ArrowRight size={18} />
             </Link>
           </div>
         </div>
@@ -418,7 +418,7 @@ export default function Index() {
           </div>
           <div className="mt-16 border-t border-primary/10 pt-8 flex flex-col items-center justify-between gap-4 text-xs font-semibold uppercase tracking-widest text-primary/50 sm:flex-row">
             <span>© 2026 Suvaialaya. All rights reserved.</span>
-            <span className="flex items-center gap-2"><MapPin size={14} className="text-accent" /> Madurai, Tamil Nadu</span>
+            <span className="flex items-center gap-2"><MapPin size={14} className="text-accent" /> Bangalore, Karnataka</span>
           </div>
         </div>
       </footer>
