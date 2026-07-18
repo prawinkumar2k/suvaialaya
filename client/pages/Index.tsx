@@ -142,14 +142,6 @@ export default function Index() {
 
             {/* Monumental Cinematic Titles */}
             <div className="space-y-4 md:space-y-6 mb-8 select-none">
-              <motion.h2 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 0.6, y: 0 }}
-                transition={{ delay: 0.1, duration: 1 }}
-                className="text-3xl md:text-5xl font-bold text-accent mb-4 drop-shadow-sm font-sans"
-              >
-                மதுரை சித்திரைத் திருவிழா
-              </motion.h2>
               <motion.h1 
                 initial={{ opacity: 0, letterSpacing: "0.4em" }}
                 animate={{ opacity: 1, letterSpacing: "0.15em" }}

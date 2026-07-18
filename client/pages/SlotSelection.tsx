@@ -199,14 +199,14 @@ export default function SlotSelection() {
               const statusColor = isFull ? "text-destructive" : remaining < 15 ? "text-accent" : "text-primary/70";
               const isSelected = selectedSlot?.time === slot.time;
               
-              const timeStories: Record<string, { tamil: string, sub: string }> = {
-                "11:00 AM": { tamil: "மதிய விருந்து", sub: "Temple Blessings Await You" },
-                "12:00 PM": { tamil: "அருசுவை அனுபவம்", sub: "Taste The Heritage Of Madurai" },
-                "01:00 PM": { tamil: "சுவை திருவிழா", sub: "Celebrate Tradition Together" },
-                "02:00 PM": { tamil: "விருந்து நேரம்", sub: "A Feast Beyond Food" }
+              const timeStories: Record<string, string> = {
+                "11:00 AM": "Temple Blessings Await You",
+                "12:00 PM": "Taste The Heritage Of Madurai",
+                "01:00 PM": "Celebrate Tradition Together",
+                "02:00 PM": "A Feast Beyond Food"
               };
               
-              const story = timeStories[slot.time] || { tamil: "விருந்து", sub: "Madurai Feast" };
+              const storySub = timeStories[slot.time] || "Madurai Feast";
               
               return (
                 <button
@@ -218,9 +218,8 @@ export default function SlotSelection() {
                       isSelected ? 'border-primary bg-primary/10 scale-105 shadow-md' : 'bg-background border-primary/20 hover:border-primary/50 shadow-sm'}`}
                 >
                   {isSelected && <div className="absolute top-0 right-0 p-2"><Check size={16} className="text-accent" /></div>}
-                  <span className={`font-tamil font-bold text-xl mb-1 ${isFull ? 'text-foreground/50' : 'text-temple-orange'}`}>{story.tamil}</span>
-                  <span className={`font-display font-bold text-lg ${isFull ? 'text-foreground/50' : 'text-primary'}`}>{slot.time}</span>
-                  <span className={`text-[10px] italic mt-1 ${isFull ? 'text-foreground/50' : 'text-foreground/70'}`}>{story.sub}</span>
+                  <span className={`font-display font-bold text-2xl ${isFull ? 'text-foreground/50' : 'text-temple-orange'}`}>{slot.time}</span>
+                  <span className={`text-[11px] font-bold uppercase tracking-widest mt-2 ${isFull ? 'text-foreground/50' : 'text-foreground/70'}`}>{storySub}</span>
                   <div className={`mt-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${statusColor}`}>
                     <Users size={12} />
                     <span>{statusText}</span>

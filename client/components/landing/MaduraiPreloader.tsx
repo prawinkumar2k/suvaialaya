@@ -83,9 +83,6 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
                   exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
                   transition={{ duration: 1.5 }}
                 >
-                  <h2 className="text-3xl md:text-5xl font-bold text-temple-gold/60 mb-2 font-sans tracking-wide">
-                    சுவையாலயா
-                  </h2>
                   <h1 className="font-display text-4xl md:text-6xl font-bold tracking-widest text-temple-gold uppercase">
                     SUVAIALAYA
                   </h1>
@@ -103,9 +100,6 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
                   exit={{ opacity: 0, filter: "blur(10px)" }}
                   transition={{ duration: 1.5 }}
                 >
-                  <h2 className="text-3xl md:text-5xl font-bold text-temple-orange/80 mb-4 font-sans drop-shadow-sm">
-                    மதுரைக்கு நல்வரவு
-                  </h2>
                   <h2 className="font-display text-5xl md:text-7xl font-extrabold tracking-wider text-temple-orange uppercase leading-none drop-shadow-[0_0_30px_rgba(255,122,0,0.5)]">
                     Welcome to<br />Madurai
                   </h2>
@@ -121,9 +115,6 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
                   transition={{ duration: 1.5 }}
                   className="max-w-xl"
                 >
-                  <p className="text-2xl md:text-3xl text-temple-gold/80 mb-6 font-sans">
-                    "பாரம்பரியம் அன்புடன் பரிமாறப்படும் நகரம்"
-                  </p>
                   <p className="font-display text-3xl md:text-4xl italic text-temple-gold leading-relaxed">
                     "The city where tradition is served with love."
                   </p>
