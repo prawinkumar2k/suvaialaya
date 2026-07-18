@@ -37,8 +37,8 @@ export default function App() {
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/organizers" element={<PlaceholderPage />} /> 
+          <Route path="/" element={<SlotSelection />} />
+          <Route path="/organizers" element={<Index />} /> 
           <Route path="/events/:eventId" element={<PlaceholderPage />} />
           
           <Route path="/about" element={<About />} />
