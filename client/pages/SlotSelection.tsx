@@ -151,9 +151,9 @@ export default function SlotSelection() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-3xl px-5 pt-16 sm:px-8 relative z-10">
+      <div className="mx-auto max-w-3xl px-5 pt-16 pb-40 sm:px-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-primary uppercase">{eventData.title}</h1>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-primary uppercase">SUVAIALAYA RESTAURANT BANGALORE</h1>
           <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-primary/70">Reserve your table</p>
           <OrnamentalDivider />
         </motion.div>
@@ -247,7 +247,7 @@ export default function SlotSelection() {
                 THE BANANA LEAVES ARE WAITING.
               </p>
               <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-primary/75 mt-2">
-                THE MADURAI THIRUVIZHA BEGINS SOON.
+                THE SUVAIALAYA EXPERIENCE AWAITS.
               </p>
             </motion.div>
           )}
