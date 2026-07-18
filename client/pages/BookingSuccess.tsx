@@ -40,23 +40,26 @@ export default function BookingSuccess() {
     // 3. Header Text
     doc.setTextColor(primaryGreen);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("SUVAIALAYA", 50, 20, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("YOUR INVITATION HAS ARRIVED", 50, 20, { align: "center" });
     
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(7);
     doc.setTextColor(primaryGreen);
-    doc.text("SOUTH INDIAN CUISINE", 50, 25, { align: "center" });
+    doc.text("SCAN TO ENTER THE SUVAIYALAYA EXPERIENCE", 50, 25, { align: "center" });
 
     // Separator
-    doc.setDrawColor(15, 59, 40); // Green
+    doc.setDrawColor(212, 175, 55); // Gold
     doc.setLineWidth(0.2);
-    doc.line(20, 32, 80, 32);
+    doc.line(15, 30, 85, 30);
 
     // 4. Event Title
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("MADURAI KARI VIRUNTHU", 50, 42, { align: "center" });
+    doc.setFontSize(11);
+    doc.text("MADURAI CHITHIRAI THIRUVIZHA", 50, 38, { align: "center" });
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.text("SUVAIALAYA SOUTH INDIAN CUISINE", 50, 44, { align: "center" });
 
     // 5. Booking Details Grid
     doc.setFillColor(15, 59, 40);
@@ -130,10 +133,10 @@ export default function BookingSuccess() {
     doc.text("123 Heritage Road, Madurai", 50, 161, { align: "center" });
 
     // Footer
-    doc.setTextColor(100, 100, 100);
-    doc.setFontSize(6);
-    doc.text("Please present this E-Ticket at the entrance.", 50, 168, { align: "center" });
-    doc.text("Valid for one-time entry only.", 50, 172, { align: "center" });
+    doc.setTextColor(15, 59, 40); // Green
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.text("WE ARE WAITING TO WELCOME YOU.", 50, 170, { align: "center" });
 
     // Save
     doc.save(`Suvaialaya-Ticket-${bookingId}.pdf`);
@@ -166,9 +169,20 @@ export default function BookingSuccess() {
             <Leaf className="h-10 w-10 text-primary" />
           </div>
           
-          <h1 className="font-display text-4xl font-bold text-primary">Confirmed.</h1>
-          <p className="mt-3 text-sm font-semibold text-primary/70 uppercase tracking-widest">Your table is reserved</p>
-          <p className="mt-4 text-xs font-bold uppercase tracking-widest bg-primary/10 inline-block px-4 py-2 rounded-full text-primary border border-primary/20">Booking ID: <span className="text-accent">{bookingId}</span></p>
+          <div className="space-y-6 py-4">
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">WELCOME TO THE SUVAIYALAYA EXPERIENCE</h2>
+            <div className="h-px w-8 bg-accent/40 mx-auto" />
+            <h1 className="font-display text-3xl font-extrabold text-primary tracking-wider uppercase leading-snug">
+              YOUR SEAT <br/> HAS BEEN RESERVED.
+            </h1>
+            <div className="h-px w-16 bg-accent/40 mx-auto" />
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-primary/80 space-y-2">
+              <p>THE BANANA LEAF AWAITS YOU.</p>
+              <p className="text-accent">THE TEMPLE FESTIVAL AWAITS YOU.</p>
+              <p className="text-primary">SEE YOU AT MADURAI.</p>
+            </div>
+          </div>
+          <p className="mt-4 text-xs font-bold uppercase tracking-widest bg-primary/10 inline-block px-4 py-2 rounded-full text-primary border border-primary/20">Invitation ID: <span className="text-accent">{bookingId}</span></p>
 
           <div className="mt-8 bg-primary/5 rounded-xl p-6 text-left border border-primary/20 shadow-sm relative">
             <div className="flex items-center gap-4 mb-5">

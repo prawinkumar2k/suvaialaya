@@ -112,46 +112,111 @@ export default function Index() {
         </div>
         
         <div className="mx-auto max-w-7xl px-5 relative z-10 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              <span className="size-2 rounded-full bg-accent" /> {festival.dates}
-            </div>
-            <h3 className="font-display mt-8 text-2xl sm:text-3xl font-bold tracking-widest text-accent uppercase">
-              {festival.restaurantName}
-            </h3>
-            <p className="text-xs font-semibold tracking-[0.3em] uppercase text-primary/70 mt-2">
-              {festival.tagline}
-            </p>
-            <div className="my-8 flex justify-center">
-              <div className="h-0.5 w-24 bg-accent/40 rounded-full" />
-            </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="flex flex-col items-center justify-center font-display text-center relative z-10"
+          >
+            {/* Year Badge */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 0.6, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="text-2xl font-bold tracking-[0.3em] text-accent mb-6"
+            >
+              2026
+            </motion.div>
             
-            <p className="italic text-primary/80 mb-4 font-display text-xl">Proudly Presents</p>
-            <h1 className="font-display mx-auto max-w-4xl text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl xl:text-[6rem] uppercase text-primary drop-shadow-sm">
-              MADURAI <br/>KARI VIRUNTHU
-            </h1>
-            
-            <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-foreground/80 sm:text-lg">
-              Experience the Authentic Taste of Madurai. A luxury, premium dining experience that brings traditional flavors to a communal table.
-            </p>
+            {/* Golden thin line */}
+            <div className="h-[2px] w-12 bg-accent/30 mb-8" />
 
-            <div className="mt-12 flex justify-center">
+            {/* Monumental Cinematic Titles */}
+            <div className="space-y-4 md:space-y-6 mb-8 select-none">
+              <motion.h1 
+                initial={{ opacity: 0, letterSpacing: "0.4em" }}
+                animate={{ opacity: 1, letterSpacing: "0.15em" }}
+                transition={{ delay: 0.3, duration: 1.2 }}
+                className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
+              >
+                MADURAI
+              </motion.h1>
+              <motion.h1 
+                initial={{ opacity: 0, letterSpacing: "0.4em" }}
+                animate={{ opacity: 1, letterSpacing: "0.15em" }}
+                transition={{ delay: 0.5, duration: 1.2 }}
+                className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
+              >
+                CHITHIRAI
+              </motion.h1>
+              <motion.h1 
+                initial={{ opacity: 0, letterSpacing: "0.4em" }}
+                animate={{ opacity: 1, letterSpacing: "0.15em" }}
+                transition={{ delay: 0.7, duration: 1.2 }}
+                className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
+              >
+                THIRUVIZHA
+              </motion.h1>
+            </div>
+
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 0.8 }}
+              className="text-2xl sm:text-3xl italic text-accent font-semibold tracking-widest mb-12"
+            >
+              HAS ARRIVED.
+            </motion.p>
+
+            <div className="h-[2px] w-24 bg-accent/30 mb-12" />
+
+            {/* Event Highlights Grid */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl w-full mb-12 px-4"
+            >
+              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
+                <span className="text-accent text-2xl font-bold font-display mb-1">23</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Legendary Dishes</span>
+              </div>
+              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
+                <span className="text-accent text-2xl font-bold font-display mb-1">10</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Days Only</span>
+              </div>
+              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
+                <span className="text-accent text-2xl font-bold font-display mb-1">Limited</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Seats Daily</span>
+              </div>
+              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
+                <span className="text-accent text-2xl font-bold font-display mb-1">One Grand</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Experience</span>
+              </div>
+            </motion.div>
+
+            <div className="h-[2px] w-12 bg-accent/30 mb-8" />
+
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.4, duration: 0.8 }}
+              className="text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-primary/80 mb-12"
+            >
+              Welcome to the Suvaialaya Experience.
+            </motion.p>
+
+            <div className="mt-4 flex justify-center mb-12">
                <Countdown />
             </div>
 
-            <div className="mt-12 flex flex-col items-center gap-4 sm:flex-row justify-center">
-              <Link to="/slots" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-xl transition-all hover:bg-primary/90 hover:scale-105 border border-accent/20">
+            <div className="flex flex-col items-center gap-4 sm:flex-row justify-center w-full max-w-md">
+              <Link to="/slots" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-xl transition-all hover:bg-primary/90 hover:scale-105 border border-accent/20">
                 Book Your Seat <ArrowRight size={16} />
               </Link>
-              <button type="button" onClick={() => scrollTo("experience")} className="inline-flex items-center justify-center gap-2 rounded-md border border-primary/20 bg-transparent px-8 py-4 text-sm font-bold uppercase tracking-wider text-primary transition-all hover:bg-primary/5">
+              <button type="button" onClick={() => scrollTo("experience")} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md border border-primary/20 bg-transparent px-8 py-4 text-xs font-bold uppercase tracking-wider text-primary transition-all hover:bg-primary/5">
                 Discover the experience <ArrowDown size={16} />
               </button>
-            </div>
-            
-            <div className="mt-16 flex flex-wrap justify-center gap-x-8 gap-y-4 text-xs font-bold uppercase tracking-widest text-primary/70">
-              <span className="flex items-center gap-2"><CalendarDays size={16} className="text-accent" /> 9 Days Only</span>
-              <span className="flex items-center gap-2"><Clock3 size={16} className="text-accent" /> 11 AM — 9 PM</span>
-              <span className="flex items-center gap-2"><Users size={16} className="text-accent" /> 70 Guests / Slot</span>
             </div>
           </motion.div>
         </div>
@@ -184,26 +249,57 @@ export default function Index() {
       <section id="menu" className="bg-primary text-primary-foreground relative overflow-hidden">
         <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-10 mix-blend-overlay" />
         <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10 relative z-10">
-          <SectionHeading light eyebrow="The menu" title="A feast worth waiting for." copy="Every dish is a love letter to the streets, homes, and kitchens of Madurai." />
+          <SectionHeading light eyebrow="The menu" title="Every dish tells a story." copy="We don't serve food. We serve a century of culture, spice, and heritage." />
           
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {menuHighlights.slice(0, 6).map((dish, index) => (
-              <motion.article key={dish.name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="group relative rounded-xl border border-accent/20 bg-primary-foreground/5 p-8 transition-all hover:bg-primary-foreground/10 hover:border-accent/40">
-                <div className="flex items-center justify-between mb-8">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">{dish.category}</span>
-                  <Leaf size={16} className="text-accent/50" />
+          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { name: "MUTTON ELUMBU SOUP", subtitle: "Traditional Welcome", description: "The warmth of traditional Madurai hospitality, distilled into a rich bone broth." },
+              { name: "CHICKEN KARI DOSA", subtitle: "Signature Masterpiece", description: "Where every layer of perfectly spiced meat and golden dosa tells a story." },
+              { name: "MADURAI HALWA", subtitle: "1920 Heritage", description: "The slow-cooked, ghee-dripping sweetness of Madurai's living heritage." },
+              { name: "MADURAI JIGARTHANDA", subtitle: "Silky Legend", description: "The cool, creamy king of Madurai's summer, built to soothe and delight." }
+            ].map((dish, index) => (
+              <motion.article 
+                key={dish.name} 
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                viewport={{ once: true }} 
+                transition={{ delay: index * 0.1, duration: 0.8 }} 
+                className="group relative rounded-xl border border-accent/20 bg-primary-foreground/5 p-8 transition-all hover:bg-primary-foreground/10 hover:border-accent/40 flex flex-col justify-between min-h-[250px]"
+              >
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                  <Leaf size={60} className="text-accent" />
                 </div>
                 <div>
-                  <h3 className="font-display text-2xl font-bold leading-tight text-primary-foreground">{dish.name}</h3>
-                  <p className="mt-4 text-sm leading-relaxed text-primary-foreground/70">{dish.description}</p>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent block mb-4">{dish.subtitle}</span>
+                  <h3 className="font-display text-2xl font-bold leading-tight text-primary-foreground tracking-wide">{dish.name}</h3>
+                  <p className="mt-4 text-sm leading-relaxed text-primary-foreground/75 font-sans">{dish.description}</p>
                 </div>
               </motion.article>
             ))}
           </div>
+
+          {/* Cinematic Tagline Banner */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="mt-20 text-center py-12 px-6 border-y border-accent/20 bg-primary-foreground/[0.02] relative"
+          >
+            <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none font-display font-extrabold text-7xl md:text-9xl text-primary-foreground">
+              MADURAI
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-accent uppercase leading-none relative z-10">
+              MADURAI IS NOT COOKED.
+            </h2>
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-primary-foreground uppercase mt-2 leading-none relative z-10">
+              IT IS CELEBRATED.
+            </h2>
+          </motion.div>
           
           <div className="mt-16 flex justify-center">
-            <Link to="/menu" className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-accent hover:text-accent/80 transition-colors pb-1 border-b border-accent/30 hover:border-accent">
-              See the full menu <ArrowRight size={16} />
+            <Link to="/menu" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-accent hover:text-accent/80 transition-colors pb-1 border-b border-accent/30 hover:border-accent">
+              See the full 23-dish lineup <ArrowRight size={16} />
             </Link>
           </div>
         </div>

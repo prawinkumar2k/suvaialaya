@@ -211,6 +211,28 @@ export default function SlotSelection() {
               );
             })}
           </div>
+
+          {selectedSlot && (
+            <motion.div 
+              initial={{ opacity: 0, y: 15 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="mt-12 text-center p-8 border-2 border-dashed border-primary/20 rounded-2xl bg-primary/5 relative overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+                <Leaf size={100} className="text-primary" />
+              </div>
+              <p className="text-2xl sm:text-3xl font-display font-extrabold tracking-widest text-primary">
+                ONLY <span className="text-accent">{selectedSlot.capacity - selectedSlot.booked}</span> SEATS REMAIN
+              </p>
+              <div className="h-[2px] w-12 bg-accent/30 mx-auto my-4" />
+              <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-accent leading-relaxed">
+                THE BANANA LEAVES ARE WAITING.
+              </p>
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-primary/75 mt-2">
+                THE MADURAI THIRUVIZHA BEGINS SOON.
+              </p>
+            </motion.div>
+          )}
         </motion.div>
       </div>
 
