@@ -97,6 +97,7 @@ export function createServer() {
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com"],
           imgSrc: ["'self'", "data:", "https:", "blob:"],
+          mediaSrc: ["'self'", "https://actions.google.com"],
           upgradeInsecureRequests: null, // Do not force HTTPS in development
         },
       },
