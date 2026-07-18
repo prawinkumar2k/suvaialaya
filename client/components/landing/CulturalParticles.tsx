@@ -47,9 +47,25 @@ export function CulturalParticles() {
         </motion.div>
       ))}
       
+      {/* Toran (Mango Leaves & Marigold) Decorative Top Border */}
+      <div className="absolute top-0 left-0 right-0 h-12 md:h-16 flex justify-around overflow-hidden opacity-90 drop-shadow-md z-50 pointer-events-none">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div key={`toran-${i}`} className="flex flex-col items-center -mt-2">
+            {/* Mango Leaf */}
+            <svg viewBox="0 0 20 40" className="w-6 h-10 md:w-8 md:h-14 text-[#2E7D32]" fill="currentColor">
+              <path d="M10 0 C0 10, 0 30, 10 40 C20 30, 20 10, 10 0 Z" />
+              <path d="M10 0 L10 40" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+            </svg>
+            {/* Marigold Flower */}
+            <div className="w-3 h-3 md:w-4 md:h-4 bg-orange-500 rounded-full -mt-2 shadow-[0_0_8px_rgba(249,115,22,0.8)] border border-orange-400" />
+            <div className="w-2 h-2 md:w-3 md:h-3 bg-yellow-400 rounded-full -mt-2 shadow-[0_0_5px_rgba(250,204,21,0.8)]" />
+          </div>
+        ))}
+      </div>
+      
       {/* Ambient glow effects */}
-      <div className="absolute top-1/4 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl mix-blend-screen animate-pulse duration-10000" />
-      <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl mix-blend-multiply" />
+      <div className="absolute top-1/4 left-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl mix-blend-screen animate-pulse duration-[10000ms]" />
+      <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl mix-blend-multiply" />
     </div>
   );
 }

@@ -259,10 +259,10 @@ export default function Index() {
           
           <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { name: "MUTTON ELUMBU SOUP", subtitle: "Traditional Welcome", description: "The warmth of traditional Madurai hospitality, distilled into a rich bone broth.", image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=2071&auto=format&fit=crop" },
-              { name: "CHICKEN KARI DOSA", subtitle: "Signature Masterpiece", description: "Where every layer of perfectly spiced meat and golden dosa tells a story.", image: "https://images.unsplash.com/photo-1627308595229-7830f5c92f70?q=80&w=1964&auto=format&fit=crop" },
-              { name: "MADURAI HALWA", subtitle: "1920 Heritage", description: "The slow-cooked, ghee-dripping sweetness of Madurai's living heritage.", image: "https://images.unsplash.com/photo-1634509176140-5a3ab9cdaab4?q=80&w=2070&auto=format&fit=crop" },
-              { name: "MADURAI JIGARTHANDA", subtitle: "Silky Legend", description: "The cool, creamy king of Madurai's summer, built to soothe and delight.", image: "https://images.unsplash.com/photo-1570114683057-a41aa7e06a5a?q=80&w=2056&auto=format&fit=crop" }
+              { name: "MUTTON ELUMBU SOUP", subtitle: "Traditional Welcome", description: "The warmth of traditional Madurai hospitality, distilled into a rich bone broth.", image: "/images/food/mutton_elumbu_soup.png" },
+              { name: "CHICKEN KARI DOSA", subtitle: "Signature Masterpiece", description: "Where every layer of perfectly spiced meat and golden dosa tells a story.", image: "/images/food/chicken_kari_dosa.png" },
+              { name: "MADURAI HALWA", subtitle: "1920 Heritage", description: "The slow-cooked, ghee-dripping sweetness of Madurai's living heritage.", image: "/images/food/madurai_halwa.png" },
+              { name: "MADURAI JIGARTHANDA", subtitle: "Silky Legend", description: "The cool, creamy king of Madurai's summer, built to soothe and delight.", image: "/images/food/madurai_jigarthanda.png" }
             ].map((dish, index) => (
               <motion.article 
                 key={dish.name} 
