@@ -280,14 +280,14 @@ export default function Index() {
                   <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent" />
                 </div>
                 
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity z-10">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity z-10 pointer-events-none">
                   <Leaf size={60} className="text-accent" />
                 </div>
                 
-                <div className="relative z-10 p-8 h-full flex flex-col justify-end">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent block mb-2 drop-shadow-md">{dish.subtitle}</span>
-                  <h3 className="font-display text-2xl font-bold leading-tight text-primary-foreground tracking-wide drop-shadow-lg">{dish.name}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-primary-foreground/90 font-sans drop-shadow-md">{dish.description}</p>
+                <div className="relative z-20 mt-auto p-6 bg-gradient-to-t from-primary to-transparent pt-12 flex flex-col justify-end h-full">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent/80 block mb-2 drop-shadow-md">{dish.subtitle}</span>
+                  <h3 className="font-display text-2xl font-bold leading-snug text-primary-foreground tracking-wide drop-shadow-lg">{dish.name}</h3>
+                  <p className="mt-3 text-xs leading-relaxed text-primary-foreground/90 font-sans drop-shadow-md">{dish.description}</p>
                 </div>
               </motion.article>
             ))}
@@ -299,16 +299,15 @@ export default function Index() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1 }}
-            className="mt-20 text-center py-12 px-6 border-y border-accent/20 bg-primary-foreground/[0.02] relative"
+            className="mt-20 text-center py-16 px-6 border-y border-accent/20 bg-primary-foreground/[0.02] relative overflow-hidden"
           >
-            <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none select-none font-display font-extrabold text-7xl md:text-9xl text-primary-foreground">
+            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none font-display font-extrabold text-[8rem] md:text-[14rem] text-primary-foreground leading-none overflow-hidden">
               MADURAI
             </div>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-accent uppercase leading-none relative z-10">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-temple-gold uppercase leading-[1.2] relative z-10 drop-shadow-md">
               MADURAI IS NOT COOKED.
-            </h2>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-primary-foreground uppercase mt-2 leading-none relative z-10">
-              IT IS CELEBRATED.
+              <br />
+              <span className="text-primary-foreground block mt-2">IT IS CELEBRATED.</span>
             </h2>
           </motion.div>
           
