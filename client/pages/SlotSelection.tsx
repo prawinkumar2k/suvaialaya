@@ -253,6 +253,38 @@ export default function SlotSelection() {
           )}
         </motion.div>
       </div>
+      
+      {/* 10-Image Exact Match Food Gallery */}
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 mt-16 mb-24 pb-24">
+        <h3 className="font-display text-2xl font-bold text-primary mb-6 border-b-2 border-primary/20 pb-2 inline-block">The authentic Madurai taste waiting for you...</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {[
+            "/images/food/mutton_briyani.png",
+            "/images/food/mutton_kola_urundai.png",
+            "/images/food/kongu_meals.png",
+            "/images/food/karaikudi_mutton.png",
+            "/images/food/bun_parotta.png",
+            "/images/food/jigarthanda.png",
+            "/images/food/meen_polichathu.png",
+            "/images/food/chettinad_chicken.png",
+            "/images/food/elaneer_payasam.png",
+            "/images/food/kongu_meals.png"
+          ].map((img, idx) => (
+            <motion.div 
+              key={idx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * idx }}
+              className="aspect-square rounded-xl overflow-hidden border border-primary/20 shadow-md relative group"
+            >
+              <img src={img} alt="South Indian Dish" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div className="absolute inset-0 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                <Leaf className="text-accent" size={24} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
       {/* Floating Bottom Bar */}
       <motion.div 

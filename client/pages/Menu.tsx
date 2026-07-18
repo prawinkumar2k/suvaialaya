@@ -35,16 +35,16 @@ export default function Menu() {
     });
 
   const categoryImages: Record<string, string> = {
-    "Suvaialaya Briyani": "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?q=80&w=1200",
-    "Special Combo": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=1200",
-    "Meals": "https://images.unsplash.com/photo-1589301760014-d929f39ce9b1?q=80&w=1200",
-    "Mutton Starters": "https://images.unsplash.com/photo-1631452180519-c014fe946bc0?q=80&w=1200",
-    "Chicken Starters": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?q=80&w=1200",
-    "Seafood Starters": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=1200",
-    "Tawa Breads": "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200",
-    "Parotta": "https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?q=80&w=1200",
-    "Non-veg Tiffin": "https://images.unsplash.com/photo-1610192244261-3f33de7155e2?q=80&w=1200",
-    "Desserts": "https://images.unsplash.com/photo-1605197136006-25f0fcb7e416?q=80&w=1200"
+    "Suvaialaya Briyani": "/images/food/mutton_briyani.png",
+    "Special Combo": "/images/food/kongu_meals.png",
+    "Meals": "/images/food/kongu_meals.png",
+    "Mutton Starters": "/images/food/mutton_kola_urundai.png",
+    "Chicken Starters": "/images/food/chettinad_chicken.png",
+    "Seafood Starters": "/images/food/meen_polichathu.png",
+    "Tawa Breads": "/images/food/bun_parotta.png",
+    "Parotta": "/images/food/bun_parotta.png",
+    "Non-veg Tiffin": "/images/food/karaikudi_mutton.png",
+    "Desserts": "/images/food/elaneer_payasam.png"
   };
 
   return (
