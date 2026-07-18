@@ -27,17 +27,22 @@ import QRScanner from "@/pages/QRScanner";
 import TicketVerification from "@/pages/TicketVerification";
 import KitchenDashboard from "@/pages/KitchenDashboard";
 
+import { AudioProvider } from "@/contexts/AudioContext";
+import { CulturalParticles } from "@/components/landing/CulturalParticles";
+
 const queryClient = new QueryClient();
 
 export default function App() {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
+      <AudioProvider>
+        <CulturalParticles />
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
           <Route path="/organizers" element={<PlaceholderPage />} /> 
           <Route path="/events/:eventId" element={<PlaceholderPage />} />
           
@@ -73,6 +78,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </AudioProvider>
     </TooltipProvider>
   </QueryClientProvider>
   );

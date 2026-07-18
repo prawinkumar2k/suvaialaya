@@ -105,10 +105,16 @@ export default function Index() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-24 lg:pt-24 lg:pb-32">
-        <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-30 mix-blend-multiply" />
-        <div className="absolute top-0 right-0 p-10 opacity-10">
-           <Leaf size={300} className="text-primary" />
+      <section className="relative overflow-hidden pt-12 pb-24 lg:pt-24 lg:pb-32 min-h-[90vh] flex items-center justify-center">
+        {/* Cinematic Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img src="https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?q=80&w=2070&auto=format&fit=crop" alt="Temple Background" className="w-full h-full object-cover opacity-30 mix-blend-multiply sepia-[0.2]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/70 to-background" />
+        </div>
+        
+        <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-50 mix-blend-multiply pointer-events-none" />
+        <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none blur-sm animate-pulse">
+           <Leaf size={400} className="text-primary" />
         </div>
         
         <div className="mx-auto max-w-7xl px-5 relative z-10 text-center">
@@ -253,10 +259,10 @@ export default function Index() {
           
           <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { name: "MUTTON ELUMBU SOUP", subtitle: "Traditional Welcome", description: "The warmth of traditional Madurai hospitality, distilled into a rich bone broth." },
-              { name: "CHICKEN KARI DOSA", subtitle: "Signature Masterpiece", description: "Where every layer of perfectly spiced meat and golden dosa tells a story." },
-              { name: "MADURAI HALWA", subtitle: "1920 Heritage", description: "The slow-cooked, ghee-dripping sweetness of Madurai's living heritage." },
-              { name: "MADURAI JIGARTHANDA", subtitle: "Silky Legend", description: "The cool, creamy king of Madurai's summer, built to soothe and delight." }
+              { name: "MUTTON ELUMBU SOUP", subtitle: "Traditional Welcome", description: "The warmth of traditional Madurai hospitality, distilled into a rich bone broth.", image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=2071&auto=format&fit=crop" },
+              { name: "CHICKEN KARI DOSA", subtitle: "Signature Masterpiece", description: "Where every layer of perfectly spiced meat and golden dosa tells a story.", image: "https://images.unsplash.com/photo-1627308595229-7830f5c92f70?q=80&w=1964&auto=format&fit=crop" },
+              { name: "MADURAI HALWA", subtitle: "1920 Heritage", description: "The slow-cooked, ghee-dripping sweetness of Madurai's living heritage.", image: "https://images.unsplash.com/photo-1634509176140-5a3ab9cdaab4?q=80&w=2070&auto=format&fit=crop" },
+              { name: "MADURAI JIGARTHANDA", subtitle: "Silky Legend", description: "The cool, creamy king of Madurai's summer, built to soothe and delight.", image: "https://images.unsplash.com/photo-1570114683057-a41aa7e06a5a?q=80&w=2056&auto=format&fit=crop" }
             ].map((dish, index) => (
               <motion.article 
                 key={dish.name} 
@@ -264,15 +270,21 @@ export default function Index() {
                 whileInView={{ opacity: 1, y: 0 }} 
                 viewport={{ once: true }} 
                 transition={{ delay: index * 0.1, duration: 0.8 }} 
-                className="group relative rounded-xl border border-accent/20 bg-primary-foreground/5 p-8 transition-all hover:bg-primary-foreground/10 hover:border-accent/40 flex flex-col justify-between min-h-[250px]"
+                className="group relative rounded-xl border border-accent/20 bg-primary-foreground/5 overflow-hidden transition-all hover:bg-primary-foreground/10 hover:border-accent/40 flex flex-col justify-between min-h-[350px] shadow-lg"
               >
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <div className="absolute inset-0 z-0 opacity-40 group-hover:opacity-70 transition-opacity duration-700">
+                  <img src={dish.image} alt={dish.name} className="w-full h-full object-cover mix-blend-overlay" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent" />
+                </div>
+                
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity z-10">
                   <Leaf size={60} className="text-accent" />
                 </div>
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent block mb-4">{dish.subtitle}</span>
-                  <h3 className="font-display text-2xl font-bold leading-tight text-primary-foreground tracking-wide">{dish.name}</h3>
-                  <p className="mt-4 text-sm leading-relaxed text-primary-foreground/75 font-sans">{dish.description}</p>
+                
+                <div className="relative z-10 p-8 h-full flex flex-col justify-end">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent block mb-2 drop-shadow-md">{dish.subtitle}</span>
+                  <h3 className="font-display text-2xl font-bold leading-tight text-primary-foreground tracking-wide drop-shadow-lg">{dish.name}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-primary-foreground/90 font-sans drop-shadow-md">{dish.description}</p>
                 </div>
               </motion.article>
             ))}

@@ -112,7 +112,12 @@ export default function SlotSelection() {
 
   return (
     <main className="min-h-screen bg-background text-foreground pb-32 relative selection:bg-accent/30">
-      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none" />
+      {/* Cinematic Background */}
+      <div className="absolute inset-0 z-0 fixed">
+        <img src="https://images.unsplash.com/photo-1605282717013-118e47228800?q=80&w=2070&auto=format&fit=crop" alt="Banana Leaf Background" className="w-full h-full object-cover opacity-10 mix-blend-multiply sepia-[0.3]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/90 to-background" />
+      </div>
+      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none fixed" />
       
       {/* Top Header */}
       <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
