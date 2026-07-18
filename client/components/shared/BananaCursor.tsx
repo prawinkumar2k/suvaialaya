@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, useSpring, useMotionValue } from "framer-motion";
 
 export function BananaCursor() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
@@ -34,17 +34,9 @@ export function BananaCursor() {
     };
   }, [cursorX, cursorY, isVisible]);
 
-  // Hide the cursor on mobile/touch devices since they don't need custom cursors
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  }, []);
-
-  if (isTouchDevice) return null;
-
   return (
     <motion.div
-      className="fixed top-0 left-0 z-[9999] pointer-events-none mix-blend-difference"
+      className="fixed top-0 left-0 z-[9999] pointer-events-none hidden sm:block"
       style={{
         x: smoothX,
         y: smoothY,
