@@ -323,11 +323,11 @@ export default function Index() {
       <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10">
         <div className="grid gap-16 lg:grid-cols-2 items-center">
           <div>
-            <SectionHeading eyebrow="The venue" title="Somewhere special in Madurai." copy="The exact venue details will be shared with your booking confirmation. Think warm light, long tables, and the sound of good conversation." />
+            <SectionHeading eyebrow="The venue" title="Somewhere special in Bangalore." copy="The exact venue details will be shared with your booking confirmation. Think warm light, authentic Madurai aromas, and the sound of good conversation." />
             <div className="mt-10 flex items-center justify-center gap-4 text-sm font-semibold border p-6 rounded-xl border-primary/20 bg-primary/5">
               <MapPin size={24} className="text-accent" />
               <div className="text-left">
-                <p className="text-primary font-bold">Madurai, Tamil Nadu</p>
+                <p className="text-primary font-bold">Bangalore, Karnataka</p>
                 <a href="https://share.google/lMg8g7DHS0wRBuZn0" target="_blank" rel="noopener noreferrer" className="text-xs text-primary/70 hover:text-primary transition-colors mt-1 block">View on Google Maps &rarr;</a>
               </div>
             </div>
