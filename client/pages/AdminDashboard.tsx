@@ -450,7 +450,7 @@ export default function AdminDashboard() {
                   <h1 className="font-display text-4xl font-bold text-primary">Events & Slots</h1>
                   <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Manage your venue schedule</p>
                 </div>
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
                   {events.length === 0 ? (
                     <div className="col-span-full text-center py-20 border border-dashed border-primary/20 rounded-xl bg-primary/5">
                       <p className="text-primary/60 uppercase tracking-widest font-bold">No Events Found</p>

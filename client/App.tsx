@@ -31,6 +31,16 @@ import { AudioProvider } from "@/contexts/AudioContext";
 import { CulturalParticles } from "@/components/landing/CulturalParticles";
 import { AuraCursor } from "@/components/shared/AuraCursor";
 
+import { useLocation } from "react-router-dom";
+
+const ParticlesWrapper = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith("/admin") || location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/kitchen")) {
+    return null;
+  }
+  return <CulturalParticles />;
+};
+
 const queryClient = new QueryClient();
 
 export default function App() {
@@ -38,11 +48,11 @@ export default function App() {
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AudioProvider>
-        <CulturalParticles />
         <AuraCursor />
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ParticlesWrapper />
           <Routes>
             <Route path="/" element={<Index />} />
           <Route path="/organizers" element={<PlaceholderPage />} /> 
