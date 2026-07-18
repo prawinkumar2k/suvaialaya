@@ -148,7 +148,7 @@ export default function Index() {
                 transition={{ delay: 0.3, duration: 1.2 }}
                 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
               >
-                MADURAI
+                SUVAIALAYA
               </motion.h1>
               <motion.h1 
                 initial={{ opacity: 0, letterSpacing: "0.4em" }}
@@ -156,7 +156,7 @@ export default function Index() {
                 transition={{ delay: 0.5, duration: 1.2 }}
                 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
               >
-                CHITHIRAI
+                RESTAURANT
               </motion.h1>
               <motion.h1 
                 initial={{ opacity: 0, letterSpacing: "0.4em" }}
@@ -164,7 +164,7 @@ export default function Index() {
                 transition={{ delay: 0.7, duration: 1.2 }}
                 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
               >
-                THIRUVIZHA
+                BANGALORE
               </motion.h1>
             </div>
 
@@ -302,10 +302,10 @@ export default function Index() {
             className="mt-20 text-center py-16 px-6 border-y border-accent/20 bg-primary-foreground/[0.02] relative overflow-hidden"
           >
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none font-display font-extrabold text-[8rem] md:text-[14rem] text-primary-foreground leading-none overflow-hidden">
-              MADURAI
+              SUVAIALAYA
             </div>
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-temple-gold uppercase leading-[1.2] relative z-10 drop-shadow-md">
-              MADURAI IS NOT COOKED.
+              TRADITION IS NOT COOKED.
               <br />
               <span className="text-primary-foreground block mt-2">IT IS CELEBRATED.</span>
             </h2>
