@@ -1,119 +1,66 @@
-# SUVAIALAYA SOUTH INDIAN CUISINE
-## Project Proposal & Cost Quotation (Startup Edition)
+# Project Cost Proposal & Agreement — Suvaialaya SaaS Platform
+### (Final Startup Plan — Standardized Charges)
+
+This document outlines the final comprehensive cost breakdown for the development, setup, hosting, domain, and recurring maintenance support of the **Suvaialaya Event & Restaurant Booking SaaS Platform**.
+
+All estimates are presented in both **Indian Rupees (INR - ₹)** and **US Dollars (USD - $)**.
 
 ---
 
-### Executive Summary
-**Suvaialaya** is a high-performance, enterprise-grade Event & Restaurant Booking SaaS Platform designed specifically for the restaurant industry. It handles high-concurrency ticket reservations, slot allocations, real-time kitchen queues, admin dashboards, security layers, and automated ticketing workflows. 
+## 1. Summary of Project Costs
 
-This document details the software development costs, architectural breakdown, hosting optimization, and on-demand maintenance retainers tailored to keep capital expenditures minimal for a startup.
-
----
-
-## 1. Project Financial Summary
-
-| Billing Item | Startup Tier (INR) | Startup Tier (USD) | Payment Schedule / Nature |
+| Component | Cost (INR) | Cost (USD) | Payment Model / Frequency |
 | :--- | :--- | :--- | :--- |
-| **A. Phase-Wise Development Fee** | **₹1,80,000** | **$2,160** | One-Time (50% Advance / 50% Delivery) |
-| **B. Monthly Hosting & Operational Costs** | **~₹500 / month** | **~$6 / month** | Monthly (Billed directly by Host Provider) |
-| **C. Post-Launch Maintenance & Support** | **₹0 / month** | **$0 / month** | Billed On-Demand (₹750 / hr or $10 / hr) |
+| **A. One-Time Software Engineering** | **₹1,80,000** | **$2,160** | One-time (50% advance, 50% on completion) |
+| **B. Domain Registration (`.com` / `.in`)**| **₹600** | **$8** | Yearly renewal |
+| **C. Server VPS Hosting (Hetzner / Hostinger)**| **~₹779 / month** | **~$9.50 / month**| Monthly (KVM 2 Plan: 2 vCPU, 8GB RAM, 100GB NVMe)|
+| **D. Monthly Active SRE Maintenance Support**| **₹3,000 / month** | **$36 / month** | Monthly subscription retainer |
 
 ---
 
-## 2. Comprehensive Functional Scope (What is Built)
+## 2. Complete Cost Details
 
-The development fee covers the implementation of **21 pages** and a robust backend middleware ecosystem.
-
-```mermaid
-graph TD
-    User([Customer]) -->|Browse & Reserve| Web[Vite Frontend Client]
-    Web -->|Vanguard Guards| API[Express API Server]
-    API -->|Read/Write Flags| DB[(MongoDB Replica Set)]
-    API -->|Acquire Seat Lock| Redis[(Redis In-Memory Store)]
-    Redis -->|Process Job| Bull[BullMQ Async Workers]
-    Bull -->|Dispatch Email| Resend[Resend Service]
-```
-
-### A. Frontend Modules (React 18 + Vite)
-1. **Interactive Landing Page (`Index.tsx`)**: High-fidelity masonry layouts showcasing South Indian culinary galleries, real-time ticket sales tracking, and direct booking flows.
-2. **Responsive Menu & Gallery Pages (`Menu.tsx`, `Gallery.tsx`)**: Premium menu display with responsive category filter switches and loaded culinary visuals.
-3. **Dynamic Slot & Seat Selection (`SlotSelection.tsx`)**: Polling checks that query available slots and prevent users from choosing expired times.
-4. **Secure Checkout Forms (`BookingForm.tsx`, `Payment.tsx`)**: Zod-validated registration forms capturing guest counts, names, and contact details, coupled with payment flows.
-5. **Multi-Role User Dashboard (`UserDashboard.tsx`)**: Client account panel showing historical bookings, download links for PDF receipts, QR tickets, and quick cancellation triggers.
-
-### B. Specialized Operations Control Panels (RBAC Enforced)
-* **Admin Control Center (`AdminDashboard.tsx`)**: High-fidelity dashboard visualizing revenue analytics, booking ledgers, CSV ledger exports, capacity config settings, and emergency feature flag switches.
-* **Receptionist Ledger (`ReceptionDashboard.tsx`)**: Designed for onsite hostesses to check guests in, review daily guest list tallies, and filter by payment states.
-* **Kitchen Production Panel (`KitchenDashboard.tsx`)**: Grid updates showing real-time dietary requirements (e.g., spice levels, allergies) and aggregate pax summaries.
-* **Door Scanner app (`QRScanner.tsx`, `TicketVerification.tsx`)**: Fully integrated browser-based QR scanner using device cameras for immediate ticket validation and check-in confirmation.
-
-### C. Authentication & Security Gateways
-* BCrypt hashing protection for client credentials.
-* OTP Verification flow (`VerifyOTP.tsx`) for two-factor checkout protection.
-* Secure Forgot/Reset Password flows (`ForgotPassword.tsx`, `ResetPassword.tsx`).
+### A. One-Time Software Development & Setup (₹1,80,000 / $2,160)
+This covers the complete implementation, database locking systems, and testing:
+1. **Interactive Client UI (Vite + React 18)**: Masonry galleries, booking slot selector interface, checkout screens, user panels, and SMS/OTP verification screen.
+2. **Operations Dashboard System**:
+   * **Admin Console**: Sales/pax analytics charts, exportable logs, and system feature toggles.
+   * **Reception Dashboard**: Live guest list, status tracking, and manual override check-ins.
+   * **Kitchen dashboard**: Live order display, aggregate guest lists, and spice/dietary filters.
+   * **QR Ticket Validator**: Built-in camera scanner for receptionist check-ins.
+3. **Robust Backend REST API**: Mongoose schema integrations, multi-role RBAC security layers, and rate limit protection.
+4. **DevOps & Infrastructure**: Docker container builds (App, self-hosted MongoDB, Redis cache/queues), free Let's Encrypt SSL configuration, and Winston logs.
 
 ---
 
-## 3. Technology Stack & DevOps Architecture
-
-Suvaialaya is engineered using a robust **Three-Tier Architecture** configured for maximum vertical scale on single-instance systems.
-
-* **Frontend**: React 18 SPA, Vite, Tailwind CSS 3, Radix UI.
-* **Backend**: Express 5.0 (Node.js 20+), Winston Logger, Prometheus metrics.
-* **Databases**: MongoDB 6+ (replica set configuration for atomic transaction rollbacks).
-* **Caching & Queue Processing**: Redis 7+, BullMQ (asynchronous email and QR generators).
-* **Security Middleware**:
-  * `helmet`: Guarding HTTP headers.
-  * `express-rate-limit` + Redis store: DoS/Brute-force protection.
-  * `express-mongo-sanitize`: SQL/NoSQL Injection blocker.
-  * `HttpOnly, Secure, SameSite=Strict` cookies to defend against XSS.
+### B. Setup & Launch Prerequisites (One-Time / Annual)
+* **Domain Name Purchase (₹600 / $8 for Year 1)**: Registration of `suvaialaya.in` or `suvaialaya.com` (based on availability).
+* **Let's Encrypt SSL (₹0 / $0 - Free Forever)**: Installed directly on Nginx proxy to enable secure `https://` access.
 
 ---
 
-## 4. Development Fee Allocation (₹1,80,000 / $2,160)
-
-The one-time engineering fee is calculated based on **270 hours** of development:
-
-1. **Design & Core Frontend (75 Hours - ₹50,000 / $600)**
-   * Structuring responsive layout sheets, animations, typography, and SVG assets.
-   * Designing user dashboards, scanner layouts, and receptionist grids.
-2. **Backend REST API & Database (90 Hours - ₹65,000 / $780)**
-   * Implementing atomic transaction locks (using Redis locks) to prevent double-booking of single seats.
-   * Designing endpoints for analytics dashboards, waitlist routing, and authentication.
-3. **Queue Processing & Services (45 Hours - ₹30,000 / $360)**
-   * Implementing BullMQ workers for background email template compilation and PDF ticket generation.
-   * Creating email delivery hooks (Resend API) for confirmation and cancellations.
-4. **DevOps, Security & SRE Integrations (60 Hours - ₹35,000 / $420)**
-   * Building Docker container architectures (Node + MongoDB + Redis + Prometheus + Nginx).
-   * Configuring the Memory Watchdog and rotational database backup engine to protect against database corruption.
-   * Writing chaos testing scripts to verify local offline execution resilience.
+### C. Server VPS Hosting (₹779 / month or $9.50 / month)
+We will run the app, database, and queue engine on a single **Hostinger/Hetzner CPX21 KVM VPS**:
+* **Specs**: 2 vCPU Cores, 8 GB RAM, 100 GB NVMe Disk Space, 8 TB Bandwidth.
+* **Why this plan**: The 8 GB RAM provides ample room to run MongoDB and Redis locally, while the 2 vCPUs prevent CPU bottlenecks during concurrent checkouts.
 
 ---
 
-## 5. Startup Hosting Cost Optimization
-
-To support early-stage startups, we avoid expensive database hosts (like MongoDB Atlas) and caching hosts (like Redis Enterprise). Instead, we run everything on **one single Virtual Private Server (VPS)**.
-
-### Standard Cloud Setup vs. Startup Optimized Setup
-
-| Hosting Component | Standard Hosting (Enterprise) | Startup Optimized Hosting | How We Save |
-| :--- | :--- | :--- | :--- |
-| **App & Frontend Host** | $15 Droplet (DigitalOcean) | Included in Single VPS | Run together using Docker. |
-| **MongoDB Database** | MongoDB Atlas Dedicated ($60/mo) | Self-hosted Database ($0/mo) | MongoDB replica set configured inside a Docker volume. |
-| **Redis Cache / Queue** | Managed Redis ($15/mo) | Self-hosted Redis ($0/mo) | Redis container run in the same internal network. |
-| **Transactional Emails**| Resend Paid Tier ($20/mo) | Resend Free Tier ($0/mo) | Bypassed fees by staying under 3,000 free emails/mo. |
-| **Database Backups** | AWS S3 Storage ($5/mo) | GDrive Sync ($0/mo) | Local backup cron uploads archives to a free-tier drive. |
-| **Security Auditing** | Paid vulnerability scans ($50/mo) | Trivy & Gitleaks ($0/mo) | Integrated free security scanners in the CI/CD pipeline. |
-| **Monthly Burn Rate**| **~₹10,500 / month ($125)** | **~₹500 / month ($6)** | **Saved ₹10,000 ($119) every month.** |
+### D. Monthly SRE Maintenance & Support Retainer (₹3,000 / month or $36 / month)
+A custom-tailored startup maintenance plan to ensure the platform stays online and secure without costing enterprise retainer fees:
+1. **24/7 Endpoint Monitoring**: Auto-pingers to alert us if the app server goes offline.
+2. **Backup Snapshot Health Checks**: Weekly verification of the database backup scheduler archives (verifying `.tar.gz` local backups).
+3. **Emergency Patching**: Immediate application of security updates and NPM hotfixes to pass Gitleaks/Trivy CI/CD gates.
+4. **Included Adjustments (2 hours/mo)**: Basic text adjustments, simple menu alterations, and logo changes.
+5. **Support SLA**: Standard issue updates completed within 24 hours. Critical (P1) server-down issues addressed within 4 hours.
 
 ---
 
-## 6. Maintenance & Support SLA
+## 3. Project Deliverables Checklist
 
-To keep the startup from paying unnecessary monthly fees when the app is running smoothly, we utilize an **On-Demand Maintenance Agreement**:
-
-* **Monthly Retainer**: **₹0 ($0)**. No payments are required unless you request changes.
-* **On-Demand Assistance**: Billed at **₹750 / hour ($10 / hour)**.
-* **Emergency Hotfixes (P1 Issues)**: Billed at the standard hourly rate, with guaranteed investigation within 4 hours.
-* **Standard Updates**: Includes simple menu adjustments, logo modifications, and text shifts (completed within 24-48 hours of ticket creation).
-* **Security Upkeep**: Automatic checking and fixing of NPM package vulnerabilities to maintain passing status on Gitleaks and Trivy.
+* [ ] Custom Vite/React SPA + Node.js API codebase pushed to GitHub.
+* [ ] Hostinger/Hetzner KVM VPS Setup & Docker Deployment.
+* [ ] Domain pointing DNS config (A records, SPF/DKIM for mail delivery).
+* [ ] Automated database cron backup engine with local rotation retention.
+* [ ] Admin, Receptionist, Kitchen, Scanner access controls.
+* [ ] Completed handoff documentation (`README.md`, `DOCKER.md`, `ARCHITECTURE.md`).
