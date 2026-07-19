@@ -244,20 +244,22 @@ export function createServer() {
     /^\/ticket\/[^/]+$/
   ];
 
-  app.use((req, res, next) => {
-    if (req.path.startsWith("/api")) {
-      return next();
-    }
-    if (path.extname(req.path)) {
-      return next();
-    }
-    const isValid = VALID_FRONTEND_ROUTES.some(regex => regex.test(req.path));
-    if (!isValid) {
-      res.status(404).send("Not Found");
-      return;
-    }
-    next();
-  });
+  if (process.env.NODE_ENV === "production") {
+    app.use((req, res, next) => {
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      if (path.extname(req.path)) {
+        return next();
+      }
+      const isValid = VALID_FRONTEND_ROUTES.some(regex => regex.test(req.path));
+      if (!isValid) {
+        res.status(404).send("Not Found");
+        return;
+      }
+      next();
+    });
+  }
 
   // ─── Catch-all 404 for undefined API routes ──────────────────────────────
   app.use("/api", (req, res) => {
