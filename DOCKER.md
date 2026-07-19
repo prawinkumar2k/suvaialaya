@@ -24,8 +24,8 @@ cd suvaialaya
 # 2. Copy environment file
 cp .env.example .env
 
-# 3. Launch everything (MongoDB + App) with a single command!
-docker-compose up --build
+# 3. Launch everything (MongoDB + Redis + App) with a single command!
+docker compose -f docker-compose.local.yml up --build
 ```
 
 Open your browser at: **http://localhost:8080** 🎉
@@ -39,8 +39,8 @@ Open your browser at: **http://localhost:8080** 🎉
 After the app starts, run the seed command **once** to populate demo data:
 
 ```bash
-# In a second terminal window (while docker-compose is running):
-docker exec sems-application node -e "
+# In a second terminal window (while docker compose is running):
+docker exec sems-application-local node -e "
 const { execSync } = require('child_process');
 execSync('node dist/server/node-build.mjs seed', { stdio: 'inherit' });
 "
@@ -65,10 +65,10 @@ Then log in with:
 
 ```bash
 # Stop all containers (keeps your database data)
-docker-compose down
+docker compose -f docker-compose.local.yml down
 
 # Stop AND delete all data (fresh reset)
-docker-compose down -v
+docker compose -f docker-compose.local.yml down -v
 ```
 
 ---
@@ -77,7 +77,7 @@ docker-compose down -v
 
 ```bash
 git pull origin main
-docker-compose up --build
+docker compose -f docker-compose.local.yml up --build
 ```
 
 ---
@@ -99,9 +99,10 @@ For a real production deployment, update these:
 ## 🗂️ What's Running Inside Docker
 
 ```
-docker-compose up starts:
-  ├── sems-database   → MongoDB 6.0  (port 27017)
-  └── sems-application → Node.js + React SPA (port 8080)
+docker compose up starts:
+  ├── sems-database-local    → MongoDB 6.0  (port 27017)
+  ├── sems-redis-local       → Redis 7.0    (port 6379)
+  └── sems-application-local  → Node.js + React SPA (port 8080)
 ```
 
 ---
@@ -113,10 +114,10 @@ docker-compose up starts:
 docker ps
 
 # View live logs
-docker-compose logs -f
+docker compose -f docker-compose.local.yml logs -f
 
 # View app logs only
-docker-compose logs -f sems-app
+docker compose -f docker-compose.local.yml logs -f sems-app
 ```
 
 ---
