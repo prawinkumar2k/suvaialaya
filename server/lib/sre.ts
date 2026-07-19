@@ -68,29 +68,121 @@ export function startWaitlistMonitor() {
 }
 
 // ─── BACKUP ENGINE ────────────────────────────────────────────────────────────
-// Runs MongoDB dump every 6 hours
-// In production: replace execSync with AWS S3 upload via @aws-sdk/client-s3
+// Runs MongoDB dump every 6 hours and maintains rotational retention locally
 export function startBackupScheduler() {
+  const fs = require("fs");
+  const path = require("path");
+
   // Every 6 hours: 0 */6 * * *
   cron.schedule("0 */6 * * *", async () => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const backupPath = `/backups/mongodb-${timestamp}`;
+    const backupsDir = path.resolve(process.cwd(), "data", "backups");
+    const rawBackupPath = path.join(backupsDir, `mongodb-raw-${timestamp}`);
+    const archivePath = path.join(backupsDir, `mongodb-${timestamp}.tar.gz`);
     const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/suvaialaya";
 
-    logger.info("Starting scheduled MongoDB backup", { backupPath });
+    logger.info("Starting scheduled MongoDB backup process", { timestamp });
 
+    let auditId: string | null = null;
     try {
-      execSync(`mongodump --uri="${mongoUri}" --out="${backupPath}" --gzip`, {
+      // 1. Create backups directory if not exists
+      if (!fs.existsSync(backupsDir)) {
+        fs.mkdirSync(backupsDir, { recursive: true });
+      }
+
+      // 2. Log backup start in AuditLog
+      const AuditLog = mongoose.model("AuditLog") as any;
+      const audit = await AuditLog.create({
+        action: "system.backup.started",
+        resource: { type: "system", id: "mongodb" },
+        status: "success",
+        metadata: { timestamp, target: archivePath },
+      });
+      auditId = (audit as any)._id.toString();
+
+      // 3. Execute mongodump to raw folder
+      execSync(`mongodump --uri="${mongoUri}" --out="${rawBackupPath}" --gzip`, {
         timeout: 5 * 60 * 1000, // 5-minute timeout
       });
 
-      logger.info("MongoDB backup completed", { backupPath, timestamp });
+      // 4. Compress the folder using tar (cross-platform or native shell command)
+      // Since tar is installed on standard Linux/macOS/Windows environments
+      execSync(`tar -czf "${archivePath}" -C "${backupsDir}" "${path.basename(rawBackupPath)}"`, {
+        timeout: 2 * 60 * 1000,
+      });
 
-      // In production: upload to S3
-      // await uploadToS3(backupPath, `backups/mongodb/${timestamp}.tar.gz`);
+      // 5. Delete raw uncompressed backup folder to conserve disk space
+      fs.rmSync(rawBackupPath, { recursive: true, force: true });
+
+      const stats = fs.statSync(archivePath);
+      const sizeBytes = stats.size;
+
+      logger.info("MongoDB backup completed and compressed", { archivePath, sizeBytes });
+
+      // 6. Log success in AuditLog
+      if (auditId) {
+        await AuditLog.updateOne(
+          { _id: auditId },
+          {
+            $set: {
+              action: "system.backup.success",
+              metadata: { timestamp, archivePath, sizeBytes, status: "success" },
+            },
+          }
+        );
+      }
+
+      // 7. Rotate backups: Keep only the 5 most recent backup files
+      const files = fs.readdirSync(backupsDir)
+        .filter((file: string) => file.startsWith("mongodb-") && file.endsWith(".tar.gz"))
+        .map((file: string) => ({
+          name: file,
+          time: fs.statSync(path.join(backupsDir, file)).mtime.getTime(),
+        }))
+        .sort((a: any, b: any) => b.time - a.time); // newest first
+
+      if (files.length > 5) {
+        const toDelete = files.slice(5);
+        for (const file of toDelete) {
+          fs.unlinkSync(path.join(backupsDir, file.name));
+          logger.info("Rotated and deleted old backup file", { file: file.name });
+        }
+      }
     } catch (err: any) {
       logger.error("MongoDB backup failed", { error: err.message });
       await alerts.backupFailed("mongodb", err.message);
+
+      // Clean up raw backup path in case of failure
+      if (fs.existsSync(rawBackupPath)) {
+        fs.rmSync(rawBackupPath, { recursive: true, force: true });
+      }
+
+      try {
+        const AuditLog = mongoose.model("AuditLog");
+        if (auditId) {
+          await AuditLog.updateOne(
+            { _id: auditId },
+            {
+              $set: {
+                action: "system.backup.failed",
+                status: "failure",
+                errorMessage: err.message,
+                metadata: { timestamp, error: err.message },
+              },
+            }
+          );
+        } else {
+          await AuditLog.create({
+            action: "system.backup.failed",
+            resource: { type: "system", id: "mongodb" },
+            status: "failure",
+            errorMessage: err.message,
+            metadata: { timestamp, error: err.message },
+          });
+        }
+      } catch (logErr: any) {
+        logger.error("Failed to log backup error to AuditLog", { error: logErr.message });
+      }
     }
   });
 
@@ -106,7 +198,7 @@ export function startBackupScheduler() {
     }
   });
 
-  logger.info("Backup scheduler started (MongoDB every 6h, Redis every 6h)");
+  logger.info("Backup scheduler started (MongoDB with local rotation/auditing, Redis BGSAVE)");
 }
 
 // ─── SRE: NoShow Auto-marker ──────────────────────────────────────────────────
