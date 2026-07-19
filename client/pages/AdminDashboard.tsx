@@ -296,7 +296,8 @@ export default function AdminDashboard() {
                       <thead className="text-[10px] text-primary/60 uppercase tracking-widest bg-primary/5 border-b border-primary/10">
                         <tr>
                           <th className="px-6 py-4 font-bold">Booking ID</th>
-                          <th className="px-6 py-4 font-bold">Guest Name</th>
+                          <th className="px-6 py-4 font-bold">Guest Details</th>
+                          <th className="px-6 py-4 font-bold">Contact Info</th>
                           <th className="px-6 py-4 font-bold">Slot</th>
                           <th className="px-6 py-4 font-bold text-center">Pax</th>
                           <th className="px-6 py-4 font-bold">Status</th>
@@ -306,7 +307,7 @@ export default function AdminDashboard() {
                       <tbody className="divide-y divide-primary/10">
                         {bookings.length === 0 && (
                           <tr>
-                            <td colSpan={6} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
+                            <td colSpan={7} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
                               No bookings found in database
                             </td>
                           </tr>
@@ -314,7 +315,14 @@ export default function AdminDashboard() {
                         {[...bookings].reverse().slice(0, 10).map((b) => (
                           <tr key={b._id} className="hover:bg-primary/5 transition-colors">
                             <td className="px-6 py-5 font-bold text-primary">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
-                            <td className="px-6 py-5 text-foreground/80 font-medium">{b.user?.name || b.guestDetails?.fullName || "Guest"}</td>
+                            <td className="px-6 py-5 text-foreground/80 font-medium">
+                              <div>{b.user?.name || b.guestDetails?.fullName || "Guest"}</div>
+                              {b.guestDetails?.city && <div className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">{b.guestDetails.city}</div>}
+                            </td>
+                            <td className="px-6 py-5 text-primary/70 text-xs">
+                              <div>{b.user?.email || b.guestDetails?.email || "N/A"}</div>
+                              <div className="font-medium mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
+                            </td>
                             <td className="px-6 py-5 text-primary/70">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
                             <td className="px-6 py-5 text-center font-bold text-primary">{b.numberOfGuests}</td>
                             <td className="px-6 py-5">
@@ -379,7 +387,8 @@ export default function AdminDashboard() {
                       <thead className="text-[10px] text-primary/60 uppercase tracking-widest bg-primary/5 border-b border-primary/10">
                         <tr>
                           <th className="px-6 py-4 font-bold">Booking ID</th>
-                          <th className="px-6 py-4 font-bold">Guest Name</th>
+                          <th className="px-6 py-4 font-bold">Guest Details</th>
+                          <th className="px-6 py-4 font-bold">Contact Info</th>
                           <th className="px-6 py-4 font-bold">Slot</th>
                           <th className="px-6 py-4 font-bold text-center">Pax</th>
                           <th className="px-6 py-4 font-bold">Status</th>
@@ -389,7 +398,7 @@ export default function AdminDashboard() {
                       <tbody className="divide-y divide-primary/10">
                         {bookings.length === 0 && (
                           <tr>
-                            <td colSpan={6} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
+                            <td colSpan={7} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
                               No bookings found in database
                             </td>
                           </tr>
@@ -397,7 +406,14 @@ export default function AdminDashboard() {
                         {[...bookings].reverse().map((b) => (
                           <tr key={b._id} className="hover:bg-primary/5 transition-colors">
                             <td className="px-6 py-5 font-bold text-primary">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
-                            <td className="px-6 py-5 text-foreground/80 font-medium">{b.user?.name || b.guestDetails?.fullName || "Guest"}</td>
+                            <td className="px-6 py-5 text-foreground/80 font-medium">
+                              <div>{b.user?.name || b.guestDetails?.fullName || "Guest"}</div>
+                              {b.guestDetails?.city && <div className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">{b.guestDetails.city}</div>}
+                            </td>
+                            <td className="px-6 py-5 text-primary/70 text-xs">
+                              <div>{b.user?.email || b.guestDetails?.email || "N/A"}</div>
+                              <div className="font-medium mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
+                            </td>
                             <td className="px-6 py-5 text-primary/70">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
                             <td className="px-6 py-5 text-center font-bold text-primary">{b.numberOfGuests}</td>
                             <td className="px-6 py-5">

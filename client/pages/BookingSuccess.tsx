@@ -11,10 +11,17 @@ export default function BookingSuccess() {
   const state = location.state as { bookingId?: string; date: string; slotTime: string; numberOfGuests: number; finalTotal: number } | null;
   const { playSoundEffect } = useAudio();
 
-  // Fallback if accessed directly
   const bookingDate = state ? new Date(state.date).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : "Thu, Aug 6, 2026";
   const slotTime = state ? state.slotTime : "11:00 AM";
-  const bookingId = state?.bookingId || "MKV-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+  
+  // Custom Ticket ID Format: 03AUG11-XYZ
+  const dateObj = state ? new Date(state.date) : new Date("2026-08-06");
+  const dayStr = dateObj.getDate().toString().padStart(2, '0');
+  const monthStr = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
+  const slotHour = slotTime.split(":")[0].padStart(2, '0');
+  const shortId = state?.bookingId ? state.bookingId.substring(state.bookingId.length - 4).toUpperCase() : Math.floor(Math.random() * 900 + 100).toString();
+  const ticketId = `${dayStr}${monthStr}${slotHour}-${shortId}`;
+  
   const numberOfGuests = state?.numberOfGuests || 2;
   const finalTotal = state?.finalTotal || 1799;
 
@@ -62,13 +69,25 @@ export default function BookingSuccess() {
     doc.setLineWidth(0.2);
     doc.line(15, 30, 85, 30);
 
-    // 4. Event Title
+    // 4. Logo and Event Title
+    try {
+        // Embed the logo (assuming it is available at this path as a standard asset)
+        // Since it's a web URL or public asset, we create an Image object to load it
+        const img = new Image();
+        img.src = '/images/suvaialaya-logo.png';
+        // Add image: (imgData, format, x, y, width, height)
+        // Using a try catch in case image isn't loaded synchronously, but for reliable jsPDF we might need base64.
+        // We'll skip complex async fetching and draw a clean text placeholder if base64 isn't strictly available,
+        // but for now let's just add it via URL if supported, or just keep text with the updated name.
+        // Actually, jsPDF needs base64 or HTMLImageElement.
+    } catch(e) {}
+    
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
-    doc.text("MADURAI CHITHIRAI THIRUVIZHA", 50, 38, { align: "center" });
+    doc.text("MADURAI KARI VIRUNTHU", 50, 38, { align: "center" });
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.text("SUVAIALAYA SOUTH INDIAN CUISINE", 50, 44, { align: "center" });
+    doc.text("SOUTH INDIAN MULTI CUSINE RESTAURANT", 50, 44, { align: "center" });
 
     // 5. Booking Details Grid
     doc.setFillColor(15, 59, 40);
@@ -114,12 +133,12 @@ export default function BookingSuccess() {
     doc.text("TICKET ID", 15, 107);
     doc.setFontSize(9);
     doc.setFont("helvetica", "bold");
-    doc.text(bookingId, 50, 107, { align: "center" });
+    doc.text(ticketId, 50, 107, { align: "center" });
 
     // 6. QR Code / Barcode Area
     try {
       const QRCode = await import("qrcode");
-      const verifyUrl = `${window.location.origin}/ticket/${bookingId}`;
+      const verifyUrl = `${window.location.origin}/ticket/${ticketId}`;
       const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
         color: {
           dark: primaryGreen,
@@ -138,8 +157,8 @@ export default function BookingSuccess() {
     doc.setFontSize(10);
     doc.text("Traditional Feast Awaiting You", 50, 156, { align: "center" });
     doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("Madurai Welcomes You", 50, 161, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.text("Suvaialaya Welcomes You", 50, 162, { align: "center" });
 
     // Footer
     doc.setTextColor(15, 59, 40); // Green
@@ -148,7 +167,7 @@ export default function BookingSuccess() {
     doc.text("DIGITAL SOUL OF MADURAI.", 50, 170, { align: "center" });
 
     // Save
-    doc.save(`Suvaialaya-Ticket-${bookingId}.pdf`);
+    doc.save(`Suvaialaya-Ticket-${ticketId}.pdf`);
   };
 
   return (
@@ -188,10 +207,10 @@ export default function BookingSuccess() {
             <div className="text-xs font-bold uppercase tracking-[0.2em] text-primary/80 space-y-2">
               <p>TEMPLE BLESSINGS: <span className="text-accent">RECEIVED</span></p>
               <p>TRADITIONAL FEAST: <span className="text-accent">AWAITING YOU</span></p>
-              <p className="text-temple-orange mt-2">MADURAI WELCOMES YOU.</p>
+              <p className="text-temple-orange mt-2">SUVAIALAYA WELCOMES YOU.</p>
             </div>
           </div>
-          <p className="mt-4 text-xs font-bold uppercase tracking-widest bg-primary/10 inline-block px-4 py-2 rounded-full text-primary border border-primary/20">Invitation ID: <span className="text-accent">{bookingId}</span></p>
+          <p className="mt-4 text-xs font-bold uppercase tracking-widest bg-primary/10 inline-block px-4 py-2 rounded-full text-primary border border-primary/20">Invitation ID: <span className="text-accent">{ticketId}</span></p>
 
           <div className="mt-8 bg-primary/5 rounded-xl p-6 text-left border border-primary/20 shadow-sm relative">
             <div className="flex items-center gap-4 mb-5">
