@@ -115,10 +115,7 @@ export default function Index() {
           <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/70 to-background" />
         </div>
         
-        <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-50 mix-blend-multiply pointer-events-none" />
-        <div className="absolute top-0 right-0 p-10 opacity-10 pointer-events-none blur-sm animate-pulse">
-           <Leaf size={400} className="text-primary" />
-        </div>
+        {/* Removed decorative leaf background per client request */}
         
         <div className="mx-auto max-w-7xl px-5 relative z-10 text-center">
           <motion.div 
@@ -255,8 +252,7 @@ export default function Index() {
                 }}
                 className="relative overflow-visible rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-background via-white to-primary/10 p-8 shadow-2xl transition-all group backdrop-blur-xl transform-gpu perspective-[1000px]"
               >
-                <div className="absolute -right-4 -top-4 opacity-10 group-hover:opacity-30 group-hover:rotate-45 group-hover:scale-150 transition-all duration-500 z-0">
-                  <Leaf size={120} className="text-primary drop-shadow-[0_0_15px_rgba(230,0,92,0.8)]" />
+                <div className="absolute -right-4 -top-4 opacity-0 transition-all duration-500 z-0">
                 </div>
                 <span className="font-display text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent to-temple-maroon drop-shadow-md relative z-10">{step.number}</span>
                 <h3 className="mt-6 font-display text-2xl font-bold text-primary relative z-10">{step.title}</h3>
@@ -301,8 +297,7 @@ export default function Index() {
                   <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
                 </div>
                 
-                <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-50 group-hover:rotate-90 transition-all duration-500 z-10 pointer-events-none">
-                  <Leaf size={80} className="text-temple-gold drop-shadow-[0_0_20px_rgba(255,215,0,0.8)]" />
+                <div className="absolute top-0 right-0 p-4 opacity-0 transition-all duration-500 z-10 pointer-events-none">
                 </div>
                 
                 <div className="relative z-20 mt-auto p-6 bg-gradient-to-t from-primary to-transparent pt-12 flex flex-col justify-end h-full">

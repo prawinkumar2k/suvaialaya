@@ -45,16 +45,17 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-primary text-primary-foreground overflow-hidden"
           onClick={handleEnter}
         >
-          {/* Animated Mandala/Lotus Background */}
+          {/* Animated Logo Background */}
           <motion.div
-            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none"
+            animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.1, 0.05] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
           >
-            <svg viewBox="0 0 200 200" className="w-[800px] h-[800px] text-temple-gold" fill="currentColor">
-              <path d="M100 0 C120 40, 160 40, 200 100 C160 160, 120 160, 100 200 C80 160, 40 160, 0 100 C40 40, 80 40, 100 0 Z" />
-              <circle cx="100" cy="100" r="20" fill="none" stroke="currentColor" strokeWidth="2" />
-            </svg>
+            <img 
+              src="/images/suvaialaya-logo.png" 
+              alt="Suvaialaya Logo Background" 
+              className="w-[800px] h-[800px] object-contain opacity-20 grayscale brightness-200 contrast-125 mix-blend-overlay"
+            />
           </motion.div>
 
           <div className="relative z-10 flex flex-col items-center justify-center text-center px-4">
@@ -101,7 +102,7 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
                   transition={{ duration: 1.5 }}
                 >
                   <h2 className="font-display text-5xl md:text-7xl font-extrabold tracking-wider text-temple-orange uppercase leading-none drop-shadow-[0_0_30px_rgba(255,122,0,0.5)]">
-                    Welcome to<br />Madurai
+                    Welcome to<br />Madurai Festival
                   </h2>
                 </motion.div>
               )}
