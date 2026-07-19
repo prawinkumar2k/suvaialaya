@@ -22,7 +22,7 @@ export const notificationWorker = new Worker(
         break;
       }
       case "cancellation": {
-        // TODO: send cancellation email — hook into sendBookingConfirmationEmail with type param
+        await sendBookingConfirmationEmail(bookingId, "cancellation");
         logger.info("Cancellation notification processed", { bookingId });
         break;
       }
