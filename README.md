@@ -189,14 +189,24 @@ event-ticket-hub/
    ```
    *Note: Concurrently spins up both Vite client and Express API on a single port (8080) for simplified proxying.*
 
-### 🐳 Docker Setup (Production)
+### 🐳 Docker Setup (Easiest Way to Run)
+
+If you are just downloading this to test it locally, you can run the entire stack using Docker without needing to install Node.js, MongoDB, or Redis on your machine!
 
 ```bash
-# Build and launch all services in detached mode
-docker-compose up -d --build
+# Build and launch the local environment
+docker-compose -f docker-compose.local.yml up -d --build
 
+# The app will be available at http://localhost:8080
 # Monitor live orchestration logs
-docker-compose logs -f
+docker-compose -f docker-compose.local.yml logs -f
+```
+
+### 🚀 Production Deployment
+
+For production (with Nginx SSL, Prometheus, and Grafana):
+```bash
+docker-compose up -d --build
 ```
 
 ---

@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  sems-db:
+    image: mongo:6.0
+    container_name: sems-database-local
+    restart: unless-stopped
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - sems-db-data-local:/data/db
+    networks:
+      - sems-network-local
+    healthcheck:
+      test: |
+        mongosh --eval "
+          try { rs.status() } catch(e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }
+        "
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  sems-redis:
+    image: redis:7-alpine
+    container_name: sems-redis-local
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - sems-redis-data-local:/data
+    networks:
+      - sems-network-local
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sems-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: sems-application-local
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=development
+      - PORT=8080
+      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya?replicaSet=rs0
+      - REDIS_HOST=sems-redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=local_development_secret_key_change_me_12345
+    depends_on:
+      sems-db:
+        condition: service_healthy
+      sems-redis:
+        condition: service_healthy
+    networks:
+      - sems-network-local
+
+volumes:
+  sems-db-data-local:
+  sems-redis-data-local:
+
+networks:
+  sems-network-local:
+    driver: bridge
