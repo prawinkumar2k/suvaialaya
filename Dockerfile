@@ -51,14 +51,14 @@ COPY --from=builder /app/dist ./dist
 # Create logs directory with correct permissions
 RUN chown -R appuser:nodejs /app/logs
 
+# Install PM2 for Node.js clustering (must run as root)
+RUN npm install -g pm2 --quiet
+
 # Switch to non-root user
 USER appuser
 
 # Expose port
 EXPOSE 8080
-
-# Install PM2 for Node.js clustering
-RUN npm install -g pm2 --quiet
 
 # Environment
 ENV NODE_ENV=production
