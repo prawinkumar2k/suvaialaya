@@ -29,6 +29,9 @@ function expressPlugin(): Plugin {
     name: "express-plugin",
     apply: "serve", // Only apply during development (serve mode)
     async configureServer(server) {
+      if (process.env.VITEST) {
+        return;
+      }
       const { createServer } = await import("./server");
       const app = createServer();
 
