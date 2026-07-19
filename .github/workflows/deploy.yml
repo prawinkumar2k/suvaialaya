@@ -8,8 +8,12 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/suvaialaya-app
+  IMAGE_NAME: ${{ github.repository }}
   NODE_VERSION: "20"
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   # ─────────────────────────────────────────────────────────
@@ -158,6 +162,11 @@ jobs:
             
             # Rolling update — zero downtime
             cd /opt/suvaialaya
+            
+            # Update the image path in docker-compose.yml if it exists
+            if [ -f docker-compose.yml ]; then
+              sed -i 's|ghcr.io/prawinkumar2k/suvaialaya/suvaialaya-app|ghcr.io/prawinkumar2k/suvaialaya|g' docker-compose.yml
+            fi
             
             # Update the app container only (database & redis stay running)
             docker compose up -d --no-deps --pull always sems-app
