@@ -1,4 +1,5 @@
 import "dotenv/config";
+import path from "node:path";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -212,6 +213,51 @@ export function createServer() {
   app.get("/api/health", getSystemHealth);    // Kubernetes liveness + readiness
   app.get("/api/metrics", getMetrics);        // Prometheus scrape endpoint
   app.get("/api/ping", (_req, res) => res.json({ message: "pong" }));
+
+  // ─── Catch-all 404 for undefined Page routes (SEO & Red Team Security) ─────
+  const VALID_FRONTEND_ROUTES = [
+    /^\/$/,
+    /^\/about$/,
+    /^\/menu$/,
+    /^\/gallery$/,
+    /^\/login$/,
+    /^\/register$/,
+    /^\/forgot-password$/,
+    /^\/verify-otp$/,
+    /^\/reset-password$/,
+    /^\/slots$/,
+    /^\/booking-form$/,
+    /^\/payment$/,
+    /^\/success$/,
+    /^\/dashboard$/,
+    /^\/admin$/,
+    /^\/reception$/,
+    /^\/kitchen$/,
+    /^\/scanner$/,
+    /^\/organizers$/,
+    /^\/contact$/,
+    /^\/faq$/,
+    /^\/help$/,
+    /^\/terms$/,
+    /^\/privacy$/,
+    /^\/events\/[^/]+$/,
+    /^\/ticket\/[^/]+$/
+  ];
+
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+    if (path.extname(req.path)) {
+      return next();
+    }
+    const isValid = VALID_FRONTEND_ROUTES.some(regex => regex.test(req.path));
+    if (!isValid) {
+      res.status(404).send("Not Found");
+      return;
+    }
+    next();
+  });
 
   // ─── Catch-all 404 for undefined API routes ──────────────────────────────
   app.use("/api", (req, res) => {
