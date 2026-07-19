@@ -92,7 +92,7 @@ export function createServer() {
           defaultSrc: ["'self'"],
           scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://checkout.razorpay.com", "blob:"],
           workerSrc: ["'self'", "blob:"],
-          frameSrc: ["'self'", "https://api.razorpay.com"],
+          frameSrc: ["'self'", "https://api.razorpay.com", "https://maps.google.com", "https://www.google.com"],
           connectSrc: ["'self'", "https://api.razorpay.com", "https://lumberjack.razorpay.com", "ws:", "wss:"],
           styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
           fontSrc: ["'self'", "https://fonts.gstatic.com"],

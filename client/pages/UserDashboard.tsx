@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, User, Ticket, Settings, Bell, LogOut, Download, Calendar, Clock, CreditCard, Leaf, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Ticket, Settings, Bell, LogOut, Download, Calendar, Clock, CreditCard, Leaf, Loader2, CalendarRange } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { Input } from "@/components/ui/input";
@@ -68,8 +68,7 @@ export default function UserDashboard() {
     if (user.role === "admin" || user.role === "owner") {
       navigate("/admin");
       return;
-    } else if (user.role === "kitchen_staff") {
-      navigate("/kitchen");
+
       return;
     } else if (user.role === "scanner" || user.role === "receptionist") {
       navigate("/scanner");
@@ -240,6 +239,11 @@ export default function UserDashboard() {
                               ${booking.bookingStatus === 'Confirmed' ? 'bg-accent/10 text-accent border-accent/20' : 'bg-primary/5 text-primary/60 border-primary/10'}`}>
                               {booking.bookingStatus}
                             </span>
+                            {booking.isRescheduled && (
+                              <span className="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded text-[10px] font-bold uppercase tracking-widest">
+                                Rescheduled
+                              </span>
+                            )}
                             <span className="text-[10px] font-bold uppercase tracking-widest text-primary/50">ID: {booking._id}</span>
                           </div>
                           <h3 className="font-display text-2xl font-bold text-primary">{booking.event?.title || "Madurai Kari Virunthu"}</h3>
@@ -262,6 +266,11 @@ export default function UserDashboard() {
                           <div className="text-3xl font-display font-bold text-primary">₹{booking.totalAmount.toLocaleString("en-IN")}</div>
                           {booking.bookingStatus === 'Confirmed' && (
                             <div className="flex gap-2">
+                              <Link to={`/slots?reschedule=${booking._id}`}>
+                                <button className="flex items-center justify-center gap-2 rounded-md bg-accent/10 text-accent border border-accent/20 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-accent hover:text-accent-foreground transition-all">
+                                  <CalendarRange size={14} /> Reschedule
+                                </button>
+                              </Link>
                               <button 
                                 onClick={() => handleCancelBooking(booking._id)}
                                 className="flex items-center justify-center gap-2 rounded-md bg-destructive/10 text-destructive border border-destructive/20 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest hover:bg-destructive hover:text-destructive-foreground transition-all"

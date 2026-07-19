@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, ChefHat } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { toast } from "sonner";
@@ -201,6 +201,12 @@ export default function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-6">
+            <Link to="/kitchen" className="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-4 py-2 rounded-md hover:bg-primary/5 transition-all">
+              <ChefHat size={16} /> Open Kitchen
+            </Link>
+            <Link to="/reception" className="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-4 py-2 rounded-md hover:bg-primary/5 transition-all">
+              <Users size={16} /> Open Reception
+            </Link>
             <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-4 py-2 rounded-md hover:bg-primary/5 transition-all">
               <ScanLine size={16} /> Open Scanner
             </Link>

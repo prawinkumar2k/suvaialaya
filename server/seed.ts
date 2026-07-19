@@ -109,10 +109,19 @@ async function seedDatabase() {
 
     await Booking.insertMany(bookingsToInsert);
 
+    // Create another user so John Doe doesn't see everyone else's mock bookings
+    const secondaryUser = await User.create({
+      name: "Jane Smith",
+      email: "jane@example.com",
+      phone: "0987654321",
+      password: "password123", 
+      role: "customer",
+    });
+
     // Create some bookings for other random guests to fill up the ledger
     const guestNames = ["Priya Sharma", "Rahul Verma", "Arun Kumar", "Sneha Iyer", "Vikram Singh"];
     const otherBookings = guestNames.map((name, i) => ({
-      user: johnDoe._id, // linking to same user for simplicity, but different guest names
+      user: secondaryUser._id, // linking to secondary user so John Doe's dashboard is clean
       event: event._id,
       date: `2026-08-0${i + 1}`,
       slotTime: i % 2 === 0 ? "07:00 PM" : "01:00 PM",

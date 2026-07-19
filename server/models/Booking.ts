@@ -60,6 +60,10 @@ const bookingSchema = new mongoose.Schema(
       default: "Confirmed",
       index: true,
     },
+    isRescheduled: {
+      type: Boolean,
+      default: false,
+    },
 
     // ─── Ticketing ──────────────────────────────────────────────────────────
     qrCodeUrl: { type: String },

@@ -26,6 +26,7 @@ import AdminDashboard from "@/pages/AdminDashboard";
 import QRScanner from "@/pages/QRScanner";
 import TicketVerification from "@/pages/TicketVerification";
 import KitchenDashboard from "@/pages/KitchenDashboard";
+import ReceptionDashboard from "@/pages/ReceptionDashboard";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { AuraCursor } from "@/components/shared/AuraCursor";
 
@@ -41,7 +42,7 @@ export default function App() {
         <AuraCursor />
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<Index />} />
           <Route path="/organizers" element={<PlaceholderPage />} /> 
@@ -67,6 +68,7 @@ export default function App() {
           {/* Dashboards */}
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/reception" element={<ReceptionDashboard />} />
           <Route path="/kitchen" element={<KitchenDashboard />} />
           <Route path="/scanner" element={<QRScanner />} />
           <Route path="/ticket/:id" element={<TicketVerification />} />

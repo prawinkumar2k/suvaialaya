@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, Clock, Users, Leaf, Check, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
@@ -25,6 +25,9 @@ export default function SlotSelection() {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedSlot, setSelectedSlot] = useState<any | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const rescheduleBookingId = searchParams.get("reschedule");
+  const [rescheduling, setRescheduling] = useState(false);
   const { playSoundEffect } = useAudio();
 
   useEffect(() => {
@@ -34,8 +37,7 @@ export default function SlotSelection() {
       if (user.role === "admin" || user.role === "owner") {
         navigate("/admin");
         return;
-      } else if (user.role === "kitchen_staff") {
-        navigate("/kitchen");
+
         return;
       } else if (user.role === "scanner" || user.role === "receptionist") {
         navigate("/scanner");
@@ -64,7 +66,7 @@ export default function SlotSelection() {
     fetchEvent();
   }, []);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!localStorage.getItem("token")) {
       toast.error("Please login to continue booking.");
       navigate("/login");
@@ -72,6 +74,29 @@ export default function SlotSelection() {
     }
     if (selectedSlot && eventData) {
       playSoundEffect("conch");
+      
+      if (rescheduleBookingId) {
+        setRescheduling(true);
+        try {
+          const res = await axios.put(`/api/bookings/${rescheduleBookingId}/reschedule`, {
+            newDate: selectedDate,
+            newSlotTime: selectedSlot.time
+          }, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+          });
+          
+          if (res.data.success) {
+            toast.success("Booking rescheduled successfully!");
+            navigate("/dashboard");
+          }
+        } catch (err: any) {
+          toast.error(err.response?.data?.error || "Failed to reschedule booking");
+        } finally {
+          setRescheduling(false);
+        }
+        return;
+      }
+
       navigate("/booking-form", {
         state: {
           eventId: eventData._id,
@@ -153,8 +178,8 @@ export default function SlotSelection() {
 
       <div className="mx-auto max-w-3xl px-5 pt-16 pb-40 sm:px-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-primary uppercase">SUVAIALAYA RESTAURANT BANGALORE</h1>
-          <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-primary/70">Reserve your table</p>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-primary uppercase">{rescheduleBookingId ? "Reschedule Booking" : "SUVAIALAYA RESTAURANT"}</h1>
+          <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-primary/70">{rescheduleBookingId ? "Select a new date and time for your reservation" : "Reserve your table"}</p>
           <OrnamentalDivider />
         </motion.div>
 
@@ -165,7 +190,7 @@ export default function SlotSelection() {
             <h2>Choose Date</h2>
           </div>
           
-          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x justify-start">
+          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x justify-center">
             {formattedDates.map((d: any) => {
               const isSelected = selectedDate === d.full;
               return (
@@ -198,16 +223,6 @@ export default function SlotSelection() {
               const statusText = isFull ? "Sold Out" : remaining < 15 ? "Filling Fast" : "Available";
               const statusColor = isFull ? "text-destructive" : remaining < 15 ? "text-accent" : "text-primary/70";
               const isSelected = selectedSlot?.time === slot.time;
-              
-              const timeStories: Record<string, string> = {
-                "11:00 AM": "Temple Blessings Await You",
-                "12:00 PM": "Taste The Heritage Of Madurai",
-                "01:00 PM": "Celebrate Tradition Together",
-                "02:00 PM": "A Feast Beyond Food"
-              };
-              
-              const storySub = timeStories[slot.time] || "Madurai Feast";
-              
               return (
                 <button
                   key={slot.time}
@@ -219,7 +234,6 @@ export default function SlotSelection() {
                 >
                   {isSelected && <div className="absolute top-0 right-0 p-2"><Check size={16} className="text-accent" /></div>}
                   <span className={`font-display font-bold text-2xl ${isFull ? 'text-foreground/50' : 'text-temple-orange'}`}>{slot.time}</span>
-                  <span className={`text-[11px] font-bold uppercase tracking-widest mt-2 ${isFull ? 'text-foreground/50' : 'text-foreground/70'}`}>{storySub}</span>
                   <div className={`mt-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${statusColor}`}>
                     <Users size={12} />
                     <span>{statusText}</span>
@@ -302,10 +316,11 @@ export default function SlotSelection() {
           </div>
           <button 
             onClick={handleContinue} 
-            disabled={!selectedSlot} 
-            className="rounded-md bg-primary px-8 py-3.5 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!selectedSlot || rescheduling} 
+            className="rounded-md bg-primary px-8 py-3.5 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Continue
+            {rescheduling ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+            {rescheduleBookingId ? "Reschedule" : "Continue"}
           </button>
         </div>
       </motion.div>

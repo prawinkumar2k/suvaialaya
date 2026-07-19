@@ -79,7 +79,7 @@ export async function acquireSeatLock(
     return result === "OK";
   } catch (e) {
     logger.warn("Redis unavailable, bypassed acquireSeatLock");
-    return true; // Allow proceeding without lock
+    return false; // MUST fail booking when Redis is offline to prevent double bookings
   }
 }
 

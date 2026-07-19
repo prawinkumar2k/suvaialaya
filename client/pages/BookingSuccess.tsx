@@ -32,7 +32,7 @@ export default function BookingSuccess() {
   const handleDownloadTicket = async () => {
     const { generatePremiumTicket } = await import("@/lib/ticketGenerator");
     await generatePremiumTicket(state || {
-        _id: bookingId,
+        _id: state?.bookingId || "MOCK1234",
         date: state?.date || new Date().toISOString(),
         slotTime: slotTime,
         numberOfGuests: numberOfGuests,

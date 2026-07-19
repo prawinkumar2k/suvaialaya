@@ -2,13 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { addNotificationJob, scheduleSeatRelease } from '../../server/lib/queues';
 import { acquireSeatLock, releaseSeatLock } from '../../server/lib/redis';
 
-// Mock the Redis client
-const mockRedisClient = {
+// Mock the Redis client using vi.hoisted
+const mockRedisClient = vi.hoisted(() => ({
   status: 'ready',
   set: vi.fn(),
   del: vi.fn(),
   ping: vi.fn().mockResolvedValue('PONG')
-};
+}));
 
 vi.mock('../../server/lib/redis', async (importOriginal) => {
   const actual = await importOriginal();

@@ -60,7 +60,7 @@ export default function Index() {
   const [openFaq, setOpenFaq] = useState(0);
   const [preloaderComplete, setPreloaderComplete] = useState(false);
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  const navItems = [{ label: "The Experience", id: "experience" }, { label: "The Menu", id: "menu" }, { label: "Good to know", id: "faq" }];
+  const navItems = [{ label: "The Experience", id: "experience" }, { label: "The Menu", id: "menu" }];
 
   return (
     <main className="overflow-hidden bg-background text-foreground selection:bg-accent/30">
@@ -155,24 +155,7 @@ export default function Index() {
               >
                 RESTAURANT
               </motion.h1>
-              <motion.h1 
-                initial={{ opacity: 0, letterSpacing: "0.4em" }}
-                animate={{ opacity: 1, letterSpacing: "0.15em" }}
-                transition={{ delay: 0.7, duration: 1.2 }}
-                className="text-4xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
-              >
-                BANGALORE
-              </motion.h1>
             </div>
-
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 0.8 }}
-              className="text-2xl sm:text-3xl italic text-accent font-semibold tracking-widest mb-12"
-            >
-              HAS ARRIVED.
-            </motion.p>
 
             <div className="h-[2px] w-24 bg-accent/30 mb-12" />
 
@@ -350,14 +333,26 @@ export default function Index() {
               </div>
             </div>
           </div>
-          <div className="relative min-h-[400px] overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 shadow-inner flex items-center justify-center">
-            <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(hsl(var(--primary)/.3)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--primary)/.3)_1px,transparent_1px)] [background-size:40px_40px]" />
-            <div className="relative z-10 text-center bg-background/90 p-8 rounded-xl border border-primary/20 shadow-lg backdrop-blur-sm">
-              <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary text-accent">
-                <MapPin size={28} />
+          <div className="relative min-h-[400px] overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 shadow-inner group">
+            <iframe 
+              src="https://maps.google.com/maps?q=Narayana%20Hrudayalaya%20Hospital,%20Bommasandra,%20Karnataka&t=k&z=17&ie=UTF8&iwloc=&output=embed"
+              width="100%" 
+              height="100%" 
+              style={{ border: 0, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="grayscale-[0.3] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
+            ></iframe>
+            
+            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]" />
+            
+            <div className="absolute bottom-6 left-6 right-6 z-10 text-center bg-background/95 p-4 rounded-xl border border-primary/20 shadow-xl backdrop-blur-sm transform transition-transform duration-500 group-hover:translate-y-2">
+              <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-primary text-accent absolute -top-5 left-1/2 -translate-x-1/2 border-4 border-background shadow-md">
+                <MapPin size={18} />
               </div>
-              <p className="mt-6 font-display text-2xl font-bold text-primary">SUVAIALAYA</p>
-              <p className="text-xs uppercase tracking-widest text-primary/70 mt-2">South Indian Cuisine</p>
+              <p className="mt-3 font-display text-xl font-bold text-primary tracking-wide">SUVAIALAYA</p>
+              <p className="text-[10px] uppercase tracking-widest text-primary/70 mt-1">South Indian Cuisine</p>
             </div>
           </div>
         </div>
@@ -384,23 +379,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="mx-auto max-w-3xl px-5 py-24 sm:px-8">
-        <SectionHeading eyebrow="Good to know" title="Questions, answered." />
-        <div className="mt-12 border-t border-primary/20">
-          {faqs.map((item, index) => (
-            <div key={item.question} className="border-b border-primary/20">
-              <button type="button" onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="flex w-full items-center justify-between py-6 text-left focus-visible:outline-none">
-                <span className="font-display text-xl font-bold text-primary">{item.question}</span>
-                {openFaq === index ? <Minus size={20} className="shrink-0 text-accent" /> : <Plus size={20} className="shrink-0 text-accent" />}
-              </button>
-              {openFaq === index && (
-                <p className="max-w-2xl pb-8 pr-8 text-sm leading-relaxed text-foreground/80">{item.answer}</p>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
+
 
       {/* 10-Image Masonry Gallery */}
       <section className="bg-background py-24 border-t border-primary/10">
@@ -446,7 +425,7 @@ export default function Index() {
           </h2>
           <p className="mt-6 text-lg text-primary-foreground/80">Save your seat at the feast.</p>
           <div className="mt-10">
-            <Link to="/slots" className="inline-flex items-center justify-center gap-3 rounded-md bg-accent px-10 py-5 text-sm font-bold uppercase tracking-widest text-primary shadow-xl transition-all hover:bg-accent/90 hover:scale-105">
+            <Link to="/slots" className="inline-flex items-center justify-center gap-3 rounded-md bg-background px-10 py-5 text-sm font-bold uppercase tracking-widest text-primary shadow-xl transition-all hover:bg-white hover:scale-105">
               Book for ₹{festival.price} <ArrowRight size={18} />
             </Link>
           </div>

@@ -45,11 +45,74 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-primary text-primary-foreground overflow-hidden"
           onClick={handleEnter}
         >
+          {/* Flower Toran / Garland at top */}
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 0.85, y: 0 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="absolute top-0 left-0 right-0 z-50 flex justify-center pointer-events-none w-full overflow-hidden opacity-90 mix-blend-screen"
+          >
+            <svg viewBox="0 0 2000 120" className="w-full h-auto drop-shadow-lg" preserveAspectRatio="none">
+              <defs>
+                <radialGradient id="gold-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#FFF200" stopOpacity="1" />
+                  <stop offset="70%" stopColor="#FFB800" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#E69500" stopOpacity="0" />
+                </radialGradient>
+                <g id="flower">
+                  <circle cx="0" cy="0" r="10" fill="url(#gold-glow)" />
+                  <circle cx="0" cy="0" r="6" fill="#FFA500" opacity="0.6" />
+                  <circle cx="0" cy="0" r="3" fill="#FF4500" opacity="0.8" />
+                </g>
+                <g id="leaf-small">
+                  <path d="M0,0 Q6,8 0,16 Q-6,8 0,0" fill="#4CAF50" opacity="0.6" />
+                </g>
+                <g id="hanging-short">
+                  <use href="#flower" y="0" />
+                  <use href="#flower" y="16" />
+                  <use href="#flower" y="32" />
+                  <use href="#leaf-small" y="42" />
+                </g>
+                <g id="hanging-med">
+                  <use href="#flower" y="0" />
+                  <use href="#flower" y="16" />
+                  <use href="#flower" y="32" />
+                  <use href="#flower" y="48" />
+                  <use href="#flower" y="64" />
+                  <use href="#leaf-small" y="74" />
+                </g>
+                <g id="swag-elegant">
+                  <path d="M0,0 Q100,60 200,0" fill="none" stroke="url(#gold-glow)" strokeWidth="8" strokeLinecap="round" strokeDasharray="1 14" />
+                  <path d="M20,0 Q100,50 180,0" fill="none" stroke="#FFA500" strokeWidth="6" strokeLinecap="round" strokeDasharray="1 12" opacity="0.8" />
+                </g>
+              </defs>
+              
+              {/* Main horizontal line */}
+              <line x1="-50" y1="8" x2="2050" y2="8" stroke="url(#gold-glow)" strokeWidth="16" strokeDasharray="1 15" strokeLinecap="round" />
+              <line x1="-50" y1="8" x2="2050" y2="8" stroke="#FFA500" strokeWidth="6" strokeDasharray="1 15" strokeLinecap="round" opacity="0.8" />
+              
+              {/* Swags (U-shapes) repeated across 2000px */}
+              {[...Array(10)].map((_, i) => (
+                <use key={`swag-${i}`} href="#swag-elegant" x={i * 200} y="8" />
+              ))}
+
+              {/* Hanging Lines repeated */}
+              {[...Array(11)].map((_, i) => (
+                <g key={`hang-${i}`}>
+                  <use href="#hanging-med" x={i * 200} y="8" />
+                  {i < 10 && <use href="#hanging-short" x={i * 200 + 100} y="8" />}
+                </g>
+              ))}
+            </svg>
+          </motion.div>
+
+          {/* Removed Banana Trees */}
+
           {/* Animated Logo Background */}
           <motion.div
             animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.1, 0.05] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
           >
             <img 
               src="/images/suvaialaya-logo.png" 

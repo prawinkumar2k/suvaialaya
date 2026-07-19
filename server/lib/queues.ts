@@ -96,8 +96,9 @@ export async function scheduleSeatRelease(
     if (redis.status !== "ready") throw new Error("Redis offline");
     await seatReleaseQueue.add("release", { bookingId }, { delay: delayMs, jobId: `seat-release:${bookingId}` });
     logger.info("Seat release scheduled", { bookingId, delayMs });
-  } catch (e) {
+  } catch (e: any) {
     logger.warn("Redis unavailable, skipped seat release scheduling");
+    throw e;
   }
 }
 

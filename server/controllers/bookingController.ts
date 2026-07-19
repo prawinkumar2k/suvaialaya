@@ -474,3 +474,57 @@ export const verifyBooking = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+
+// -----------------------------------------------------------------------------
+// @desc    Reschedule booking
+// @route   PUT /api/bookings/:id/reschedule
+// @access  Private
+// -----------------------------------------------------------------------------
+export const rescheduleBooking = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) return res.status(404).json({ success: false, error: "Booking not found" });
+    if (booking.user.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ success: false, error: "Not authorized" });
+    }
+    if (booking.bookingStatus !== "Confirmed") return res.status(400).json({ success: false, error: "Only confirmed bookings can be rescheduled" });
+
+    const { newDate, newSlotTime } = req.body;
+    const event = await Event.findById(booking.event);
+    if (!event) return res.status(404).json({ success: false, error: "Event not found" });
+    
+    // Check new capacity
+    const newSlot = event.slots.find(s => s.time === newSlotTime);
+    if (!newSlot) return res.status(400).json({ success: false, error: "Invalid slot" });
+    
+    // If they are rescheduling to the same slot, return an error
+    if (booking.date === newDate && booking.slotTime === newSlotTime) {
+      return res.status(400).json({ success: false, error: "Please select a different date or time to reschedule." });
+    }
+
+    if (newSlot.capacity - newSlot.booked < booking.numberOfGuests) {
+      return res.status(400).json({ success: false, error: "Not enough seats in the new slot" });
+    }
+
+    // Atomic update: Deduct from new slot, add to old slot
+    await Event.updateOne(
+      { _id: event._id, "slots.time": newSlotTime },
+      { $inc: { "slots.$.booked": booking.numberOfGuests } }
+    );
+    await Event.updateOne(
+      { _id: event._id, "slots.time": booking.slotTime },
+      { $inc: { "slots.$.booked": -booking.numberOfGuests } }
+    );
+
+    booking.date = newDate;
+    booking.slotTime = newSlotTime;
+    booking.isRescheduled = true;
+    await booking.save();
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+

@@ -39,8 +39,7 @@ export default function Login() {
         const role = response.data.data.role;
         if (role === "admin" || role === "owner") {
           navigate("/admin");
-        } else if (role === "kitchen_staff") {
-          navigate("/kitchen");
+
         } else if (role === "scanner" || role === "receptionist") {
           navigate("/scanner");
         } else {
@@ -133,9 +132,7 @@ export default function Login() {
               <button type="button" onClick={() => handleAutoFill('admin@suvaialaya.com', 'admin123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
                 Fill Admin
               </button>
-              <button type="button" onClick={() => handleAutoFill('kitchen@suvaialaya.com', 'kitchen123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
-                Fill Kitchen
-              </button>
+
               <button type="button" onClick={() => handleAutoFill('scanner@suvaialaya.com', 'scanner123')} className="bg-primary/5 hover:bg-primary/10 border border-primary/10 text-primary p-2 rounded transition-colors text-center">
                 Fill Scanner
               </button>
