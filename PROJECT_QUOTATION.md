@@ -16,18 +16,18 @@ The platform is designed to handle high-concurrency ticket reservations, slot al
 
 The project pricing is structured to support startup scalability, minimizing initial capital expenditures (CapEx) and monthly operating costs (OpEx).
 
-| Pricing Item | Cost (INR - ₹) | Cost (USD - $) | Billing Frequency / Nature |
-| :--- | :--- | :--- | :--- |
-| **A. One-Time Software Engineering & Setup** | **₹1,80,000** | **$2,160** | One-time fee (Billed in 2 Milestones) |
-| **B. Domain Registration (`.com` / `.in`)**| **₹600** | **$8** | Annual Renewal (Paid directly to registrar) |
-| **C. Server VPS Hosting (2 vCPU, 8GB RAM)** | **~₹779 / month** | **~$9.50 / month** | Monthly (Paid directly to VPS host) |
-| **D. Platform SRE Maintenance Retainer** | **₹3,000 / month** | **$36 / month** | Monthly Subscription Retainer |
+| Pricing Item | Cost (INR - ₹) | Billing Frequency / Nature |
+| :--- | :--- | :--- |
+| **A. One-Time Software Engineering & Setup** | **₹1,80,000** | One-time fee (Billed in 2 Milestones) |
+| **B. Domain Registration (`.in` / `.com`)**| **₹600** | Annual Renewal (Paid directly to registrar) |
+| **C. Server VPS Hosting (2 vCPU, 8GB RAM)** | **~₹779 / month** | Monthly (Paid directly to VPS host) |
+| **D. Platform SRE Maintenance Retainer** | **₹3,00,0 / month** | Monthly Subscription Retainer |
 
 ---
 
 ## 2. Business Justification: Market Rate Comparison
 
-To ensure transparency, the proposed startup rates are compared below against standard software engineering and system administrator industry rates in the region:
+To ensure transparency, the proposed startup rates are compared below against standard software engineering and system administrator industry rates in India:
 
 | Component / Phase | Proposed Startup Fee | Standard Freelancer Market Rate | Professional Agency Rate | Startup Savings |
 | :--- | :--- | :--- | :--- | :--- |
@@ -38,7 +38,7 @@ To ensure transparency, the proposed startup rates are compared below against st
 ### Why this proposal is highly cost-effective:
 1. **Strategic Architectural Optimization (Self-Hosting)**: Standard development setups rely on paid managed databases (like MongoDB Atlas) and cloud queue instances (like Redis Cloud) which scale monthly bills to ₹8,000+. By packaging MongoDB and Redis into a containerized Docker architecture, the entire platform runs securely on a single ₹779/mo virtual private server (VPS).
 2. **Integrated Security & Backup Tools**: Rather than paying for third-party security audit software or offsite backup SaaS providers, the platform uses integrated, automated open-source workflows (Trivy, Gitleaks, Nginx Certbot SSL, and local gzip backup rotations) costing ₹0/mo.
-3. **Fair Engineering Rate**: The one-time fee is based on **270 hours** of senior development and deployment configuration. This equates to an effective rate of **₹666 per hour (~$8/hour)**, which is highly competitive for enterprise-grade MERN stack engineering.
+3. **Fair Engineering Rate**: The one-time fee is based on **270 hours** of senior development and deployment configuration. This equates to an effective rate of **₹666 per hour**, which is highly competitive for enterprise-grade MERN stack engineering.
 
 ---
 
@@ -62,8 +62,8 @@ The development scope includes the deployment and validation of the following mo
 
 ## 4. Payment Milestones (One-Time Engineering Fee)
 
-* **Milestone 1 (50% Advance - ₹90,000 / $1,080)**: Project initiation, database schema setup, backend API development, and frontend page layouts.
-* **Milestone 2 (50% Upon Delivery - ₹90,000 / $1,080)**: Completion of integration tests, Docker container setup, domain setup, payment gateway verification, and deployment handoff.
+* **Milestone 1 (50% Advance - ₹90,000)**: Project initiation, database schema setup, backend API development, and frontend page layouts.
+* **Milestone 2 (50% Upon Delivery - ₹90,000)**: Completion of integration tests, Docker container setup, domain setup, payment gateway verification, and deployment handoff.
 
 ---
 
