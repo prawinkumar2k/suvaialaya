@@ -195,18 +195,18 @@ If you are just downloading this to test it locally, you can run the entire stac
 
 ```bash
 # Build and launch the local environment
-docker-compose -f docker-compose.local.yml up -d --build
+docker compose -f docker-compose.local.yml up -d --build
 
 # The app will be available at http://localhost:8080
 # Monitor live orchestration logs
-docker-compose -f docker-compose.local.yml logs -f
+docker compose -f docker-compose.local.yml logs -f
 ```
 
 ### 🚀 Production Deployment
 
 For production (with Nginx SSL, Prometheus, and Grafana):
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 ---
