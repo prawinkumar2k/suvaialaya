@@ -30,6 +30,7 @@ import engineRoutes from "./routes/engineRoutes";
 import waitlistRoutes from "./routes/waitlistRoutes.ts";
 import analyticsRoutes from "./routes/analyticsRoutes.ts";
 import kitchenRoutes from "./routes/kitchenRoutes";
+import menuRoutes from "./routes/menuRoutes";
 import { getSystemHealth, getMetrics } from "./controllers/healthController";
 
 // ─── Connect to MongoDB ────────────────────────────────────────────────────────
@@ -208,6 +209,7 @@ export function createServer() {
   app.use("/api/analytics", analyticsRoutes);
   app.use("/api/engines", engineRoutes);
   app.use("/api/kitchen", kitchenRoutes);
+  app.use("/api/menu", menuRoutes);
 
   // ─── Health & Observability Endpoints ────────────────────────────────────
   app.get("/api/health", getSystemHealth);    // Kubernetes liveness + readiness
