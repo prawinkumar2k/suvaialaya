@@ -26,7 +26,7 @@ export default function BookingSuccess() {
   const finalTotal = state?.finalTotal || 1799;
 
   useEffect(() => {
-    playSoundEffect("nadaswaram");
+    playSoundEffect("success");
   }, [playSoundEffect]);
 
   const handleDownloadTicket = async () => {
