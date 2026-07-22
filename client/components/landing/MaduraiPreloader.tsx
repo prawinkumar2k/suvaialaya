@@ -42,7 +42,7 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1.5, ease: "easeInOut" }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-primary text-primary-foreground overflow-hidden"
+          className="fixed inset-0 z-[900] flex flex-col items-center justify-center bg-primary text-primary-foreground overflow-hidden"
           onClick={handleEnter}
         >
           {/* Flower Toran / Garland at top */}

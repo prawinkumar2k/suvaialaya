@@ -139,35 +139,31 @@ export default function SlotSelection() {
   });
 
   return (
-    <main className="min-h-screen bg-background text-foreground pb-32 relative selection:bg-accent/30">
-      {/* Cinematic Background */}
-      <div className="absolute inset-0 z-0 fixed">
-        <img src="https://images.unsplash.com/photo-1605282717013-118e47228800?q=80&w=2070&auto=format&fit=crop" alt="Banana Leaf Background" className="w-full h-full object-cover opacity-10 mix-blend-multiply sepia-[0.3]" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/90 to-background" />
-      </div>
-      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none fixed" />
+    <main className="min-h-screen bg-white text-[#1a3d2b] pb-32 relative overflow-hidden">
+      {/* ── BACKGROUND ACCENTS ── */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none fixed" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none fixed" />
       
       {/* Top Header */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
-      <header className="sticky top-0 z-50 border-b border-primary/20 bg-background/95 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10 relative">
           <BrandMark />
           <div className="flex items-center gap-4 relative z-10">
             {localStorage.getItem("token") ? (
               <>
-                <span className="text-xs font-bold text-primary mr-2 hidden sm:block">
+                <span className="text-[10px] font-bold text-[#1a3d2b] mr-2 hidden sm:block uppercase tracking-widest">
                   {localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")!).name : ""}
                 </span>
-                <Link to={localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")!).role === "admin" ? "/admin" : "/dashboard"} className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary/5 transition-all">
+                <Link to={localStorage.getItem("user") && JSON.parse(localStorage.getItem("user")!).role === "admin" ? "/admin" : "/dashboard"} className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
                   Dashboard
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary/5 transition-all">
+                <Link to="/login" className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 transition-all">
                   Sign In
                 </Link>
-                <Link to="/register" className="text-[10px] sm:text-xs font-bold uppercase tracking-widest bg-primary text-primary-foreground border-2 border-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:bg-primary/90 transition-all">
+                <Link to="/register" className="text-[10px] font-bold uppercase tracking-widest bg-[#1a3d2b] text-white px-4 py-2 rounded-lg hover:bg-[#2d6a4f] transition-all shadow-md hover:shadow-lg">
                   Sign Up
                 </Link>
               </>
@@ -176,34 +172,35 @@ export default function SlotSelection() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-3xl px-5 pt-16 pb-40 sm:px-8 relative z-10">
+      <div className="mx-auto max-w-4xl px-5 pt-16 pb-40 sm:px-8 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-primary uppercase">{rescheduleBookingId ? "Reschedule Booking" : "SUVAIALAYA RESTAURANT"}</h1>
-          <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-primary/70">{rescheduleBookingId ? "Select a new date and time for your reservation" : "Reserve your table"}</p>
+          <h1 className="font-display text-4xl font-bold tracking-tight text-[#1a3d2b] uppercase">{rescheduleBookingId ? "Reschedule Booking" : "SUVAIALAYA RESTAURANT"}</h1>
+          <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">{rescheduleBookingId ? "Select a new date and time for your reservation" : "Reserve your table"}</p>
           <OrnamentalDivider />
         </motion.div>
 
         {/* Date Selection */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.6 }} className="mt-12">
-          <div className="flex justify-center items-center gap-3 mb-6 font-display font-bold text-2xl text-primary">
-            <CalendarDays className="text-accent" size={24} />
+          <div className="flex justify-center items-center gap-3 mb-6 font-display font-bold text-2xl text-[#1a3d2b]">
+            <CalendarDays className="text-[#c9841a]" size={24} />
             <h2>Choose Date</h2>
           </div>
           
-          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x justify-center">
+          <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x justify-center" style={{ perspective: 1000 }}>
             {formattedDates.map((d: any) => {
               const isSelected = selectedDate === d.full;
               return (
-                <button
+                <motion.button
                   key={d.full}
                   onClick={() => { setSelectedDate(d.full); setSelectedSlot(null); }}
-                  className={`flex-shrink-0 snap-start w-24 flex flex-col items-center py-4 rounded-xl border-2 transition-all shadow-sm
-                    ${isSelected ? 'border-primary bg-primary/10 scale-105 shadow-md' : 'bg-background border-primary/20 hover:border-primary/50 hover:bg-primary/5'}`}
+                  whileHover={!isSelected ? { rotateX: 2, rotateY: -2, y: -2 } : {}}
+                  className={`flex-shrink-0 snap-start w-28 flex flex-col items-center py-5 rounded-2xl transition-all shadow-[0_4px_15px_rgb(0,0,0,0.02)]
+                    ${isSelected ? 'border-2 border-[#1a3d2b] bg-[#1a3d2b]/5 scale-105 shadow-md z-10' : 'bg-white border border-gray-100 hover:border-gray-300'}`}
                 >
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-primary' : 'text-primary/60'}`}>{d.day}</span>
-                  <span className={`mt-2 font-display text-2xl font-bold ${isSelected ? 'text-primary' : 'text-foreground/80'}`}>{d.date}</span>
-                  {isSelected && <Check size={14} className="text-accent mt-2" />}
-                </button>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-[#1a3d2b]' : 'text-[#1a3d2b]/60'}`}>{d.day}</span>
+                  <span className={`mt-2 font-display text-3xl font-bold ${isSelected ? 'text-[#1a3d2b]' : 'text-[#1a3d2b]/80'}`}>{d.date}</span>
+                  {isSelected && <Check size={16} className="text-[#c9841a] mt-2" />}
+                </motion.button>
               )
             })}
           </div>
@@ -211,35 +208,36 @@ export default function SlotSelection() {
 
         {/* Time Selection */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="mt-16">
-          <div className="flex justify-center items-center gap-3 mb-8 font-display font-bold text-2xl text-primary">
-            <Clock className="text-accent" size={24} />
+          <div className="flex justify-center items-center gap-3 mb-8 font-display font-bold text-2xl text-[#1a3d2b]">
+            <Clock className="text-[#c9841a]" size={24} />
             <h2>Choose Slot</h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-5" style={{ perspective: 1000 }}>
             {eventData.slots.map((slot: any) => {
               const remaining = slot.capacity - slot.booked;
               const isFull = remaining <= 0;
               const statusText = isFull ? "Sold Out" : remaining < 15 ? "Filling Fast" : "Available";
-              const statusColor = isFull ? "text-destructive" : remaining < 15 ? "text-accent" : "text-primary/70";
+              const statusColor = isFull ? "text-red-500" : remaining < 15 ? "text-[#c9841a]" : "text-[#1a3d2b]/60";
               const isSelected = selectedSlot?.time === slot.time;
               return (
-                <button
+                <motion.button
                   key={slot.time}
                   disabled={isFull}
                   onClick={() => setSelectedSlot(slot)}
-                  className={`relative flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all overflow-hidden text-center
-                    ${isFull ? 'opacity-50 cursor-not-allowed bg-primary/5 border-primary/10' : 
-                      isSelected ? 'border-primary bg-primary/10 scale-105 shadow-md' : 'bg-background border-primary/20 hover:border-primary/50 shadow-sm'}`}
+                  whileHover={!isFull && !isSelected ? { rotateX: 2, rotateY: -2, y: -2, scale: 1.02 } : {}}
+                  className={`relative flex flex-col items-center justify-center p-6 rounded-2xl transition-all overflow-hidden text-center shadow-[0_4px_15px_rgb(0,0,0,0.02)]
+                    ${isFull ? 'opacity-50 cursor-not-allowed bg-gray-50 border border-gray-100' : 
+                      isSelected ? 'border-2 border-[#1a3d2b] bg-[#1a3d2b]/5 scale-105 shadow-md z-10' : 'bg-white border border-gray-100 hover:border-gray-300'}`}
                 >
-                  {isSelected && <div className="absolute top-0 right-0 p-2"><Check size={16} className="text-accent" /></div>}
-                  <span className={`font-display font-bold text-2xl ${isFull ? 'text-foreground/50' : 'text-temple-orange'}`}>{slot.time}</span>
+                  {isSelected && <div className="absolute top-0 right-0 p-3"><Check size={18} className="text-[#c9841a]" /></div>}
+                  <span className={`font-display font-bold text-3xl ${isFull ? 'text-[#1a3d2b]/50' : 'text-[#1a3d2b]'}`}>{slot.time}</span>
                   <div className={`mt-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${statusColor}`}>
                     <Users size={12} />
                     <span>{statusText}</span>
                   </div>
-                  {!isFull && <span className="absolute bottom-1 right-2 text-[9px] font-bold uppercase tracking-widest text-primary/40">{remaining} Seats left</span>}
-                </button>
+                  {!isFull && <span className="absolute bottom-2 right-3 text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]/40">{remaining} Seats left</span>}
+                </motion.button>
               );
             })}
           </div>
@@ -248,19 +246,19 @@ export default function SlotSelection() {
             <motion.div 
               initial={{ opacity: 0, y: 15 }} 
               animate={{ opacity: 1, y: 0 }} 
-              className="mt-12 text-center p-8 border-2 border-dashed border-primary/20 rounded-2xl bg-primary/5 relative overflow-hidden"
+              className="mt-12 text-center p-8 border border-gray-100 rounded-2xl bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
             >
               <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                <Leaf size={100} className="text-primary" />
+                <Leaf size={100} className="text-[#1a3d2b]" />
               </div>
-              <p className="text-2xl sm:text-3xl font-display font-extrabold tracking-widest text-primary">
-                ONLY <span className="text-accent">{selectedSlot.capacity - selectedSlot.booked}</span> SEATS REMAIN
+              <p className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-[#1a3d2b]">
+                ONLY <span className="text-[#c9841a]">{selectedSlot.capacity - selectedSlot.booked}</span> SEATS REMAIN
               </p>
-              <div className="h-[2px] w-12 bg-accent/30 mx-auto my-4" />
-              <p className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-accent leading-relaxed">
+              <div className="h-1 w-16 bg-[#c9841a]/30 mx-auto my-5 rounded-full" />
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-[#c9841a] leading-relaxed">
                 THE BANANA LEAVES ARE WAITING.
               </p>
-              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-primary/75 mt-2">
+              <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.25em] text-[#1a3d2b]/50 mt-2">
                 THE SUVAIALAYA EXPERIENCE AWAITS.
               </p>
             </motion.div>
@@ -268,56 +266,24 @@ export default function SlotSelection() {
         </motion.div>
       </div>
       
-      {/* 10-Image Exact Match Food Gallery */}
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 mt-16 mb-24 pb-24">
-        <h3 className="font-display text-2xl font-bold text-primary mb-6 border-b-2 border-primary/20 pb-2 inline-block">The authentic Madurai taste waiting for you...</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {[
-            "/images/food/mutton_briyani.png",
-            "/images/food/mutton_kola_urundai.png",
-            "/images/food/kongu_meals.png",
-            "/images/food/karaikudi_mutton.png",
-            "/images/food/bun_parotta.png",
-            "/images/food/jigarthanda.png",
-            "/images/food/meen_polichathu.png",
-            "/images/food/chettinad_chicken.png",
-            "/images/food/elaneer_payasam.png",
-            "/images/food/kongu_meals.png"
-          ].map((img, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * idx }}
-              className="aspect-square rounded-xl overflow-hidden border border-primary/20 shadow-md relative group"
-            >
-              <img src={img} alt="South Indian Dish" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-primary/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                <Leaf className="text-accent" size={24} />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
       {/* Floating Bottom Bar */}
       <motion.div 
-        className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-lg border-t-2 border-primary/20 z-40 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]"
+        className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-100 z-40 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.05)]"
         initial={{ y: 100 }} animate={{ y: 0 }} transition={{ delay: 0.3, type: "spring", stiffness: 100 }}
       >
-        <div className="max-w-3xl mx-auto flex items-center justify-between p-5 sm:px-8">
+        <div className="max-w-4xl mx-auto flex items-center justify-between p-5 sm:px-8">
           <div className="flex flex-col">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Reservation Details</p>
-            <p className="font-display font-bold text-lg text-primary mt-1">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Reservation Details</p>
+            <p className="font-display font-bold text-xl text-[#1a3d2b] mt-1">
               {selectedDate ? new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "-"} 
-              <span className="mx-2 text-accent">|</span> 
+              <span className="mx-3 text-[#c9841a]">|</span> 
               {selectedSlot ? selectedSlot.time : "-"}
             </p>
           </div>
           <button 
             onClick={handleContinue} 
             disabled={!selectedSlot || rescheduling} 
-            className="rounded-md bg-primary px-8 py-3.5 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg transition-all hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="rounded-xl bg-[#1a3d2b] px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-[#2d6a4f] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 hover:-translate-y-1"
           >
             {rescheduling ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {rescheduleBookingId ? "Reschedule" : "Continue"}

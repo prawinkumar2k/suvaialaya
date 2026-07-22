@@ -1,457 +1,455 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowDown, ArrowRight, CalendarDays, Clock3, MapPin, Menu, Minus, Plus, Star, Users, X, Leaf } from "lucide-react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Ticket, ArrowRight, MapPin, Clock, UtensilsCrossed,
+  CalendarDays, Star, ChevronRight, Gift, Users, Sparkles
+} from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
+import { Link, useNavigate } from "react-router-dom";
 import { MaduraiPreloader } from "@/components/landing/MaduraiPreloader";
-import { faqs, festival, menuHighlights, testimonials } from "@/data/madurai-festival";
+import { SuvaiBot } from "@/components/landing/SuvaiBot";
 
-function Countdown() {
-  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0 });
-  useEffect(() => {
-    const update = () => {
-      const target = new Date("2026-08-01T11:00:00").getTime();
-      const distance = Math.max(0, target - Date.now());
-      setTime({
-        days: Math.floor(distance / 86400000),
-        hours: Math.floor(distance / 3600000) % 24,
-        minutes: Math.floor(distance / 60000) % 60,
-      });
-    };
-    update();
-    const interval = window.setInterval(update, 60000);
-    return () => window.clearInterval(interval);
-  }, []);
-  return (
-    <div className="flex items-center gap-4 sm:gap-6">
-      {Object.entries(time).map(([label, value]) => (
-        <div key={label} className="text-center relative">
-          <p className="font-display text-3xl font-bold text-primary sm:text-4xl">{String(value).padStart(2, "0")}</p>
-          <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-accent">{label}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
+const BRAND_IMG = "/temple-bg.png";
 
-function OrnamentalDivider() {
-  return (
-    <div className="flex items-center justify-center gap-4 my-8 opacity-70">
-      <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary"></div>
-      <Leaf size={16} className="text-accent" />
-      <div className="h-px w-16 bg-gradient-to-l from-transparent to-primary"></div>
-    </div>
-  );
-}
+const fade = {
+  hidden: { opacity: 0, y: 24 },
+  show: (i: number) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.12 + 0.5, duration: 0.6, ease: "easeOut" as const },
+  }),
+};
 
-function SectionHeading({ eyebrow, title, copy, light = false }: { eyebrow: string; title: string; copy?: string; light?: boolean }) {
-  return (
-    <div className={`text-center flex flex-col items-center ${light ? "text-primary-foreground" : "text-foreground"}`}>
-      <p className={`text-sm font-bold uppercase tracking-[0.25em] ${light ? "text-accent" : "text-primary"}`}>{eyebrow}</p>
-      <h2 className="font-display mt-4 max-w-2xl text-4xl font-bold leading-[1.1] sm:text-5xl">{title}</h2>
-      {copy && <p className={`mt-5 max-w-xl text-center leading-relaxed ${light ? "text-primary-foreground/80" : "text-foreground/70"}`}>{copy}</p>}
-      <OrnamentalDivider />
-    </div>
-  );
-}
+const PHONE = "90350 05335";
+
+const MENU_HIGHLIGHTS = [
+  {
+    category: "Biryani",
+    img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&q=80",
+    items: [
+      { name: "Chicken Biryani — Seeraga Samba", price: "₹269" },
+      { name: "Mutton Biryani — Seeraga Samba", price: "₹369" },
+      { name: "Chicken Varuval Biryani", price: "₹269" },
+      { name: "Mutton Varuval Biryani", price: "₹369" },
+      { name: "Chicken 65 Biryani", price: "₹269" },
+      { name: "Egg Biryani", price: "₹219" },
+    ],
+  },
+  {
+    category: "Meals",
+    img: "https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=800&q=80",
+    items: [
+      { name: "Kongu Thokku Meals", price: "₹399", note: "4 Types of Thokku (Chicken, Kaadai, Prawns, Nethili Karuvada) · Fish Curry · Mutton Gravy · Rice · Day Spl Chicken 2pc · Egg · Poriyal · Rasam · Curd · Gulkand · Banana" },
+      { name: "Chicken Meals", price: "₹295", note: "Ponni Rice · Parotta · Chicken Gravy · 2 Spl Starters · Egg · Rasam · Curd · Papad · Gulkand · Banana" },
+      { name: "Mutton Meals", price: "₹395", note: "Ponni Rice · Bun Parotta · Mutton Gravy · Chicken/Mutton Starters · Egg · Rasam · Curd · Papad · Sweet" },
+      { name: "Fish Meals", price: "₹385", note: "Ponni Rice · Chapathi · Fish Curry · Fish Fry · Prawn 65 · Sambar · Poriyal · Rasam · Curd · Papad · Sweet · Gulkand · Banana" },
+      { name: "Veg Meals", price: "₹191", note: "Ponni Rice · Chapathi · Veg Gravy · Poriyal · Koottu · Sambar · Vatha Kulambu · Rasam · Curd · Papad · Sweet · Gulkand · Banana" },
+      { name: "Dry Nuts Curds Rice", price: "₹139" },
+      { name: "Jeera Rice", price: "₹149" },
+    ],
+  },
+  {
+    category: "Chicken Starters",
+    img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&q=80",
+    items: [
+      { name: "Day Special Starters", price: "₹259" },
+      { name: "Chettinad Chicken Chukka", price: "₹259" },
+      { name: "Chicken Milagu Varuval", price: "₹259" },
+      { name: "Karaikudi Chicken Ghee Roast", price: "₹269" },
+      { name: "Chicken 65 — Boneless", price: "₹219" },
+      { name: "Chicken Lollipop (5 pc)", price: "₹249" },
+      { name: "Chicken Manchurian", price: "₹249" },
+      { name: "Chicken 555", price: "₹249" },
+      { name: "Dragon Chicken", price: "₹249" },
+      { name: "Japan Chicken", price: "₹259" },
+      { name: "Lemon Chicken", price: "₹249" },
+      { name: "Monica Chicken", price: "₹229" },
+      { name: "Dynamite Chicken", price: "₹229" },
+    ],
+  },
+  {
+    category: "Mutton Starters",
+    img: "https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=800&q=80",
+    items: [
+      { name: "Mutton Kola Urundai (1 pc)", price: "₹69" },
+      { name: "Mutton Nei Chukka", price: "₹369" },
+      { name: "Mutton Milagu Varuval", price: "₹369" },
+      { name: "Karaikudi Mutton Ghee Roast", price: "₹369" },
+      { name: "Mutton Boti Fry / Semi Gravy", price: "₹229" },
+      { name: "Mutton Nalli Ghee Roast / Semi Gravy (2pc)", price: "₹359" },
+    ],
+  },
+  {
+    category: "Seafood",
+    img: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=800&q=80",
+    items: [
+      { name: "Tawa Vanjaram Fry", price: "₹229" },
+      { name: "Meen Polichathu — Vanjaram", price: "₹259" },
+      { name: "Prawn (65 / Pepper Dry / Manchurian)", price: "₹269/289/289" },
+      { name: "Tawa Squid / Prawn", price: "₹399/299" },
+      { name: "Butter Garlic Prawns / Squid", price: "₹329/399" },
+      { name: "BBQ Fish", price: "SR" },
+      { name: "Tandoori Fish", price: "SR" },
+      { name: "Jambu Prawns", price: "SR" },
+      { name: "Tiger Prawns", price: "SR" },
+      { name: "Crab Roast", price: "SR" },
+    ],
+  },
+  {
+    category: "Tandoori",
+    img: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80",
+    items: [
+      { name: "Tandoori Chicken Platter", price: "₹1199" },
+      { name: "Tandoori Chicken (Half/Full)", price: "₹349/649" },
+      { name: "BBQ Chicken (Half/Full)", price: "₹349/649" },
+      { name: "Al Faham Chicken (Half/Full)", price: "₹359/659" },
+      { name: "Chicken Tikka", price: "₹299" },
+      { name: "Hariyali Chicken Tikka", price: "₹319" },
+      { name: "Malai Chicken Tikka", price: "₹319" },
+      { name: "Kalmi Kabab (1 pc)", price: "₹99" },
+      { name: "Tangdi Kabab (1 pc)", price: "₹99" },
+    ],
+  },
+  {
+    category: "Veg Starters",
+    img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80",
+    items: [
+      { name: "Panneer Tikka", price: "₹299" },
+      { name: "Panneer (65 / Manchurian / Pepper Dry)", price: "₹229/249/249" },
+      { name: "Mushroom (65 / Manchurian / Pepper Dry)", price: "₹219/239/239" },
+      { name: "Gobi (65 / Manchurian / Pepper Dry)", price: "₹219/239/239" },
+      { name: "Dragon Panneer", price: "₹249" },
+      { name: "Butter Garlic Mushroom", price: "₹259" },
+    ],
+  },
+  {
+    category: "Curries",
+    img: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&q=80",
+    items: [
+      { name: "Chicken Butter Masala", price: "₹289" },
+      { name: "Panner Butter Masala", price: "₹249" },
+      { name: "Panner Tikka Masala", price: "₹359" },
+      { name: "Chicken Tikka Masala", price: "₹389" },
+      { name: "Kadai (Chicken/Panner/Mushroom)", price: "₹299/249/239" },
+      { name: "Chicken Chettinad Masala", price: "₹269" },
+      { name: "Mutton Thani Kulambu", price: "₹349" },
+      { name: "Mutton Chettinad Masala", price: "₹359" },
+      { name: "Mutton Pepper Masala", price: "₹369" },
+      { name: "Mutton Vengaya Kari", price: "₹359" },
+      { name: "Prawn Masala", price: "₹339" },
+      { name: "Meen Kuzhambu", price: "₹269" },
+    ],
+  },
+  {
+    category: "Breads & Parotta",
+    img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80",
+    items: [
+      { name: "Bun / Nool Parrota + Mutton Vengaya Curry", price: "₹449" },
+      { name: "Bun / Nool Parrota + Mutton Nalli Semi Gravy", price: "₹449" },
+      { name: "Bun / Nool Parrota + Mutton Boti Semi Gravy", price: "₹349" },
+      { name: "Bun Parrota", price: "₹100" },
+      { name: "Nool Parrota", price: "₹110" },
+      { name: "Egg Parrota", price: "₹120" },
+      { name: "Parotta", price: "₹80" },
+      { name: "Chapathi", price: "₹80" },
+      { name: "Roti (Plain/Butter)", price: "₹45/65" },
+      { name: "Naan (Plain/Butter/Garlic)", price: "₹55/65/70" },
+      { name: "Kulcha (Plain/Butter/Panner)", price: "₹49/59/99" },
+    ],
+  },
+  {
+    category: "Tiffin & Breakfast",
+    img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800&q=80",
+    items: [
+      { name: "Idly (3 pc)", price: "₹70" },
+      { name: "Ghee Masala Dosa", price: "₹139" },
+      { name: "Ghee Kara Dosa", price: "₹129" },
+      { name: "Ghee Roast", price: "₹119" },
+      { name: "Ghee Podi Dosa", price: "₹129" },
+      { name: "Plain Paper Roast", price: "₹119" },
+      { name: "Uthappam (Plain/Ghee/Onion)", price: "₹89/119/109" },
+      { name: "Idiyappam (Coconut Milk/Veg Kuruma)", price: "₹100" },
+      { name: "Pazhaya Soru — Non-veg", price: "₹199", note: "2 types of Non-veg Thokku, Chinna Vengayam, Pachamilaga" },
+      { name: "Non-Veg Mini Tiffin", price: "₹199", note: "Idly, Set Dosa, Parrota, Egg, Chicken Gravy, Mutton Gravy, Chutney" },
+      { name: "Kari Dosa (Chicken/Mutton)", price: "₹229/299" },
+      { name: "Kothu Idly (Chicken/Egg)", price: "₹189/169" },
+      { name: "Kothu Idiyappam (Chicken/Egg)", price: "₹189/169" },
+    ],
+  },
+  {
+    category: "Desserts",
+    img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80",
+    items: [
+      { name: "Madurai Jigarthanda", price: "₹139" },
+      { name: "Elaneer Payasam", price: "₹129" },
+      { name: "Gulab Jamun with Ice Cream", price: "₹120" },
+      { name: "Rose Milk", price: "₹80" },
+      { name: "Coconut Pudding", price: "₹99" },
+      { name: "FS with Ice Cream", price: "₹139" },
+      { name: "Fruit Mixer with Badam Milk", price: "₹109" },
+    ],
+  },
+];
+
+const SPECIALS = [
+  {
+    name: "Kongu Thokku Meals",
+    price: "₹399",
+    tag: "Signature",
+    desc: "4 Types of Thokku (Chicken, Kaadai, Prawns, Nethili Karuvada) · Fish Curry · Mutton Gravy · Rice · Day Spl Chicken 2pc · Egg · Poriyal · Rasam · Curd · Gulkand · Banana",
+  },
+  {
+    name: "Chicken 8 Meal Combo",
+    price: "₹399",
+    tag: "Best Value",
+    desc: "Sweet · Mini Chicken Biryani · Bun Parotta · Chicken Gravy · 2 Chicken Starters · Boiled Egg · Onion Raita",
+  },
+  {
+    name: "Mutton 8 Meal Combo",
+    price: "₹499",
+    tag: "Feast",
+    desc: "Sweet · Mini Mutton Biryani · Bun Parotta · Mutton Gravy · Mutton Varuval · Chicken Starters · Boiled Egg · Onion Raita",
+  },
+  {
+    name: "Tandoori Chicken Platter",
+    price: "₹1199",
+    tag: "Grand",
+    desc: "Full Tandoori Chicken · BBQ Chicken · Al Faham Chicken · Chicken Tikka · Hariyali Tikka · Malai Tikka — the ultimate celebration feast",
+  },
+];
 
 export default function Index() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [openFaq, setOpenFaq] = useState(0);
-  const [preloaderComplete, setPreloaderComplete] = useState(false);
-  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  const navItems = [{ label: "The Experience", id: "experience" }, { label: "The Menu", id: "menu" }];
+  const [done, setDone] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(0);
+  const navigate = useNavigate();
 
   return (
-    <main className="overflow-hidden bg-background text-foreground selection:bg-accent/30">
-      {!preloaderComplete && <MaduraiPreloader onComplete={() => setPreloaderComplete(true)} />}
-      {/* Decorative Top Border */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
+    <main className="bg-white text-[#1a3d2b] font-sans min-h-screen overflow-x-hidden">
+      <AnimatePresence>
+        {!done && <MaduraiPreloader onComplete={() => setDone(true)} />}
+      </AnimatePresence>
+      <SuvaiBot />
 
-      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/95 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-          <BrandMark />
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Primary navigation">
-            {navItems.map((item) => (
-              <button key={item.id} type="button" onClick={() => scrollTo(item.id)} className="text-sm font-semibold tracking-wide text-primary/80 transition-colors hover:text-accent">
-                {item.label}
-              </button>
+      {/* ── NAVBAR ── */}
+      <motion.nav
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
+        className="fixed top-0 left-0 right-0 z-[130] flex items-center justify-between px-8 md:px-16 py-4 bg-white/95 backdrop-blur-md border-b border-gray-100"
+      >
+        <BrandMark size="md" />
+        <div className="hidden md:flex items-center gap-8">
+          {[{ label: "Home", href: "/" }, { label: "Menu", href: "/menu" }, { label: "Gallery", href: "/gallery" }, { label: "About", href: "/about" }].map(({ label, href }) => (
+            <Link key={label} to={href} className="text-xs font-semibold tracking-widest uppercase text-[#1a3d2b]/60 hover:text-[#1a3d2b] transition-colors">{label}</Link>
+          ))}
+        </div>
+        <button onClick={() => navigate("/slots")} className="flex items-center gap-2 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white text-xs font-bold uppercase tracking-widest px-6 py-2.5 rounded-full transition-colors">
+          <Ticket size={13} /> Book Now
+        </button>
+      </motion.nav>
+
+      {/* ── HERO ── */}
+      <section className="min-h-screen pt-20 flex flex-col lg:flex-row">
+        {/* Left text */}
+        <div className="flex-1 flex flex-col justify-center px-8 md:px-14 lg:px-20 py-16">
+          <motion.div custom={0} variants={fade} initial="hidden" animate="show"
+            className="inline-flex items-center gap-2 bg-[#1a3d2b]/8 border border-[#1a3d2b]/20 text-[#1a3d2b] text-[10px] font-bold tracking-[0.3em] uppercase px-4 py-2 rounded-full w-fit mb-6">
+            <Star size={10} fill="currentColor" /> From Madurai · To Bangalore
+          </motion.div>
+
+          <motion.h1 custom={1} variants={fade} initial="hidden" animate="show"
+            className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-4 text-[#1a3d2b]">
+            Authentic<br />South Indian<br />Multi Cuisine
+          </motion.h1>
+
+          <motion.p custom={2} variants={fade} initial="hidden" animate="show"
+            className="text-[#1a3d2b]/60 text-base leading-relaxed max-w-md mb-6">
+            From the <strong className="text-[#1a3d2b]">Heart of Madurai</strong> to the <strong className="text-[#1a3d2b]">Soul of Bangalore</strong> —
+            experience legendary Biryani, grand Kari Virundhu feasts, and the iconic Madurai Jigarthanda.
+          </motion.p>
+
+          <motion.div custom={3} variants={fade} initial="hidden" animate="show" className="flex flex-wrap gap-3 mb-8">
+            {[
+              { icon: MapPin, text: "Madurai & Bangalore" },
+              { icon: Clock, text: "Open: 11 AM – 11 PM" },
+              { icon: CalendarDays, text: "Grand Event Coming Soon" },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-2 text-xs text-[#1a3d2b]/60 font-medium bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">
+                <Icon size={12} className="text-[#1a3d2b]" /> {text}
+              </div>
             ))}
-          </nav>
-          <div className="hidden items-center gap-5 md:flex">
-            <Link to="/login" className="text-sm font-semibold tracking-wide text-primary/80 transition-colors hover:text-accent">
-              Sign In
-            </Link>
-            <Link to="/slots" className="rounded-md border border-accent bg-primary px-6 py-2.5 text-sm font-bold tracking-wide text-primary-foreground shadow-md transition-all hover:bg-primary/90 hover:shadow-lg">
-              Book Now
-            </Link>
+          </motion.div>
+
+          <motion.div custom={4} variants={fade} initial="hidden" animate="show" className="flex flex-col sm:flex-row gap-4 mb-12">
+            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/slots")} className="group flex items-center justify-center gap-3 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors">
+              <Ticket size={16} /> Reserve Your Seat
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/menu")} className="group flex items-center justify-center gap-3 border-2 border-[#1a3d2b]/30 hover:border-[#1a3d2b] text-[#1a3d2b] font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors">
+              <UtensilsCrossed size={16} /> View Full Menu
+            </motion.button>
+          </motion.div>
+
+          <motion.div custom={5} variants={fade} initial="hidden" animate="show" className="flex gap-10 border-t border-gray-200 pt-8">
+            {[{ value: "500+", label: "Guests Daily" }, { value: "80+", label: "Menu Items" }, { value: "10+", label: "Years of Service" }].map(({ value, label }) => (
+              <div key={label}>
+                <p className="text-3xl font-display font-extrabold text-[#1a3d2b]">{value}</p>
+                <p className="text-[10px] uppercase tracking-widest text-[#1a3d2b]/40 mt-1">{label}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Right image */}
+        <motion.div
+          initial={{ x: 80, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.9, ease: "easeOut" }}
+          className="w-full lg:w-[48%] flex-shrink-0 flex items-center justify-center p-8 lg:p-12 bg-gray-50"
+          style={{ perspective: 1000 }}
+        >
+          <motion.div 
+            whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
+            className="relative w-full max-w-[500px] rounded-2xl overflow-hidden border border-gray-200 bg-white"
+          >
+            <img src={BRAND_IMG} alt="Suvaialaya South Indian Cuisine Restaurant" className="w-full h-auto block"
+              onError={(e) => { e.currentTarget.style.display = "none"; }} />
+            <div className="bg-white border-t border-gray-100 px-6 py-4 flex items-center justify-between">
+              <div>
+                <p className="text-[#1a3d2b] font-bold text-sm">A Grand Event is Coming!</p>
+                <p className="text-[#1a3d2b]/50 text-xs">Stay tuned for exclusive announcements</p>
+              </div>
+              <button onClick={() => navigate("/slots")} className="flex items-center gap-1.5 bg-[#1a3d2b] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#2d6a4f] transition-colors">
+                Reserve <ChevronRight size={13} />
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ── GRAND EVENT BANNER ── */}
+      <section className="bg-[#f5f0e8] border-y border-[#1a3d2b]/10 px-8 md:px-16 py-14">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto text-center">
+          <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#1a3d2b]/50 mb-3">Announcement</p>
+          <h2 className="font-display text-4xl md:text-5xl font-extrabold text-[#1a3d2b] mb-2">Something <span className="italic">Grand</span></h2>
+          <h3 className="font-display text-2xl md:text-3xl font-bold text-[#c9841a] mb-6">Is Coming Soon</h3>
+          <p className="text-[#1a3d2b]/60 text-sm mb-10 max-w-lg mx-auto">From the heart of Madurai to the soul of Bangalore — an exclusive dining event unlike anything before.</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            {[
+              { icon: CalendarDays, label: "Exclusive Event Announcement" },
+              { icon: Sparkles, label: "Extraordinary Experiences" },
+              { icon: Gift, label: "Surprises That Delight" },
+              { icon: Users, label: "Memories That Last" },
+            ].map(({ icon: Icon, label }) => (
+              <div key={label} className="flex flex-col items-center gap-3">
+                <div className="w-14 h-14 rounded-full border-2 border-[#1a3d2b]/20 bg-white flex items-center justify-center">
+                  <Icon size={22} className="text-[#1a3d2b]" />
+                </div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/70 text-center leading-relaxed">{label}</p>
+              </div>
+            ))}
           </div>
-          <button type="button" onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-primary">
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button onClick={() => navigate("/slots")} className="inline-flex items-center gap-2 bg-[#1a3d2b] text-white font-bold px-8 py-3.5 rounded-full text-sm tracking-wide hover:bg-[#2d6a4f] transition-colors">
+            Stay Tuned — Book Early Access <ArrowRight size={14} />
           </button>
-        </div>
-        {menuOpen && (
-          <nav className="border-t border-border/50 bg-background px-5 py-4 shadow-lg md:hidden">
-            {navItems.map((item) => (
-              <button key={item.id} type="button" onClick={() => { scrollTo(item.id); setMenuOpen(false); }} className="block w-full py-3 text-left text-sm font-bold text-primary">
-                {item.label}
-              </button>
-            ))}
-            <Link to="/login" className="block w-full py-3 text-left text-sm font-bold text-primary border-t border-border/50 mt-2 pt-4">
-              Sign In
-            </Link>
-            <Link to="/slots" className="mt-4 block w-full rounded-md bg-primary py-3 text-center text-sm font-bold text-primary-foreground">
-              Book Now
-            </Link>
-          </nav>
-        )}
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-24 lg:pt-24 lg:pb-32 min-h-[90vh] flex items-center justify-center">
-        {/* Cinematic Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img src="https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?q=80&w=2070&auto=format&fit=crop" alt="Temple Background" className="w-full h-full object-cover opacity-30 mix-blend-multiply sepia-[0.2]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/70 to-background" />
-        </div>
-        
-        {/* Removed decorative leaf background per client request */}
-        
-        <div className="mx-auto max-w-7xl px-5 relative z-10 text-center">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="flex flex-col items-center justify-center font-display text-center relative z-10"
-          >
-            {/* Year Badge */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 0.6, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="text-2xl font-bold tracking-[0.3em] text-accent mb-6"
-            >
-              2026
-            </motion.div>
-            
-            {/* Golden thin line */}
-            <div className="h-[2px] w-12 bg-accent/30 mb-8" />
-
-            {/* Monumental Cinematic Titles */}
-            <div className="space-y-4 md:space-y-6 mb-8 select-none">
-              <motion.h1 
-                initial={{ opacity: 0, letterSpacing: "0.4em" }}
-                animate={{ opacity: 1, letterSpacing: "0.15em" }}
-                transition={{ delay: 0.3, duration: 1.2 }}
-                className="text-4xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
-              >
-                SUVAIALAYA
-              </motion.h1>
-              <motion.h1 
-                initial={{ opacity: 0, letterSpacing: "0.4em" }}
-                animate={{ opacity: 1, letterSpacing: "0.15em" }}
-                transition={{ delay: 0.5, duration: 1.2 }}
-                className="text-4xl sm:text-7xl md:text-8xl lg:text-[7rem] font-extrabold uppercase text-primary leading-none"
-              >
-                RESTAURANT
-              </motion.h1>
-            </div>
-
-            <div className="h-[2px] w-24 bg-accent/30 mb-12" />
-
-            {/* Event Highlights Grid */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-4xl w-full mb-12 px-4"
-            >
-              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
-                <span className="text-accent text-2xl font-bold font-display mb-1">23</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Legendary Dishes</span>
-              </div>
-              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
-                <span className="text-accent text-2xl font-bold font-display mb-1">10</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Days Only</span>
-              </div>
-              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
-                <span className="text-accent text-2xl font-bold font-display mb-1">Limited</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Seats Daily</span>
-              </div>
-              <div className="border border-primary/20 bg-primary/5 backdrop-blur-sm px-6 py-5 rounded-xl flex flex-col items-center justify-center transition-all hover:border-primary/40 hover:bg-primary/10">
-                <span className="text-accent text-2xl font-bold font-display mb-1">One Grand</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-primary/70">Experience</span>
-              </div>
-            </motion.div>
-
-            <div className="h-[2px] w-12 bg-accent/30 mb-8" />
-
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.4, duration: 0.8 }}
-              className="text-xs sm:text-sm font-bold tracking-[0.3em] uppercase text-primary/80 mb-12"
-            >
-              Welcome to the Suvaialaya Experience.
-            </motion.p>
-
-            <div className="mt-4 flex justify-center mb-12">
-               <Countdown />
-            </div>
-
-            <div className="flex flex-col items-center gap-4 sm:flex-row justify-center w-full max-w-md">
-              <Link to="/slots" className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-4 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-xl transition-all hover:bg-primary/90 hover:scale-105 border border-accent/20">
-                Book Your Seat <ArrowRight size={16} />
-              </Link>
-              <button type="button" onClick={() => scrollTo("experience")} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md border border-primary/20 bg-transparent px-8 py-4 text-xs font-bold uppercase tracking-wider text-primary transition-all hover:bg-primary/5">
-                Discover the experience <ArrowDown size={16} />
-              </button>
-            </div>
-          </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Experience Section */}
-      <section id="experience" className="border-y border-primary/10 bg-primary/5 relative">
-        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10">
-          <SectionHeading eyebrow="Your table awaits" title="A simple invitation to a very good day." copy="Choose a date. Pick your hour. We'll take care of the rest." />
-          <div className="grid gap-6 sm:grid-cols-3 mt-12">
-            {[
-              { number: "01", title: "Choose your day", text: "Nine days of shared tables." }, 
-              { number: "02", title: "Pick a slot", text: "Ten relaxed hours each day." }, 
-              { number: "03", title: "Come hungry", text: "We'll have your place ready." }
-            ].map((step, idx) => (
-              <motion.div 
-                key={step.number} 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.2 }}
-                whileHover={{ 
-                  scale: 1.05, 
-                  rotateY: 15, 
-                  rotateX: -15, 
-                  boxShadow: "0 30px 60px -12px rgba(230,0,92,0.6)" 
-                }}
-                className="relative overflow-visible rounded-3xl border-2 border-accent/40 bg-gradient-to-br from-background via-white to-primary/10 p-8 shadow-2xl transition-all group backdrop-blur-xl transform-gpu perspective-[1000px]"
-              >
-                <div className="absolute -right-4 -top-4 opacity-0 transition-all duration-500 z-0">
+      {/* ── MENU HIGHLIGHTS ── */}
+      <section className="bg-white px-8 md:px-16 py-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-5xl mx-auto">
+          <p className="text-center text-[10px] font-bold tracking-[0.4em] uppercase text-[#1a3d2b]/40 mb-2">Our Menu</p>
+          <h2 className="text-center font-display text-3xl font-bold text-[#1a3d2b] mb-8">Menu Highlights</h2>
+
+          {/* Category tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {MENU_HIGHLIGHTS.map((cat, i) => (
+              <button key={cat.category} onClick={() => setActiveMenu(i)}
+                className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-colors ${activeMenu === i ? "bg-[#1a3d2b] text-white" : "bg-gray-100 text-[#1a3d2b]/60 hover:bg-gray-200"}`}>
+                {cat.category}
+              </button>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div key={activeMenu} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}
+              className="flex flex-col md:flex-row bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
+              {/* Food image */}
+              <div className="md:w-48 flex-shrink-0">
+                <img src={MENU_HIGHLIGHTS[activeMenu].img} alt={MENU_HIGHLIGHTS[activeMenu].category}
+                  className="w-full h-48 md:h-full object-cover" />
+              </div>
+              {/* Items */}
+              <div className="flex-1">
+                {MENU_HIGHLIGHTS[activeMenu].items.map((item: any, i: number) => (
+                  <div key={item.name} className={`px-5 py-3 ${i !== MENU_HIGHLIGHTS[activeMenu].items.length - 1 ? "border-b border-gray-200" : ""}`}>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[#1a3d2b] font-semibold text-sm">{item.name}</p>
+                      <p className="text-[#1a3d2b] font-bold text-sm font-display ml-4 flex-shrink-0">{item.price}</p>
+                    </div>
+                    {item.note && <p className="text-[#1a3d2b]/45 text-[10px] mt-0.5 leading-relaxed">{item.note}</p>}
+                  </div>
+                ))}
+                <div className="px-5 py-3 bg-[#1a3d2b]/5 flex items-center justify-between">
+                  <p className="text-[#1a3d2b]/60 text-xs">Showing highlights</p>
+                  <button onClick={() => navigate("/menu")} className="flex items-center gap-1 text-[#1a3d2b] text-xs font-bold hover:underline">
+                    Full Menu <ChevronRight size={11} />
+                  </button>
                 </div>
-                <span className="font-display text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent to-temple-maroon drop-shadow-md relative z-10">{step.number}</span>
-                <h3 className="mt-6 font-display text-2xl font-bold text-primary relative z-10">{step.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-foreground/80 font-medium relative z-10">{step.text}</p>
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-transparent via-transparent to-temple-gold/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+      </section>
+
+      {/* ── SPECIAL COMBOS ── */}
+      <section className="bg-gray-50 border-t border-gray-100 px-8 md:px-16 py-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-5xl mx-auto">
+          <p className="text-center text-[10px] font-bold tracking-[0.4em] uppercase text-[#1a3d2b]/40 mb-2">Best Value</p>
+          <h2 className="text-center font-display text-3xl font-bold text-[#1a3d2b] mb-10">Suvaialaya Specials</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ perspective: 1000 }}>
+            {SPECIALS.map(({ name, price, desc, tag }, i) => (
+              <motion.div key={name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
+                onClick={() => navigate("/slots")} className="group cursor-pointer bg-white border border-gray-200 hover:border-[#1a3d2b]/40 rounded-xl p-6 transition-all shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <span className="inline-block bg-[#1a3d2b]/10 text-[#1a3d2b] text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-1">{tag}</span>
+                    <h3 className="text-[#1a3d2b] font-bold text-sm leading-tight">{name}</h3>
+                  </div>
+                  <span className="text-[#1a3d2b] font-display font-extrabold text-xl ml-4 flex-shrink-0">{price}</span>
+                </div>
+                <p className="text-[#1a3d2b]/50 text-xs leading-relaxed">{desc}</p>
               </motion.div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Menu Section */}
-      <section id="menu" className="bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-10 mix-blend-overlay" />
-        <div className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10 relative z-10">
-          <SectionHeading light eyebrow="The menu" title="Every dish tells a story." copy="We don't serve food. We serve a century of culture, spice, and heritage." />
+      {/* ── FOOTER CTA ── */}
+      <section className="bg-[#1a3d2b] px-8 md:px-16 py-14 text-center border-t-4 border-[#c9841a]">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+          <p className="text-[#c9841a] text-xs tracking-[0.3em] uppercase mb-3 font-bold">Ready to Dine?</p>
+          <h2 className="font-display text-4xl font-bold text-white mb-2">Book Your Table Today</h2>
+          <p className="text-white/70 text-sm mb-6">From the Heart of Madurai · To the Soul of Bangalore</p>
           
-          <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { name: "MUTTON BRIYANI", subtitle: "Seeraga Samba", description: "Authentic Madurai style briyani cooked with aromatic seeraga samba rice and tender mutton.", image: "/images/food/mutton_briyani.png" },
-              { name: "KARAIKUDI MUTTON ROAST", subtitle: "Signature Masterpiece", description: "Fiery Karaikudi spices blended with rich ghee roast.", image: "/images/food/karaikudi_mutton.png" },
-              { name: "BUN PAROTTA", subtitle: "Tawa Breads", description: "Madurai's famous fluffy, layered bun parotta, perfect for rich gravies.", image: "/images/food/bun_parotta.png" },
-              { name: "ELANEER PAYASAM", subtitle: "Silky Legend", description: "Tender coconut sweet pudding, built to soothe and delight.", image: "/images/food/elaneer_payasam.png" }
-            ].map((dish, index) => (
-              <motion.article 
-                key={dish.name} 
-                initial={{ opacity: 0, scale: 0.8, rotate: -5 }} 
-                whileInView={{ opacity: 1, scale: 1, rotate: 0 }} 
-                viewport={{ once: true }} 
-                transition={{ delay: index * 0.1, duration: 0.8, type: "spring" }} 
-                whileHover={{
-                  scale: 1.08,
-                  rotateY: -15,
-                  rotateX: 15,
-                  zIndex: 50,
-                  boxShadow: "0 40px 80px -15px rgba(255,69,0,0.8)"
-                }}
-                className="group relative rounded-3xl border-2 border-accent bg-primary-foreground/5 overflow-hidden flex flex-col justify-between min-h-[350px] shadow-2xl transform-gpu perspective-[1000px] cursor-pointer"
-              >
-                <div className="absolute inset-0 z-0 opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700">
-                  <img src={dish.image} alt={dish.name} className="w-full h-full object-cover mix-blend-screen" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/50 to-transparent" />
-                </div>
-                
-                <div className="absolute top-0 right-0 p-4 opacity-0 transition-all duration-500 z-10 pointer-events-none">
-                </div>
-                
-                <div className="relative z-20 mt-auto p-6 bg-gradient-to-t from-primary to-transparent pt-12 flex flex-col justify-end h-full">
-                  <span className="text-[12px] font-extrabold uppercase tracking-[0.25em] text-temple-gold block mb-2 drop-shadow-[0_0_10px_rgba(255,215,0,1)]">{dish.subtitle}</span>
-                  <h3 className="font-display text-3xl font-black leading-snug text-primary-foreground tracking-wide drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]">{dish.name}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-primary-foreground/90 font-bold drop-shadow-[0_2px_5px_rgba(0,0,0,0.8)]">{dish.description}</p>
-                </div>
-                <div className="absolute inset-0 rounded-3xl border-4 border-transparent group-hover:border-temple-gold/50 transition-colors duration-500 pointer-events-none" />
-              </motion.article>
-            ))}
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-10">
+            <button onClick={() => navigate("/slots")} className="inline-flex items-center gap-3 bg-white text-[#1a3d2b] font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide hover:bg-gray-100 transition-colors w-full md:w-auto justify-center">
+              <Ticket size={16} /> Make a Reservation <ArrowRight size={14} />
+            </button>
+            <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="inline-flex items-center gap-3 bg-transparent border border-white/30 text-white font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide hover:bg-white/10 transition-colors w-full md:w-auto justify-center">
+              Order Now: {PHONE}
+            </a>
           </div>
 
-          {/* Cinematic Tagline Banner */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-            className="mt-20 text-center py-16 px-6 border-y border-accent/20 bg-primary-foreground/[0.02] relative overflow-hidden"
-          >
-            <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none select-none font-display font-extrabold text-7xl sm:text-[8rem] md:text-[14rem] text-primary-foreground leading-none overflow-hidden">
-              SUVAIALAYA
-            </div>
-            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-widest text-temple-gold uppercase leading-[1.2] relative z-10 drop-shadow-md">
-              TRADITION IS NOT COOKED.
-              <br />
-              <span className="text-primary-foreground block mt-2">IT IS CELEBRATED.</span>
-            </h2>
-          </motion.div>
-          
-          <div className="mt-16 flex justify-center">
-            <Link to="/menu" className="inline-flex items-center gap-2 text-sm font-extrabold uppercase tracking-[0.2em] text-temple-gold hover:text-temple-gold/80 transition-all pb-1 border-b-2 border-temple-gold/50 hover:border-temple-gold drop-shadow-lg z-20 relative">
-              See the full Suvaialaya Menu <ArrowRight size={18} />
-            </Link>
+          <div className="pt-8 border-t border-white/10 max-w-2xl mx-auto flex flex-col md:flex-row justify-center items-center gap-4 md:gap-10 text-white/50 text-xs">
+            <p>GST 5% + 5% Packing Charges Applicable</p>
+            <p className="hidden md:block">•</p>
+            <p>Food Preparation Time: 15 Minutes</p>
+            <p className="hidden md:block">•</p>
+            <p className="text-[#c9841a] font-semibold">Party Orders & Outdoor Catering Available</p>
           </div>
-        </div>
+        </motion.div>
       </section>
-
-      {/* Venue Section */}
-      <section className="mx-auto max-w-7xl px-5 py-24 sm:px-8 lg:px-10">
-        <div className="grid gap-16 lg:grid-cols-2 items-center">
-          <div>
-            <SectionHeading eyebrow="The venue" title="Bommasandra, Bangalore." copy="Join us at our new flagship location. Think warm light, authentic Madurai aromas, and the sound of good conversation." />
-            <div className="mt-10 flex items-center justify-center gap-4 text-sm font-semibold border p-6 rounded-xl border-primary/20 bg-primary/5">
-              <MapPin size={32} className="text-accent flex-shrink-0" />
-              <div className="text-left">
-                <p className="text-primary font-bold">N, 256/B, nearby Narayana Hrudayalaya Hospital,</p>
-                <p className="text-primary/80 text-xs mt-1">Bommasandra Industrial Area, Bommasandra, Karnataka 560099</p>
-                <a href="https://share.google/lMg8g7DHS0wRBuZn0" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:text-accent transition-colors mt-2 block font-bold">View on Google Maps &rarr;</a>
-              </div>
-            </div>
-          </div>
-          <div className="relative min-h-[400px] overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 shadow-inner group">
-            <iframe 
-              src="https://maps.google.com/maps?q=Narayana%20Hrudayalaya%20Hospital,%20Bommasandra,%20Karnataka&t=k&z=17&ie=UTF8&iwloc=&output=embed"
-              width="100%" 
-              height="100%" 
-              style={{ border: 0, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="grayscale-[0.3] contrast-125 transition-all duration-700 group-hover:grayscale-0 group-hover:contrast-100"
-            ></iframe>
-            
-            <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]" />
-            
-            <div className="absolute bottom-6 left-6 right-6 z-10 text-center bg-background/95 p-4 rounded-xl border border-primary/20 shadow-xl backdrop-blur-sm transform transition-transform duration-500 group-hover:translate-y-2">
-              <div className="mx-auto flex size-10 items-center justify-center rounded-full bg-primary text-accent absolute -top-5 left-1/2 -translate-x-1/2 border-4 border-background shadow-md">
-                <MapPin size={18} />
-              </div>
-              <p className="mt-3 font-display text-xl font-bold text-primary tracking-wide">SUVAIALAYA</p>
-              <p className="text-[10px] uppercase tracking-widest text-primary/70 mt-1">South Indian Cuisine</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="border-y border-primary/10 bg-primary/5">
-        <div className="mx-auto max-w-5xl px-5 py-24 text-center sm:px-8">
-          <Leaf className="mx-auto text-accent" size={32} />
-          <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-primary">From our guests</p>
-          <div className="mt-12 grid gap-10 md:grid-cols-3">
-            {testimonials.map((item) => (
-              <figure key={item.name} className="flex flex-col items-center">
-                <div className="mb-6 flex justify-center gap-1 text-accent">
-                  {[1, 2, 3, 4, 5].map((star) => <Star key={star} size={14} fill="currentColor" />)}
-                </div>
-                <blockquote className="font-display text-2xl font-bold leading-snug text-primary flex-1">"{item.quote}"</blockquote>
-                <figcaption className="mt-6 text-xs font-bold uppercase tracking-widest text-primary/60">
-                  {item.name} <span className="mx-2 opacity-50">|</span> {item.role}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* 10-Image Masonry Gallery */}
-      <section className="bg-background py-24 border-t border-primary/10">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-          <SectionHeading eyebrow="Gallery" title="A feast for the eyes." copy="Get a glimpse of the authentic Madurai culinary experience waiting for you at Suvaialaya Restaurant Bangalore." />
-          
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[150px] sm:auto-rows-[200px]">
-            {[
-              "/images/food/mutton_briyani.png",
-              "/images/food/mutton_kola_urundai.png",
-              "/images/food/kongu_meals.png",
-              "/images/food/karaikudi_mutton.png",
-              "/images/food/bun_parotta.png",
-              "/images/food/jigarthanda.png",
-              "/images/food/meen_polichathu.png",
-              "/images/food/chettinad_chicken.png",
-              "/images/food/elaneer_payasam.png",
-              "/images/food/kongu_meals.png"
-            ].map((img, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: (i % 4) * 0.1, duration: 0.6 }}
-                className={`rounded-2xl overflow-hidden group relative shadow-md ${i === 0 || i === 4 || i === 7 ? 'col-span-2 row-span-2' : ''}`}
-              >
-                <img src={img} alt="Restaurant Food" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Footer */}
-      <section className="bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-10 mix-blend-overlay" />
-        <div className="mx-auto max-w-4xl px-5 py-24 text-center relative z-10">
-          <Leaf className="mx-auto text-accent mb-6" size={40} />
-          <h2 className="font-display text-4xl font-bold tracking-tight sm:text-6xl text-primary-foreground">
-            The table is almost set.
-          </h2>
-          <p className="mt-6 text-lg text-primary-foreground/80">Save your seat at the feast.</p>
-          <div className="mt-10">
-            <Link to="/slots" className="inline-flex items-center justify-center gap-3 rounded-md bg-background px-10 py-5 text-sm font-bold uppercase tracking-widest text-primary shadow-xl transition-all hover:bg-white hover:scale-105">
-              Book for ₹{festival.price} <ArrowRight size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-background text-foreground pt-20 pb-10 border-t-4 border-accent">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-          <div className="flex flex-col items-center justify-center text-center">
-            <BrandMark />
-            <p className="mt-6 max-w-md text-sm text-foreground/70 leading-relaxed">
-              Experience the authentic taste of Madurai. Traditional hospitality, curated for the modern connoisseur.
-            </p>
-            <div className="mt-8 flex gap-6 text-sm font-semibold text-primary/80">
-              <a href="tel:+919876543210" className="hover:text-accent transition-colors">+91 98765 43210</a>
-              <span className="opacity-30">|</span>
-              <a href="mailto:hello@suvaialaya.com" className="hover:text-accent transition-colors">hello@suvaialaya.com</a>
-            </div>
-          </div>
-          <div className="mt-16 border-t border-primary/10 pt-8 flex flex-col items-center justify-between gap-4 text-xs font-semibold uppercase tracking-widest text-primary/50 sm:flex-row">
-            <span>© 2026 Suvaialaya. All rights reserved.</span>
-            <span className="flex items-center gap-2"><MapPin size={14} className="text-accent" /> Bangalore, Karnataka</span>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

@@ -16,6 +16,9 @@
 
 ## 📖 Overview
 
+### 🎥 Workflow Demonstration
+![Suvaialaya Workflow Demonstration](public/videos/suvaialaya_workflow.webp)
+
 The Suvaialaya Event Ticket Hub is a high-performance, horizontally scalable event management and ticketing platform designed for a flagship South Indian culinary experience. 
 
 **Problem Statement:** Legacy restaurant booking platforms suffer from high latency, frequent double-bookings under heavy concurrent load, and lack robust offline-first ticket verification flows at the venue.

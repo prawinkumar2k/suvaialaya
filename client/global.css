@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Poppins:wght@300;400;500;600;700&family=Noto+Serif+Tamil:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600;1,700&family=DM+Sans:wght@300;400;500;600;700&family=Noto+Serif+Tamil:wght@400;600;700&family=Cinzel:wght@400;600;700;900&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,69 +6,228 @@
 
 @layer base {
   :root {
-    /* Menu Card Cream Background: #F0E8D5 */
-    --background: 41 44% 89%;
-    /* Deep Heritage Green from the Menu Card: #184A38 */
-    --foreground: 158 51% 19%;
-    
-    /* White/Cream Card */
-    --card: 41 44% 92%;
-    --card-foreground: 158 51% 19%;
-    --popover: 41 44% 92%;
-    --popover-foreground: 158 51% 19%;
-    
-    /* Primary Deep Green */
-    --primary: 158 51% 19%;
-    --primary-foreground: 41 44% 89%;
-    
-    /* Secondary (Slightly darker cream/tan) */
-    --secondary: 41 30% 82%;
-    --secondary-foreground: 158 51% 19%;
-    
-    /* Muted (For subtle text/borders) */
-    --muted: 158 30% 35%;
-    --muted-foreground: 158 30% 35%;
-    
-    /* Accent (If gold is used, otherwise matching menu card greens) */
-    --accent: 158 40% 25%;
-    --accent-foreground: 41 44% 89%;
-    
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    
-    /* Borders match the deep green */
-    --border: 158 51% 19%;
-    --input: 158 51% 19%;
-    --ring: 158 51% 19%;
-    --radius: 0.5rem;
+    /* ── PREMIUM SUVAIALAYA LIGHT THEME ── */
+
+    /* Background: Warm Ivory/Cream */
+    --background: 40 33% 97%; /* #FDFBF7 */
+
+    /* Foreground: Deep Slate Green */
+    --foreground: 160 38% 18%; /* #1C3F35 */
+
+    /* Cards: Pure white surface with slight warmth */
+    --card: 40 33% 99%; 
+    --card-foreground: 160 38% 18%;
+
+    --popover: 40 33% 99%;
+    --popover-foreground: 160 38% 18%;
+
+    /* Primary: Deep Slate Green */
+    --primary: 160 38% 18%;
+    --primary-foreground: 40 33% 97%;
+
+    /* Secondary: Soft Sage/Gray-Green */
+    --secondary: 155 20% 92%;
+    --secondary-foreground: 160 38% 18%;
+
+    /* Muted: Subtle taupe */
+    --muted: 40 15% 90%;
+    --muted-foreground: 40 10% 45%;
+
+    /* Accent: Muted Gold / Brass */
+    --accent: 40 40% 60%; /* #C3A370 */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Borders: Soft taupe/gold hint */
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
+    --ring: 40 40% 60%;
+    --radius: 0.25rem; /* Slight rounded edges */
 
     /* Status Colors */
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.7 100% 97.3%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 48 96% 89%;
-    --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
+    --success: 152 60% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 132 62% 15%;
+    --info: 210 80% 56%;
+    --info-foreground: 0 0% 98%;
   }
 
-  * { @apply border-border; }
-  html { scroll-behavior: smooth; }
-  body { @apply bg-background font-sans text-foreground antialiased; }
-  
-  @media (pointer: fine) {
-    body { cursor: none !important; }
-    button, input, a, select, textarea { cursor: none !important; }
+  * { @apply border-border; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
+
+  .glass {
+    @apply bg-background/70 backdrop-blur-md border border-white/20;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
   button { -webkit-tap-highlight-color: transparent; }
+
+  ::selection {
+    background: hsl(38 92% 55% / 0.35);
+    color: hsl(38 60% 95%);
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(38 92% 55% / 0.8);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
 }
 
+/* ── CUSTOM UTILITY CLASSES ── */
 @layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Gold shimmer text */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #f5c842 0%, #e8a320 40%, #ffd700 60%, #c8860f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Glowing text */
+  .text-glow-gold {
+    text-shadow: 0 0 30px hsl(38 92% 55% / 0.6), 0 0 60px hsl(38 92% 55% / 0.3);
+  }
+  .text-glow-green {
+    text-shadow: 0 0 25px hsl(152 60% 38% / 0.7);
+  }
+
+  /* Glassmorphism card */
+  .glass-card {
+    background: hsl(220 14% 12% / 0.75);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid hsl(38 60% 55% / 0.15);
+    box-shadow:
+      0 4px 24px hsl(0 0% 0% / 0.4),
+      inset 0 1px 0 hsl(38 60% 80% / 0.08);
+  }
+
+  /* Gold border glow */
+  .border-glow-gold {
+    box-shadow: 0 0 0 1px hsl(38 92% 55% / 0.4), 0 0 20px hsl(38 92% 55% / 0.15);
+  }
+
+  /* Luxury surface */
+  .luxury-surface {
+    background: linear-gradient(135deg, hsl(220 14% 13%) 0%, hsl(220 12% 10%) 100%);
+    border: 1px solid hsl(38 40% 25% / 0.5);
+  }
+
+  /* Ornamental line */
+  .ornament-line {
+    position: relative;
+  }
+  .ornament-line::before,
+  .ornament-line::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, hsl(38 92% 55% / 0.5), transparent);
+  }
+
+  /* Kolam pattern background */
+  .kolam-bg {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5c842' fill-opacity='0.04'%3E%3Cpath d='M30 0 L36 24 L60 30 L36 36 L30 60 L24 36 L0 30 L24 24 Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* Animated gradient border */
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(hsl(220 14% 12%), hsl(220 14% 12%)) padding-box,
+                linear-gradient(135deg, hsl(38 92% 55%), hsl(152 60% 38%), hsl(25 70% 45%)) border-box;
+    border: 1px solid transparent;
+  }
+
+  /* Premium button base */
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 font-sans text-sm font-semibold tracking-wide rounded-lg transition-all duration-300;
+    background: linear-gradient(135deg, hsl(38 85% 50%) 0%, hsl(38 92% 60%) 100%);
+    color: hsl(220 15% 8%);
+    box-shadow: 0 4px 20px hsl(38 92% 55% / 0.4), inset 0 1px 0 hsl(38 80% 80% / 0.3);
+  }
+  .btn-gold:hover {
+    box-shadow: 0 6px 30px hsl(38 92% 55% / 0.6), inset 0 1px 0 hsl(38 80% 80% / 0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost-gold {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3.5 font-sans text-sm font-semibold tracking-wide rounded-lg transition-all duration-300;
+    color: hsl(38 92% 55%);
+    border: 1px solid hsl(38 92% 55% / 0.4);
+    background: transparent;
+  }
+  .btn-ghost-gold:hover {
+    background: hsl(38 92% 55% / 0.08);
+    border-color: hsl(38 92% 55% / 0.7);
+    box-shadow: 0 0 20px hsl(38 92% 55% / 0.2);
+  }
+
+  /* Noise texture overlay */
+  .noise-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    border-radius: inherit;
+  }
 }
+
+/* ── SCROLLBAR CUSTOM ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: hsl(220 14% 10%); }
+::-webkit-scrollbar-thumb {
+  background: hsl(38 50% 30%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: hsl(38 70% 45%); }
+
+/* ── ANIMATION KEYFRAMES ── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px hsl(38 92% 55% / 0.3); }
+  50% { box-shadow: 0 0 40px hsl(38 92% 55% / 0.7), 0 0 80px hsl(38 92% 55% / 0.2); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, hsl(38 92% 80% / 0.3) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 3s ease-in-out infinite; }
+.animate-marquee { animation: marquee 25s linear infinite; }

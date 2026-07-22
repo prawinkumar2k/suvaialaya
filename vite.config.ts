@@ -4,9 +4,13 @@ import path from "node:path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  publicDir: "./client/public",
   server: {
-    host: "::",
+    host: "0.0.0.0", // Bind to all interfaces (use localhost if ERR_NETWORK_CHANGED persists)
     port: 8080,
+    headers: {
+      "Origin-Agent-Cluster": "?1"
+    },
     fs: {
       allow: ["./client", "./shared", "index.html"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],

@@ -156,14 +156,15 @@ export default function Payment() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground pb-24 relative selection:bg-accent/30">
-      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none" />
+    <main className="min-h-screen bg-white text-[#1a3d2b] pb-24 relative overflow-hidden">
+      {/* ── BACKGROUND ACCENTS ── */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none fixed" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none fixed" />
       
       {/* Top Header */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
-      <header className="sticky top-0 z-50 border-b border-primary/20 bg-background/95 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
-          <Link to="/slots" className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary/70 hover:text-primary transition-colors">
+          <Link to="/slots" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 hover:text-[#1a3d2b] transition-colors">
             <ArrowLeft size={16} /> <span className="hidden sm:inline">Back</span>
           </Link>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -175,111 +176,118 @@ export default function Payment() {
 
       <div className="mx-auto max-w-5xl px-5 pt-16 sm:px-8 lg:grid lg:grid-cols-[1.2fr_0.8fr] lg:gap-12 lg:items-start relative z-10">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-          <h1 className="font-display text-4xl font-bold tracking-tight text-primary uppercase">Payment</h1>
-          <p className="mt-3 text-sm font-semibold uppercase tracking-widest text-primary/70 flex items-center gap-2">
-            <ShieldCheck size={16} className="text-accent" /> Secure Razorpay Gateway
+          <h1 className="font-display text-4xl font-bold tracking-tight text-[#1a3d2b] uppercase">Payment</h1>
+          <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 flex items-center gap-2">
+            <ShieldCheck size={16} className="text-[#c9841a]" /> Secure Razorpay Gateway
           </p>
 
-          <div className="mt-10 space-y-4">
-            <div 
+          <div className="mt-10 space-y-4" style={{ perspective: 1000 }}>
+            <motion.div 
               onClick={() => setSelectedMethod("upi")}
-              className={`p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between shadow-sm
-                ${selectedMethod === 'upi' ? 'border-primary bg-primary/10' : 'bg-background border-primary/20 hover:border-primary/50'}`}
+              whileHover={{ scale: 1.01, rotateX: 2, rotateY: -2 }}
+              className={`p-6 rounded-2xl border cursor-pointer transition-all flex items-center justify-between shadow-[0_4px_15px_rgb(0,0,0,0.02)]
+                ${selectedMethod === 'upi' ? 'border-[#1a3d2b] bg-[#1a3d2b]/5' : 'bg-white border-gray-100 hover:border-gray-300'}`}
             >
               <div className="flex items-center gap-5">
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${selectedMethod === 'upi' ? 'bg-primary text-accent' : 'bg-primary/10 text-primary'}`}>
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${selectedMethod === 'upi' ? 'bg-[#1a3d2b] text-[#c9841a]' : 'bg-[#1a3d2b]/5 text-[#1a3d2b]'}`}>
                   <QrCode size={24} />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-primary">UPI / QR</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mt-1">GPay, PhonePe, Paytm</p>
+                  <h3 className="font-display font-bold text-xl text-[#1a3d2b]">UPI / QR</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mt-1">GPay, PhonePe, Paytm</p>
                 </div>
               </div>
-              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'upi' ? 'border-primary' : 'border-primary/30'}`}>
-                {selectedMethod === 'upi' && <div className="h-3 w-3 rounded-full bg-primary" />}
+              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'upi' ? 'border-[#1a3d2b]' : 'border-gray-200'}`}>
+                {selectedMethod === 'upi' && <div className="h-3 w-3 rounded-full bg-[#1a3d2b]" />}
               </div>
-            </div>
+            </motion.div>
 
-            <div 
+            <motion.div 
               onClick={() => setSelectedMethod("card")}
-              className={`p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between shadow-sm
-                ${selectedMethod === 'card' ? 'border-primary bg-primary/10' : 'bg-background border-primary/20 hover:border-primary/50'}`}
+              whileHover={{ scale: 1.01, rotateX: 2, rotateY: -2 }}
+              className={`p-6 rounded-2xl border cursor-pointer transition-all flex items-center justify-between shadow-[0_4px_15px_rgb(0,0,0,0.02)]
+                ${selectedMethod === 'card' ? 'border-[#1a3d2b] bg-[#1a3d2b]/5' : 'bg-white border-gray-100 hover:border-gray-300'}`}
             >
               <div className="flex items-center gap-5">
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${selectedMethod === 'card' ? 'bg-primary text-accent' : 'bg-primary/10 text-primary'}`}>
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${selectedMethod === 'card' ? 'bg-[#1a3d2b] text-[#c9841a]' : 'bg-[#1a3d2b]/5 text-[#1a3d2b]'}`}>
                   <CreditCard size={24} />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-primary">Credit / Debit Card</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mt-1">Visa, Mastercard, RuPay</p>
+                  <h3 className="font-display font-bold text-xl text-[#1a3d2b]">Credit / Debit Card</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mt-1">Visa, Mastercard, RuPay</p>
                 </div>
               </div>
-              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'card' ? 'border-primary' : 'border-primary/30'}`}>
-                {selectedMethod === 'card' && <div className="h-3 w-3 rounded-full bg-primary" />}
+              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'card' ? 'border-[#1a3d2b]' : 'border-gray-200'}`}>
+                {selectedMethod === 'card' && <div className="h-3 w-3 rounded-full bg-[#1a3d2b]" />}
               </div>
-            </div>
+            </motion.div>
 
-            <div 
+            <motion.div 
               onClick={() => setSelectedMethod("netbanking")}
-              className={`p-6 rounded-xl border-2 cursor-pointer transition-all flex items-center justify-between shadow-sm
-                ${selectedMethod === 'netbanking' ? 'border-primary bg-primary/10' : 'bg-background border-primary/20 hover:border-primary/50'}`}
+              whileHover={{ scale: 1.01, rotateX: 2, rotateY: -2 }}
+              className={`p-6 rounded-2xl border cursor-pointer transition-all flex items-center justify-between shadow-[0_4px_15px_rgb(0,0,0,0.02)]
+                ${selectedMethod === 'netbanking' ? 'border-[#1a3d2b] bg-[#1a3d2b]/5' : 'bg-white border-gray-100 hover:border-gray-300'}`}
             >
               <div className="flex items-center gap-5">
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${selectedMethod === 'netbanking' ? 'bg-primary text-accent' : 'bg-primary/10 text-primary'}`}>
+                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${selectedMethod === 'netbanking' ? 'bg-[#1a3d2b] text-[#c9841a]' : 'bg-[#1a3d2b]/5 text-[#1a3d2b]'}`}>
                   <Landmark size={24} />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-xl text-primary">Net Banking</h3>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mt-1">All major Indian banks</p>
+                  <h3 className="font-display font-bold text-xl text-[#1a3d2b]">Net Banking</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mt-1">All major Indian banks</p>
                 </div>
               </div>
-              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'netbanking' ? 'border-primary' : 'border-primary/30'}`}>
-                {selectedMethod === 'netbanking' && <div className="h-3 w-3 rounded-full bg-primary" />}
+              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${selectedMethod === 'netbanking' ? 'border-[#1a3d2b]' : 'border-gray-200'}`}>
+                {selectedMethod === 'netbanking' && <div className="h-3 w-3 rounded-full bg-[#1a3d2b]" />}
               </div>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
 
         {/* Payment Summary */}
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mt-12 lg:mt-0 sticky top-32">
-          <div className="bg-background rounded-xl border border-primary/20 p-8 shadow-md relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-               <Leaf size={80} className="text-primary" />
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mt-12 lg:mt-0 sticky top-32" style={{ perspective: 1000 }}>
+          <motion.div 
+            whileHover={{ rotateX: 2, rotateY: -2, scale: 1.01 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="bg-white rounded-2xl border border-gray-100 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-[0.03] pointer-events-none">
+               <Leaf size={100} className="text-[#1a3d2b]" />
             </div>
             
-            <h2 className="font-display font-bold text-2xl text-primary mb-2">Order Summary</h2>
-            <p className="text-xs font-bold uppercase tracking-widest text-accent mb-8">{eventTitle || "Booking Event"}</p>
+            <h2 className="font-display font-bold text-2xl text-[#1a3d2b] mb-2">Order Summary</h2>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#c9841a] mb-8">{eventTitle || "Booking Event"}</p>
             
             <div className="space-y-6 text-sm relative z-10">
-              <div className="flex justify-between items-center pb-4 border-b border-primary/10">
-                <span className="text-primary/70 font-semibold uppercase tracking-widest text-xs">{numberOfGuests}x Guest Reservation</span>
-                <span className="font-display font-bold text-lg text-primary">₹{totalAmount.toLocaleString("en-IN")}</span>
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                <span className="text-[#1a3d2b]/60 font-bold uppercase tracking-widest text-[10px]">{numberOfGuests}x Guest Reservation</span>
+                <span className="font-display font-bold text-lg text-[#1a3d2b]">₹{totalAmount.toLocaleString("en-IN")}</span>
               </div>
-              <div className="flex justify-between items-center pb-4 border-b border-primary/10 text-primary/70">
-                <span className="font-semibold uppercase tracking-widest text-[10px]">Taxes (18% GST)</span>
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100 text-[#1a3d2b]/60">
+                <span className="font-bold uppercase tracking-widest text-[10px]">Taxes (18% GST)</span>
                 <span className="font-bold">₹{tax.toLocaleString("en-IN")}</span>
               </div>
               
               <div className="pt-2 flex flex-col justify-between">
-                <span className="text-primary/70 font-semibold uppercase tracking-widest text-xs mb-1">Final Amount</span>
-                <span className="font-display font-bold text-4xl text-primary">₹{finalTotal.toLocaleString("en-IN")}</span>
+                <span className="text-[#1a3d2b]/60 font-bold uppercase tracking-widest text-[10px] mb-1">Final Amount</span>
+                <span className="font-display font-bold text-4xl text-[#1a3d2b]">₹{finalTotal.toLocaleString("en-IN")}</span>
               </div>
             </div>
 
-            <button onClick={handlePay} disabled={isProcessing} className="w-full mt-10 rounded-md bg-primary px-8 py-4 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg transition-all hover:bg-primary/90 hover:-translate-y-1 relative z-10 disabled:opacity-70 disabled:cursor-not-allowed">
+            <button onClick={handlePay} disabled={isProcessing} className="w-full mt-10 rounded-xl bg-[#1a3d2b] px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-[#2d6a4f] hover:-translate-y-1 relative z-10 disabled:opacity-70 disabled:cursor-not-allowed">
               {isProcessing ? (
                 <span className="flex items-center justify-center gap-2">
-                  <Loader2 size={18} className="animate-spin text-accent" /> Processing...
+                  <Loader2 size={18} className="animate-spin text-[#c9841a]" /> Processing...
                 </span>
               ) : (
                 `Pay ₹${finalTotal.toLocaleString("en-IN")}`
               )}
             </button>
             
-            <p className="text-[9px] font-bold uppercase tracking-widest text-center text-primary/50 mt-6 relative z-10">
+            <p className="text-[9px] font-bold uppercase tracking-widest text-center text-[#1a3d2b]/40 mt-6 relative z-10">
               By proceeding, you agree to our terms. Secure 128-bit SSL encrypted.
             </p>
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </main>

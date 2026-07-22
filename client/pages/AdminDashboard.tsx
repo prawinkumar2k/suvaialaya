@@ -187,30 +187,31 @@ export default function AdminDashboard() {
   const adminInitials = user?.name ? user.name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase() : "AD";
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col relative selection:bg-accent/30">
-      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none" />
+    <main className="min-h-screen bg-white text-[#1a3d2b] flex flex-col relative overflow-hidden">
+      {/* ── BACKGROUND ACCENTS ── */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none fixed" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none fixed" />
       
       {/* Top Header */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-primary via-accent to-primary" />
-      <header className="sticky top-0 z-50 border-b border-primary/20 bg-background/95 backdrop-blur-md shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div className="mx-auto flex h-20 items-center justify-between px-5 sm:px-8 relative z-10">
           <div className="flex items-center gap-6">
             <BrandMark />
-            <span className="hidden md:inline-flex items-center rounded-sm bg-accent/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent border border-accent/20">
+            <span className="hidden md:inline-flex items-center rounded-sm bg-[#c9841a]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#c9841a] border border-[#c9841a]/20">
               SEMS Admin
             </span>
           </div>
           <div className="flex items-center gap-6">
-            <Link to="/kitchen" className="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-4 py-2 rounded-md hover:bg-primary/5 transition-all">
+            <Link to="/kitchen" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
               <ChefHat size={16} /> Open Kitchen
             </Link>
-            <Link to="/reception" className="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-4 py-2 rounded-md hover:bg-primary/5 transition-all">
+            <Link to="/reception" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
               <Users size={16} /> Open Reception
             </Link>
-            <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary border-2 border-primary/20 px-4 py-2 rounded-md hover:bg-primary/5 transition-all">
+            <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
               <ScanLine size={16} /> Open Scanner
             </Link>
-            <div className="h-10 w-10 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center font-display font-bold text-primary shadow-inner">
+            <div className="h-10 w-10 rounded-full bg-[#1a3d2b]/5 border-2 border-[#1a3d2b]/10 flex items-center justify-center font-display font-bold text-[#1a3d2b] shadow-inner">
               {adminInitials}
             </div>
           </div>
@@ -220,8 +221,8 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col lg:flex-row relative z-10">
         
         {/* Sidebar */}
-        <aside className="w-full lg:w-64 shrink-0 border-r border-primary/10 bg-background/50 backdrop-blur-sm">
-          <nav className="flex flex-row lg:flex-col gap-2 p-5 overflow-x-auto lg:overflow-y-auto scrollbar-hide">
+        <aside className="w-full lg:w-64 shrink-0 border-r border-gray-100 bg-white/50 backdrop-blur-sm">
+          <nav className="flex flex-row lg:flex-col gap-2 p-5 overflow-x-auto lg:overflow-y-auto scrollbar-hide" style={{ perspective: 1000 }}>
             {[
               { id: "overview", icon: LayoutDashboard, label: "Overview & Reports" },
               { id: "events", icon: CalendarDays, label: "Events & Slots" },
@@ -229,20 +230,21 @@ export default function AdminDashboard() {
               { id: "analytics", icon: BarChart3, label: "Detailed Analytics" },
               { id: "settings", icon: Settings, label: "Platform Settings" },
             ].map((tab) => (
-              <button
+              <motion.button
                 key={tab.id}
+                whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-4 px-4 py-3.5 rounded-lg transition-all whitespace-nowrap lg:whitespace-normal text-xs font-bold uppercase tracking-widest
-                  ${activeTab === tab.id ? 'bg-primary text-primary-foreground shadow-md' : 'text-primary/70 hover:bg-primary/5 hover:text-primary'}`}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all whitespace-nowrap lg:whitespace-normal text-[11px] font-bold uppercase tracking-widest
+                  ${activeTab === tab.id ? 'bg-[#1a3d2b] text-white shadow-[0_4px_15px_rgb(0,0,0,0.08)]' : 'text-[#1a3d2b]/60 hover:bg-gray-50 hover:text-[#1a3d2b] border border-transparent hover:border-gray-100'}`}
               >
                 <tab.icon size={16} />
                 {tab.label}
-              </button>
+              </motion.button>
             ))}
             
-            <div className="hidden lg:block my-4 border-t border-primary/10" />
+            <div className="hidden lg:block my-4 border-t border-gray-100" />
             
-            <button onClick={handleLogout} className="flex items-center w-full gap-4 px-4 py-3.5 rounded-lg text-xs font-bold uppercase tracking-widest text-destructive hover:bg-destructive/10 transition-colors">
+            <button onClick={handleLogout} className="flex items-center w-full gap-4 px-4 py-3.5 rounded-xl text-[11px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 transition-colors border border-transparent hover:border-red-100">
               <ArrowLeft size={16} /> Logout Admin
             </button>
           </nav>
@@ -257,107 +259,116 @@ export default function AdminDashboard() {
             transition={{ duration: 0.4 }}
           >
             {activeTab === "overview" && (
-              <div className="space-y-8 max-w-7xl mx-auto">
+              <div className="space-y-8 max-w-7xl mx-auto" style={{ perspective: 1000 }}>
                 <div>
-                  <h1 className="font-display text-4xl font-bold text-primary">Dashboard Overview</h1>
-                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Real-time metrics for Suvaialaya Events</p>
+                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Dashboard Overview</h1>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Real-time metrics for Suvaialaya Events</p>
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {dynamicStats.map((stat, i) => (
-                    <div key={i} className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm relative overflow-hidden group hover:border-primary/40 transition-colors">
-                      <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-                        <Leaf size={80} className="text-primary" />
+                    <motion.div 
+                      key={i} 
+                      whileHover={{ scale: 1.02, rotateX: 1, rotateY: -1 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)] relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-gray-200 transition-all"
+                    >
+                      <div className="absolute -right-4 -top-4 opacity-[0.02] group-hover:opacity-[0.05] transition-opacity pointer-events-none">
+                        <Leaf size={80} className="text-[#1a3d2b]" />
                       </div>
                       <div className="flex justify-between items-start relative z-10">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60">{stat.label}</p>
-                          <p className="font-display text-3xl font-bold text-primary mt-2">{stat.value}</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">{stat.label}</p>
+                          <p className="font-display text-3xl font-bold text-[#1a3d2b] mt-2">{stat.value}</p>
                         </div>
-                        <div className="p-3 bg-primary/10 text-primary rounded-lg border border-primary/20">
+                        <div className="p-3 bg-[#1a3d2b]/5 text-[#1a3d2b] rounded-xl border border-[#1a3d2b]/10">
                           <stat.icon size={20} />
                         </div>
                       </div>
-                      <div className="mt-5 flex items-center text-[10px] font-bold uppercase tracking-widest text-accent relative z-10">
+                      <div className="mt-5 flex items-center text-[10px] font-bold uppercase tracking-widest text-[#c9841a] relative z-10">
                         <TrendingUp size={14} className="mr-2" /> {stat.increase} updates
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
 
                 {/* Recent Bookings Table */}
-                <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
-                  <div className="p-6 border-b border-primary/10 flex justify-between items-center bg-primary/5">
-                    <h2 className="font-display font-bold text-xl text-primary">Recent Bookings</h2>
+                <motion.div 
+                  whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="bg-white border border-gray-100 rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.02)] overflow-hidden"
+                >
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 className="font-display font-bold text-xl text-[#1a3d2b]">Recent Bookings</h2>
                     <div className="flex items-center gap-4">
-                      <button onClick={handleExportCSV} className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded hover:bg-primary/20 transition-colors">
+                      <button onClick={handleExportCSV} className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b] bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
                         Export CSV
                       </button>
-                      <button className="text-xs font-bold uppercase tracking-widest text-primary hover:text-accent transition-colors">View All &rarr;</button>
+                      <button className="text-[9px] font-bold uppercase tracking-widest text-[#c9841a] hover:text-[#1a3d2b] transition-colors">View All &rarr;</button>
                     </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                      <thead className="text-[10px] text-primary/60 uppercase tracking-widest bg-primary/5 border-b border-primary/10">
+                      <thead className="text-[9px] text-[#1a3d2b]/50 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
                         <tr>
-                          <th className="px-6 py-4 font-bold">Booking ID</th>
+                          <th className="px-6 py-4 font-bold rounded-tl-xl">Booking ID</th>
                           <th className="px-6 py-4 font-bold">Guest Details</th>
                           <th className="px-6 py-4 font-bold">Contact Info</th>
                           <th className="px-6 py-4 font-bold">Slot</th>
                           <th className="px-6 py-4 font-bold text-center">Pax</th>
                           <th className="px-6 py-4 font-bold">Status</th>
-                          <th className="px-6 py-4 font-bold text-right">Actions</th>
+                          <th className="px-6 py-4 font-bold text-right rounded-tr-xl">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-primary/10">
+                      <tbody className="divide-y divide-gray-100">
                         {bookings.length === 0 && (
                           <tr>
-                            <td colSpan={7} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
+                            <td colSpan={7} className="px-6 py-8 text-center text-[#1a3d2b]/40 font-bold uppercase tracking-widest text-[10px]">
                               No bookings found in database
                             </td>
                           </tr>
                         )}
                         {[...bookings].reverse().slice(0, 10).map((b) => (
-                          <tr key={b._id} className="hover:bg-primary/5 transition-colors">
-                            <td className="px-6 py-5 font-bold text-primary">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
-                            <td className="px-6 py-5 text-foreground/80 font-medium">
+                          <tr key={b._id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-5 font-bold text-[#1a3d2b]">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
+                            <td className="px-6 py-5 text-[#1a3d2b]/80 font-medium">
                               <div>{b.user?.name || b.guestDetails?.fullName || "Guest"}</div>
-                              {b.guestDetails?.city && <div className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">{b.guestDetails.city}</div>}
+                              {b.guestDetails?.city && <div className="text-[9px] text-[#1a3d2b]/50 font-bold uppercase tracking-widest mt-0.5">{b.guestDetails.city}</div>}
                             </td>
-                            <td className="px-6 py-5 text-primary/70 text-xs">
+                            <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs">
                               <div>{b.user?.email || b.guestDetails?.email || "N/A"}</div>
-                              <div className="font-medium mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
+                              <div className="font-bold mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
                             </td>
-                            <td className="px-6 py-5 text-primary/70">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
-                            <td className="px-6 py-5 text-center font-bold text-primary">{b.numberOfGuests}</td>
+                            <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs font-bold">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
+                            <td className="px-6 py-5 text-center font-bold text-[#1a3d2b]">{b.numberOfGuests}</td>
                             <td className="px-6 py-5">
-                              <span className={`px-3 py-1.5 rounded border text-[9px] font-bold uppercase tracking-widest
-                                ${b.bookingStatus === 'Confirmed' ? 'bg-accent/10 text-accent border-accent/20' : 
-                                  b.bookingStatus === 'Pending' ? 'bg-warning/10 text-warning border-warning/20' : 
-                                  'bg-destructive/10 text-destructive border-destructive/20'}`}>
+                              <span className={`px-3 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest
+                                ${b.bookingStatus === 'Confirmed' ? 'bg-[#c9841a]/10 text-[#c9841a] border-[#c9841a]/20' : 
+                                  b.bookingStatus === 'Pending' ? 'bg-orange-50 text-orange-500 border-orange-100' : 
+                                  'bg-red-50 text-red-500 border-red-100'}`}>
                                 {b.bookingStatus}
                               </span>
                             </td>
                             <td className="px-6 py-5 text-right relative">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button className="text-primary/50 hover:text-primary transition-colors p-2 outline-none">
+                                  <button className="text-[#1a3d2b]/40 hover:text-[#1a3d2b] transition-colors p-2 outline-none">
                                     <MoreVertical size={18} />
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 bg-background border-primary/20">
-                                  <DropdownMenuLabel className="text-primary font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
-                                  <DropdownMenuSeparator className="bg-primary/10" />
+                                <DropdownMenuContent align="end" className="w-48 bg-white border-gray-100 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+                                  <DropdownMenuLabel className="text-[#1a3d2b] font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator className="bg-gray-100" />
                                   <DropdownMenuItem 
-                                    className="cursor-pointer text-xs font-semibold text-primary focus:bg-primary/10 focus:text-primary gap-2"
+                                    className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] focus:bg-gray-50 focus:text-[#1a3d2b] gap-2"
                                     onClick={() => handleUpdateBookingStatus(b._id, 'check-in')}
                                     disabled={b.bookingStatus === 'Checked In' || b.bookingStatus === 'Cancelled'}
                                   >
-                                    <CheckSquare size={14} className="text-success" /> Mark Checked In
+                                    <CheckSquare size={14} className="text-green-600" /> Mark Checked In
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
-                                    className="cursor-pointer text-xs font-semibold text-destructive focus:bg-destructive/10 focus:text-destructive gap-2"
+                                    className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-red-500 focus:bg-red-50 focus:text-red-600 gap-2"
                                     onClick={() => handleUpdateBookingStatus(b._id, 'cancel')}
                                     disabled={b.bookingStatus === 'Cancelled'}
                                   >
@@ -371,84 +382,88 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </motion.div>
               </div>
             )}
 
             {activeTab === "bookings" && (
-              <div className="space-y-8 max-w-7xl mx-auto">
+              <div className="space-y-8 max-w-7xl mx-auto" style={{ perspective: 1000 }}>
                 <div>
-                  <h1 className="font-display text-4xl font-bold text-primary">All Bookings</h1>
-                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Master Ledger</p>
+                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">All Bookings</h1>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Master Ledger</p>
                 </div>
-                <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
-                  <div className="p-6 border-b border-primary/10 flex justify-between items-center bg-primary/5">
-                    <h2 className="font-display font-bold text-xl text-primary">Complete Ledger</h2>
-                    <button onClick={handleExportCSV} className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded hover:bg-primary/20 transition-colors">
+                <motion.div 
+                  whileHover={{ rotateX: 1, rotateY: -1, scale: 1.01 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="bg-white border border-gray-100 rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.02)] overflow-hidden"
+                >
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                    <h2 className="font-display font-bold text-xl text-[#1a3d2b]">Complete Ledger</h2>
+                    <button onClick={handleExportCSV} className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b] bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
                       Export Full CSV
                     </button>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                      <thead className="text-[10px] text-primary/60 uppercase tracking-widest bg-primary/5 border-b border-primary/10">
+                      <thead className="text-[9px] text-[#1a3d2b]/50 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
                         <tr>
-                          <th className="px-6 py-4 font-bold">Booking ID</th>
+                          <th className="px-6 py-4 font-bold rounded-tl-xl">Booking ID</th>
                           <th className="px-6 py-4 font-bold">Guest Details</th>
                           <th className="px-6 py-4 font-bold">Contact Info</th>
                           <th className="px-6 py-4 font-bold">Slot</th>
                           <th className="px-6 py-4 font-bold text-center">Pax</th>
                           <th className="px-6 py-4 font-bold">Status</th>
-                          <th className="px-6 py-4 font-bold text-right">Actions</th>
+                          <th className="px-6 py-4 font-bold text-right rounded-tr-xl">Actions</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-primary/10">
+                      <tbody className="divide-y divide-gray-100">
                         {bookings.length === 0 && (
                           <tr>
-                            <td colSpan={7} className="px-6 py-8 text-center text-primary/60 font-semibold uppercase tracking-widest text-xs">
+                            <td colSpan={7} className="px-6 py-8 text-center text-[#1a3d2b]/40 font-bold uppercase tracking-widest text-[10px]">
                               No bookings found in database
                             </td>
                           </tr>
                         )}
                         {[...bookings].reverse().map((b) => (
-                          <tr key={b._id} className="hover:bg-primary/5 transition-colors">
-                            <td className="px-6 py-5 font-bold text-primary">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
-                            <td className="px-6 py-5 text-foreground/80 font-medium">
+                          <tr key={b._id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-5 font-bold text-[#1a3d2b]">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
+                            <td className="px-6 py-5 text-[#1a3d2b]/80 font-medium">
                               <div>{b.user?.name || b.guestDetails?.fullName || "Guest"}</div>
-                              {b.guestDetails?.city && <div className="text-[10px] text-primary/60 font-bold uppercase tracking-widest">{b.guestDetails.city}</div>}
+                              {b.guestDetails?.city && <div className="text-[9px] text-[#1a3d2b]/50 font-bold uppercase tracking-widest mt-0.5">{b.guestDetails.city}</div>}
                             </td>
-                            <td className="px-6 py-5 text-primary/70 text-xs">
+                            <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs">
                               <div>{b.user?.email || b.guestDetails?.email || "N/A"}</div>
-                              <div className="font-medium mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
+                              <div className="font-bold mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
                             </td>
-                            <td className="px-6 py-5 text-primary/70">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
-                            <td className="px-6 py-5 text-center font-bold text-primary">{b.numberOfGuests}</td>
+                            <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs font-bold">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
+                            <td className="px-6 py-5 text-center font-bold text-[#1a3d2b]">{b.numberOfGuests}</td>
                             <td className="px-6 py-5">
-                              <span className={`px-3 py-1.5 rounded border text-[9px] font-bold uppercase tracking-widest
-                                ${b.bookingStatus === 'Confirmed' ? 'bg-accent/10 text-accent border-accent/20' : 
-                                  b.bookingStatus === 'Pending' ? 'bg-warning/10 text-warning border-warning/20' : 
-                                  'bg-destructive/10 text-destructive border-destructive/20'}`}>
+                              <span className={`px-3 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest
+                                ${b.bookingStatus === 'Confirmed' ? 'bg-[#c9841a]/10 text-[#c9841a] border-[#c9841a]/20' : 
+                                  b.bookingStatus === 'Pending' ? 'bg-orange-50 text-orange-500 border-orange-100' : 
+                                  'bg-red-50 text-red-500 border-red-100'}`}>
                                 {b.bookingStatus}
                               </span>
                             </td>
                             <td className="px-6 py-5 text-right relative">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button className="text-primary/50 hover:text-primary transition-colors p-2 outline-none">
+                                  <button className="text-[#1a3d2b]/40 hover:text-[#1a3d2b] transition-colors p-2 outline-none">
                                     <MoreVertical size={18} />
                                   </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48 bg-background border-primary/20">
-                                  <DropdownMenuLabel className="text-primary font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
-                                  <DropdownMenuSeparator className="bg-primary/10" />
+                                <DropdownMenuContent align="end" className="w-48 bg-white border-gray-100 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+                                  <DropdownMenuLabel className="text-[#1a3d2b] font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator className="bg-gray-100" />
                                   <DropdownMenuItem 
-                                    className="cursor-pointer text-xs font-semibold text-primary focus:bg-primary/10 focus:text-primary gap-2"
+                                    className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] focus:bg-gray-50 focus:text-[#1a3d2b] gap-2"
                                     onClick={() => handleUpdateBookingStatus(b._id, 'check-in')}
                                     disabled={b.bookingStatus === 'Checked In' || b.bookingStatus === 'Cancelled'}
                                   >
-                                    <CheckSquare size={14} className="text-success" /> Mark Checked In
+                                    <CheckSquare size={14} className="text-green-600" /> Mark Checked In
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
-                                    className="cursor-pointer text-xs font-semibold text-destructive focus:bg-destructive/10 focus:text-destructive gap-2"
+                                    className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-red-500 focus:bg-red-50 focus:text-red-600 gap-2"
                                     onClick={() => handleUpdateBookingStatus(b._id, 'cancel')}
                                     disabled={b.bookingStatus === 'Cancelled'}
                                   >
@@ -462,72 +477,77 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </motion.div>
               </div>
             )}
 
             {activeTab === "events" && (
-              <div className="space-y-8 max-w-7xl mx-auto">
+              <div className="space-y-8 max-w-7xl mx-auto" style={{ perspective: 1000 }}>
                 <div>
-                  <h1 className="font-display text-4xl font-bold text-primary">Events & Slots</h1>
-                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Manage your venue schedule</p>
+                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Events & Slots</h1>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Manage your venue schedule</p>
                 </div>
                 <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
                   {events.length === 0 ? (
-                    <div className="col-span-full text-center py-20 border border-dashed border-primary/20 rounded-xl bg-primary/5">
-                      <p className="text-primary/60 uppercase tracking-widest font-bold">No Events Found</p>
+                    <div className="col-span-full text-center py-20 border border-dashed border-gray-200 rounded-2xl bg-gray-50">
+                      <p className="text-[#1a3d2b]/40 uppercase tracking-widest font-bold text-[10px]">No Events Found</p>
                     </div>
                   ) : (
                     events.map((event) => (
-                      <div key={event._id} className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm group relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-                          <CalendarDays size={80} className="text-primary" />
+                      <motion.div 
+                        key={event._id} 
+                        whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)] group relative overflow-hidden"
+                      >
+                        <div className="absolute top-0 right-0 p-4 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
+                          <CalendarDays size={100} className="text-[#1a3d2b]" />
                         </div>
                         <div className="flex justify-between items-start mb-4 relative z-10">
                           <div>
-                            <h3 className="font-display text-xl font-bold text-primary">{event.title}</h3>
-                            <p className="text-[10px] uppercase tracking-widest text-primary/60 mt-1">{event.venue}</p>
+                            <h3 className="font-display text-xl font-bold text-[#1a3d2b]">{event.title}</h3>
+                            <p className="text-[10px] uppercase tracking-widest text-[#1a3d2b]/60 mt-1 font-bold">{event.venue}</p>
                           </div>
-                          <span className="text-xs font-bold bg-accent/20 text-accent px-2 py-1 rounded">₹{event.basePrice}</span>
+                          <span className="text-[9px] font-bold uppercase tracking-widest bg-[#c9841a]/10 text-[#c9841a] px-3 py-1.5 rounded-full border border-[#c9841a]/20">₹{event.basePrice}</span>
                         </div>
                         <div className="space-y-4 relative z-10">
-                          <div className="flex justify-between items-center bg-primary/10 p-2 rounded-lg mb-2">
-                            <span className="text-xs font-bold uppercase tracking-widest text-primary">Manage Schedule</span>
+                          <div className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 mb-2">
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]">Manage Schedule</span>
                             <div className="flex gap-2">
-                              <button onClick={() => handleAddDate(event)} className="bg-primary text-primary-foreground text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest hover:bg-primary/90 flex items-center gap-1">
-                                <Plus size={12} /> Date
+                              <button onClick={() => handleAddDate(event)} className="bg-white border border-gray-200 text-[#1a3d2b] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest hover:bg-gray-50 shadow-sm flex items-center gap-1">
+                                <Plus size={10} /> Date
                               </button>
-                              <button onClick={() => handleAddSlot(event)} className="bg-primary text-primary-foreground text-[10px] px-2 py-1 rounded font-bold uppercase tracking-widest hover:bg-primary/90 flex items-center gap-1">
-                                <Plus size={12} /> Slot
+                              <button onClick={() => handleAddSlot(event)} className="bg-white border border-gray-200 text-[#1a3d2b] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest hover:bg-gray-50 shadow-sm flex items-center gap-1">
+                                <Plus size={10} /> Slot
                               </button>
                             </div>
                           </div>
                           {event.dates?.map((dateObj: any, index: number) => (
-                            <div key={index} className="bg-primary/5 p-4 rounded-lg border border-primary/10">
-                              <div className="font-bold text-primary mb-2 border-b border-primary/10 pb-2 flex justify-between items-center">
+                            <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                              <div className="font-bold text-[#1a3d2b] text-xs uppercase tracking-widest mb-3 border-b border-gray-100 pb-2 flex justify-between items-center">
                                 {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                                <button onClick={() => handleRemoveDate(event, dateObj)} className="text-xs text-destructive hover:bg-destructive/10 p-1 rounded transition-colors" title="Remove Date">
+                                <button onClick={() => handleRemoveDate(event, dateObj)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-colors" title="Remove Date">
                                   <XCircle size={14} />
                                 </button>
                               </div>
-                              <div className="space-y-2">
+                              <div className="space-y-3">
                                 {event.slots?.map((slot: any, slotIdx: number) => {
                                   const booked = slot.booked || 0;
                                   const total = slot.capacity;
                                   const percentage = Math.round((booked / total) * 100);
                                   return (
-                                    <div key={slotIdx} className="flex justify-between items-center text-xs group/slot">
+                                    <div key={slotIdx} className="flex justify-between items-center text-xs group/slot bg-gray-50 p-2 rounded-lg">
                                       <div className="flex items-center gap-2">
-                                        <button onClick={() => handleRemoveSlot(event, slotIdx)} className="text-destructive/50 hover:text-destructive transition-colors opacity-0 group-hover/slot:opacity-100 p-0.5 rounded hover:bg-destructive/10">
+                                        <button onClick={() => handleRemoveSlot(event, slotIdx)} className="text-red-400 hover:text-red-600 transition-colors opacity-0 group-hover/slot:opacity-100 p-1 rounded-md hover:bg-red-50">
                                           <XCircle size={12} />
                                         </button>
-                                        <span className="text-primary/70">{slot.time}</span>
+                                        <span className="font-bold text-[#1a3d2b]">{slot.time}</span>
                                       </div>
-                                      <div className="flex items-center gap-2">
-                                        <div className="w-20 h-1.5 bg-primary/10 rounded-full overflow-hidden">
-                                          <div className="h-full bg-accent" style={{ width: `${percentage}%` }} />
+                                      <div className="flex items-center gap-3">
+                                        <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                          <div className="h-full bg-[#c9841a]" style={{ width: `${percentage}%` }} />
                                         </div>
-                                        <span className="font-bold text-primary w-12 text-right">{booked} / {total}</span>
+                                        <span className="font-bold text-[#1a3d2b] w-12 text-right text-[10px] uppercase tracking-widest">{booked} / {total}</span>
                                       </div>
                                     </div>
                                   );
@@ -536,7 +556,7 @@ export default function AdminDashboard() {
                             </div>
                           ))}
                         </div>
-                      </div>
+                      </motion.div>
                     ))
                   )}
                 </div>
@@ -544,121 +564,124 @@ export default function AdminDashboard() {
             )}
 
             {activeTab === "settings" && (
-              <div className="space-y-8 max-w-4xl mx-auto">
+              <div className="space-y-8 max-w-4xl mx-auto" style={{ perspective: 1000 }}>
                 <div>
-                  <h1 className="font-display text-4xl font-bold text-primary">Platform Settings</h1>
-                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Configure your restaurant platform</p>
+                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Platform Settings</h1>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Configure your restaurant platform</p>
                 </div>
-                <div className="bg-background border border-primary/20 rounded-xl p-8 shadow-sm">
-                  <h2 className="font-display text-2xl font-bold text-primary mb-6">General Information</h2>
+                <motion.div 
+                  whileHover={{ rotateX: 1, rotateY: -1, scale: 1.01 }}
+                  className="bg-white border border-gray-100 rounded-2xl p-8 shadow-[0_4px_15px_rgb(0,0,0,0.02)]"
+                >
+                  <h2 className="font-display text-2xl font-bold text-[#1a3d2b] mb-6">General Information</h2>
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Platform Name</label>
-                      <input type="text" className="w-full border border-primary/20 rounded-md px-4 py-3 bg-primary/5 focus:outline-none focus:border-accent text-primary font-medium" defaultValue="Suvaialaya Event Management System" />
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Platform Name</label>
+                      <input type="text" className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" defaultValue="Suvaialaya Event Management System" />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-primary/70 mb-2">Admin Notification Email</label>
-                      <input type="email" className="w-full border border-primary/20 rounded-md px-4 py-3 bg-primary/5 focus:outline-none focus:border-accent text-primary font-medium" defaultValue="admin@suvaialaya.com" />
+                      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Admin Notification Email</label>
+                      <input type="email" className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" defaultValue="admin@suvaialaya.com" />
                     </div>
-                    <div className="pt-4 border-t border-primary/10">
-                      <button className="bg-primary text-primary-foreground font-bold uppercase tracking-widest text-xs px-6 py-3 rounded-md hover:bg-primary/90 transition-colors">
+                    <div className="pt-6 border-t border-gray-100">
+                      <button className="bg-[#1a3d2b] text-white font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl hover:bg-[#2d6a4f] transition-colors shadow-md">
                         Save Changes
                       </button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             )}
 
             {activeTab === "analytics" && analytics && (
-              <div className="space-y-8 max-w-7xl mx-auto">
+              <div className="space-y-8 max-w-7xl mx-auto" style={{ perspective: 1000 }}>
                 <div>
-                  <h1 className="font-display text-4xl font-bold text-primary">Detailed Analytics</h1>
-                  <p className="mt-2 text-sm font-semibold uppercase tracking-widest text-primary/60">Comprehensive business intelligence</p>
+                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Detailed Analytics</h1>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Comprehensive business intelligence</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {/* Revenue Summary */}
-                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Net Revenue</h3>
-                    <p className="font-display text-3xl font-bold text-primary">₹{(analytics.revenue.netRevenue || 0).toLocaleString("en-IN")}</p>
-                    <p className="text-xs font-semibold text-primary/50 mt-2">Expected: ₹{(analytics.revenue.expected || 0).toLocaleString("en-IN")}</p>
-                  </div>
+                  <motion.div whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Net Revenue</h3>
+                    <p className="font-display text-3xl font-bold text-[#1a3d2b]">₹{(analytics.revenue.netRevenue || 0).toLocaleString("en-IN")}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]/40 mt-2">Expected: ₹{(analytics.revenue.expected || 0).toLocaleString("en-IN")}</p>
+                  </motion.div>
                   
                   {/* Customer Intel */}
-                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Unique Customers</h3>
-                    <p className="font-display text-3xl font-bold text-primary">{analytics.customers.unique || 0}</p>
-                    <p className="text-xs font-semibold text-primary/50 mt-2">Repeat Rate: {analytics.customers.repeatRate || "0%"}</p>
-                  </div>
+                  <motion.div whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Unique Customers</h3>
+                    <p className="font-display text-3xl font-bold text-[#1a3d2b]">{analytics.customers.unique || 0}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]/40 mt-2">Repeat Rate: {analytics.customers.repeatRate || "0%"}</p>
+                  </motion.div>
                   
                   {/* Performance Rates */}
-                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Check-in Rate</h3>
-                    <p className="font-display text-3xl font-bold text-primary">{analytics.rates.checkInRate || "0%"}</p>
-                    <p className="text-xs font-semibold text-primary/50 mt-2">No-show: {analytics.rates.noShowRate || "0%"}</p>
-                  </div>
+                  <motion.div whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Check-in Rate</h3>
+                    <p className="font-display text-3xl font-bold text-[#1a3d2b]">{analytics.rates.checkInRate || "0%"}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]/40 mt-2">No-show: {analytics.rates.noShowRate || "0%"}</p>
+                  </motion.div>
                   
                   {/* Volume */}
-                  <div className="bg-background border border-primary/20 rounded-xl p-6 shadow-sm">
-                    <h3 className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2">Total Guests</h3>
-                    <p className="font-display text-3xl font-bold text-primary">{analytics.guests.total || 0}</p>
-                    <p className="text-xs font-semibold text-primary/50 mt-2">Checked In: {analytics.guests.checkedIn || 0}</p>
-                  </div>
+                  <motion.div whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Total Guests</h3>
+                    <p className="font-display text-3xl font-bold text-[#1a3d2b]">{analytics.guests.total || 0}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]/40 mt-2">Checked In: {analytics.guests.checkedIn || 0}</p>
+                  </motion.div>
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-8">
                   {/* Top Slots */}
-                  <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-primary/10 bg-primary/5">
-                      <h2 className="font-display font-bold text-xl text-primary">Top Performing Slots</h2>
+                  <motion.div whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1 }} className="bg-white border border-gray-100 rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.02)] overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 bg-gray-50">
+                      <h2 className="font-display font-bold text-xl text-[#1a3d2b]">Top Performing Slots</h2>
                     </div>
                     <div className="p-6">
                       <div className="space-y-4">
                         {(analytics.slotInsights.slots || []).slice(0, 5).map((slot: any, i: number) => (
-                          <div key={i} className="flex items-center justify-between border-b border-primary/5 pb-2 last:border-0 last:pb-0">
+                          <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-3 last:border-0 last:pb-0">
                             <div>
-                              <div className="font-bold text-primary">{slot._id}</div>
-                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{slot.bookings} Bookings</div>
+                              <div className="font-bold text-[#1a3d2b] text-xs">{slot._id}</div>
+                              <div className="text-[9px] uppercase tracking-widest text-[#1a3d2b]/50 mt-1 font-bold">{slot.bookings} Bookings</div>
                             </div>
                             <div className="text-right">
-                              <div className="font-bold text-accent">₹{(slot.revenue || 0).toLocaleString("en-IN")}</div>
-                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{slot.totalGuests} Guests</div>
+                              <div className="font-bold text-[#c9841a] text-sm">₹{(slot.revenue || 0).toLocaleString("en-IN")}</div>
+                              <div className="text-[9px] uppercase tracking-widest text-[#1a3d2b]/50 mt-1 font-bold">{slot.totalGuests} Guests</div>
                             </div>
                           </div>
                         ))}
                         {(!analytics.slotInsights.slots || analytics.slotInsights.slots.length === 0) && (
-                          <div className="text-center text-primary/50 py-4 text-xs font-bold uppercase tracking-widest">No slot data available</div>
+                          <div className="text-center text-[#1a3d2b]/40 py-4 text-[10px] font-bold uppercase tracking-widest">No slot data available</div>
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
 
                   {/* Revenue Trend */}
-                  <div className="bg-background border border-primary/20 rounded-xl shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-primary/10 bg-primary/5">
-                      <h2 className="font-display font-bold text-xl text-primary">Daily Revenue Trend</h2>
+                  <motion.div whileHover={{ scale: 1.01, rotateX: 1, rotateY: -1 }} className="bg-white border border-gray-100 rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.02)] overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 bg-gray-50">
+                      <h2 className="font-display font-bold text-xl text-[#1a3d2b]">Daily Revenue Trend</h2>
                     </div>
                     <div className="p-6">
                       <div className="space-y-4">
                         {(analytics.dailyTrend || []).slice(-5).map((day: any, i: number) => (
-                          <div key={i} className="flex items-center justify-between border-b border-primary/5 pb-2 last:border-0 last:pb-0">
+                          <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-3 last:border-0 last:pb-0">
                             <div>
-                              <div className="font-bold text-primary">{new Date(day._id).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}</div>
-                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{day.bookings} Bookings</div>
+                              <div className="font-bold text-[#1a3d2b] text-xs uppercase tracking-widest">{new Date(day._id).toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                              <div className="text-[9px] uppercase tracking-widest text-[#1a3d2b]/50 mt-1 font-bold">{day.bookings} Bookings</div>
                             </div>
                             <div className="text-right">
-                              <div className="font-bold text-primary">₹{(day.revenue || 0).toLocaleString("en-IN")}</div>
-                              <div className="text-[10px] uppercase tracking-widest text-primary/60">{day.guests} Guests</div>
+                              <div className="font-bold text-[#1a3d2b] text-sm">₹{(day.revenue || 0).toLocaleString("en-IN")}</div>
+                              <div className="text-[9px] uppercase tracking-widest text-[#1a3d2b]/50 mt-1 font-bold">{day.guests} Guests</div>
                             </div>
                           </div>
                         ))}
                         {(!analytics.dailyTrend || analytics.dailyTrend.length === 0) && (
-                          <div className="text-center text-primary/50 py-4 text-xs font-bold uppercase tracking-widest">No trend data available</div>
+                          <div className="text-center text-[#1a3d2b]/40 py-4 text-[10px] font-bold uppercase tracking-widest">No trend data available</div>
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             )}
