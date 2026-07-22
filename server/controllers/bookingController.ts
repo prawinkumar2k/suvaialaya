@@ -166,6 +166,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
 
     // ─── 4. ATOMIC seat reservation using $inc with $expr guard ───────────────
     // This is the BookMyShow standard — single atomic DB operation
+    let seatsIncremented = false;
     const updatedEvent = await Event.findOneAndUpdate(
       {
         _id: eventId,
@@ -195,48 +196,57 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
         error: "Slot just filled up. Please try another time slot.",
       });
     }
+    seatsIncremented = true;
 
     // ─── 5. Create booking record ──────────────────────────────────────────────
-    const [booking] = await Booking.create(
-      [
-        {
-          user: req.user._id,
-          event: eventId,
-          date,
-          slotTime,
-          guestDetails,
-          numberOfGuests,
-          totalAmount,
-          bookingStatus: "Confirmed",
-          paymentStatus: "Pending",
-          idempotencyKey: idempotencyKey || crypto.randomUUID(),
-          bookingSource: "web",
-        },
-      ]
-    );
+    try {
+      const [booking] = await Booking.create(
+        [
+          {
+            user: req.user._id,
+            event: eventId,
+            date,
+            slotTime,
+            guestDetails,
+            numberOfGuests,
+            totalAmount,
+            bookingStatus: "Confirmed",
+            paymentStatus: "Pending",
+            idempotencyKey: idempotencyKey || crypto.randomUUID(),
+            bookingSource: "web",
+          },
+        ]
+      );
 
-    // ─── 6. Commit transaction ────────────────────────────────────────────────
-    
+      logger.info("Booking created successfully", {
+        bookingId: booking._id,
+        userId: req.user._id,
+        slotTime,
+        numberOfGuests,
+      });
 
-    logger.info("Booking created successfully", {
-      bookingId: booking._id,
-      userId: req.user._id,
-      slotTime,
-      numberOfGuests,
-    });
+      // ─── 7. Schedule auto seat-release if payment not completed in 10 min ─────
+      await scheduleSeatRelease(booking._id.toString(), SEAT_LOCK_TTL_SECONDS * 1000);
 
-    // ─── 7. Schedule auto seat-release if payment not completed in 10 min ─────
-    await scheduleSeatRelease(booking._id.toString(), SEAT_LOCK_TTL_SECONDS * 1000);
+      // ─── 8. Enqueue resilient notification (retries 5x, DLQ on failure) ───────
+      await addNotificationJob("booking_confirmation", {
+        bookingId: booking._id.toString(),
+      });
 
-    // ─── 8. Enqueue resilient notification (retries 5x, DLQ on failure) ───────
-    await addNotificationJob("booking_confirmation", {
-      bookingId: booking._id.toString(),
-    });
-
-    res.status(201).json({ success: true, data: booking });
+      res.status(201).json({ success: true, data: booking });
+    } catch (bookingError: any) {
+      // Rollback! If booking fails (e.g. schema validation), reverse the atomic increment and release lock
+      if (seatsIncremented) {
+        await Event.findOneAndUpdate(
+          { _id: eventId, "slots.time": slotTime },
+          { $inc: { "slots.$.booked": -numberOfGuests } }
+        );
+        await releaseSeatLock(eventId, date, slotTime, req.user._id.toString());
+      }
+      throw bookingError;
+    }
   } catch (error: any) {
-    
-    logger.error("Booking creation failed — transaction rolled back", {
+    logger.error("Booking creation failed", {
       error: error.message,
       userId: req.user?._id,
     });

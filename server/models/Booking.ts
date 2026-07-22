@@ -3,13 +3,12 @@ import mongoose from "mongoose";
 const guestDetailSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true },
-    age: { type: Number, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },
-    city: { type: String, required: true },
+    city: { type: String, required: false },
     emergency: { type: String, required: false },
     // ─── Operations fields (Kitchen Dashboard, Reception) ───────────────────
-    gender: { type: String, enum: ["male", "female", "other"], default: "other" },
+    gender: { type: String, enum: ["Male", "Female", "Other", "male", "female", "other"], default: "Other" },
     isVIP: { type: Boolean, default: false },
     isReturningCustomer: { type: Boolean, default: false },
     // Dietary preferences for Kitchen Dashboard
