@@ -554,3 +554,30 @@ export const rescheduleBooking = async (req: Request, res: Response, next: NextF
   }
 };
 
+// @desc    Upload ticket PDF (Base64) to booking
+// @route   PUT /api/bookings/:id/ticket
+// @access  Private
+export const uploadTicket = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { ticketPdfUrl, qrCodeUrl } = req.body;
+    
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      res.status(404).json({ success: false, error: "Booking not found" });
+      return;
+    }
+
+    if (ticketPdfUrl) booking.ticketPdfUrl = ticketPdfUrl;
+    if (qrCodeUrl) booking.qrCodeUrl = qrCodeUrl;
+    
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Ticket saved to database",
+    });
+  } catch (error: any) {
+    console.error("Upload Ticket error:", error);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};

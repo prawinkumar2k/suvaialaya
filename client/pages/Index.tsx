@@ -217,10 +217,55 @@ const SPECIALS = [
   },
 ];
 
+import axios from "axios";
+
 export default function Index() {
   const [done, setDone] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
+  const [basePrice, setBasePrice] = useState(1499);
+  const [menuHighlights, setMenuHighlights] = useState<any[]>(MENU_HIGHLIGHTS); // Default to static, override with DB
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // Fetch Event Data for dynamic pricing
+    axios.get("/api/events")
+      .then((res) => {
+        if (res.data.success && res.data.data.length > 0) {
+          setBasePrice(res.data.data[0].basePrice);
+        }
+      })
+      .catch((err) => console.error("Error fetching event:", err));
+
+    // Fetch Menu Items from Database
+    axios.get("/api/menu")
+      .then((res) => {
+        if (res.data.success && res.data.data.length > 0) {
+          const dbMenu = res.data.data;
+          
+          // Group by category
+          const categories = [...new Set(dbMenu.map((item: any) => item.category))];
+          
+          const dynamicMenu = categories.map(cat => {
+            // Find existing image for this category if possible, or use a default
+            const existingCat = MENU_HIGHLIGHTS.find(m => m.category.toLowerCase() === (cat as string).toLowerCase());
+            const img = existingCat ? existingCat.img : "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=800&q=80";
+            
+            return {
+              category: cat,
+              img,
+              items: dbMenu.filter((item: any) => item.category === cat).map((item: any) => ({
+                name: item.name,
+                price: `₹${item.price}`,
+                note: item.description
+              }))
+            };
+          });
+
+          setMenuHighlights(dynamicMenu);
+        }
+      })
+      .catch((err) => console.error("Error fetching menu:", err));
+  }, []);
 
   return (
     <main className="bg-white text-[#1a3d2b] font-sans min-h-screen overflow-x-hidden">
@@ -397,7 +442,7 @@ export default function Index() {
 
           {/* Category tabs */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {MENU_HIGHLIGHTS.map((cat, i) => (
+            {menuHighlights.map((cat, i) => (
               <button key={cat.category} onClick={() => setActiveMenu(i)}
                 className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-colors ${activeMenu === i ? "bg-[#1a3d2b] text-white" : "bg-gray-100 text-[#1a3d2b]/60 hover:bg-gray-200"}`}>
                 {cat.category}
@@ -406,24 +451,25 @@ export default function Index() {
           </div>
 
           <AnimatePresence mode="wait">
-            <motion.div key={activeMenu} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}
-              className="flex flex-col md:flex-row bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
-              {/* Food image */}
-              <div className="md:w-48 flex-shrink-0">
-                <img src={MENU_HIGHLIGHTS[activeMenu].img} alt={MENU_HIGHLIGHTS[activeMenu].category}
-                  className="w-full h-48 md:h-full object-cover" />
-              </div>
-              {/* Items */}
-              <div className="flex-1">
-                {MENU_HIGHLIGHTS[activeMenu].items.map((item: any, i: number) => (
-                  <div key={item.name} className={`px-5 py-3 ${i !== MENU_HIGHLIGHTS[activeMenu].items.length - 1 ? "border-b border-gray-200" : ""}`}>
-                    <div className="flex items-center justify-between">
-                      <p className="text-[#1a3d2b] font-semibold text-sm">{item.name}</p>
-                      <p className="text-[#1a3d2b] font-bold text-sm font-display ml-4 flex-shrink-0">{item.price}</p>
+            {menuHighlights.length > 0 && activeMenu < menuHighlights.length && (
+              <motion.div key={activeMenu} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}
+                className="flex flex-col md:flex-row bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
+                {/* Food image */}
+                <div className="md:w-48 flex-shrink-0">
+                  <img src={menuHighlights[activeMenu].img} alt={menuHighlights[activeMenu].category}
+                    className="w-full h-48 md:h-full object-cover" />
+                </div>
+                {/* Items */}
+                <div className="flex-1">
+                  {menuHighlights[activeMenu].items.map((item: any, i: number) => (
+                    <div key={item.name} className={`px-5 py-3 ${i !== menuHighlights[activeMenu].items.length - 1 ? "border-b border-gray-200" : ""}`}>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[#1a3d2b] font-semibold text-sm">{item.name}</p>
+                        <p className="text-[#1a3d2b] font-bold text-sm font-display ml-4 flex-shrink-0">{item.price}</p>
+                      </div>
+                      {item.note && <p className="text-[#1a3d2b]/45 text-[10px] mt-0.5 leading-relaxed">{item.note}</p>}
                     </div>
-                    {item.note && <p className="text-[#1a3d2b]/45 text-[10px] mt-0.5 leading-relaxed">{item.note}</p>}
-                  </div>
-                ))}
+                  ))}
                 <div className="px-5 py-3 bg-[#1a3d2b]/5 flex items-center justify-between">
                   <p className="text-[#1a3d2b]/60 text-xs">Showing highlights</p>
                   <button onClick={() => navigate("/menu")} className="flex items-center gap-1 text-[#1a3d2b] text-xs font-bold hover:underline">
@@ -432,6 +478,7 @@ export default function Index() {
                 </div>
               </div>
             </motion.div>
+            )}
           </AnimatePresence>
         </motion.div>
       </section>
@@ -485,6 +532,87 @@ export default function Index() {
           </div>
         </motion.div>
       </section>
+
+      {/* ── FULL SITE FOOTER ── */}
+      <footer className="bg-[#0f2419] text-white/60 px-8 md:px-16 py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10 pb-10 border-b border-white/10">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-3 mb-4">
+                <img src="/suvaialaya-logo.png" alt="Suvaialaya" className="h-10 w-10 object-contain rounded-lg bg-white/10 p-1" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                <div>
+                  <p className="text-white font-display font-bold text-sm tracking-widest uppercase">Suvaialaya</p>
+                  <p className="text-white/40 text-[10px] uppercase tracking-widest">South Indian Cuisine</p>
+                </div>
+              </div>
+              <p className="text-xs leading-relaxed text-white/50">
+                Authentic Madurai flavors brought to your city. From legendary Biryani to grand Kari Virundhu feasts.
+              </p>
+              <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 mt-4 text-[#c9841a] text-xs font-bold hover:text-[#e8a030] transition-colors">
+                📞 {PHONE}
+              </a>
+            </div>
+
+            {/* Discover */}
+            <div>
+              <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-4">Discover</p>
+              <ul className="space-y-3">
+                {[
+                  { label: "Home", href: "/" },
+                  { label: "Menu", href: "/menu" },
+                  { label: "Gallery", href: "/gallery" },
+                  { label: "About Us", href: "/about" },
+                ].map(({ label, href }) => (
+                  <li key={label}><Link to={href} className="text-xs hover:text-white transition-colors">{label}</Link></li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Account */}
+            <div>
+              <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-4">My Account</p>
+              <ul className="space-y-3">
+                {[
+                  { label: "Book a Seat", href: "/slots" },
+                  { label: "My Bookings", href: "/dashboard" },
+                  { label: "Login", href: "/login" },
+                  { label: "Register", href: "/register" },
+                ].map(({ label, href }) => (
+                  <li key={label}><Link to={href} className="text-xs hover:text-white transition-colors">{label}</Link></li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-4">Support</p>
+              <ul className="space-y-3">
+                {[
+                  { label: "Contact Us", href: "/contact" },
+                  { label: "FAQ", href: "/faq" },
+                  { label: "Help Center", href: "/help" },
+                  { label: "Terms & Conditions", href: "/terms" },
+                  { label: "Privacy Policy", href: "/privacy" },
+                ].map(({ label, href }) => (
+                  <li key={label}><Link to={href} className="text-xs hover:text-white transition-colors">{label}</Link></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-3">
+            <p className="text-[10px] text-white/30">© {new Date().getFullYear()} Suvaialaya. All rights reserved.</p>
+            <div className="flex items-center gap-6">
+              <Link to="/terms" className="text-[10px] hover:text-white/60 transition-colors">Terms</Link>
+              <Link to="/privacy" className="text-[10px] hover:text-white/60 transition-colors">Privacy</Link>
+              <Link to="/contact" className="text-[10px] hover:text-white/60 transition-colors">Contact</Link>
+            </div>
+            <p className="text-[10px] text-white/20">Developed by <span className="text-[#c9841a] font-bold">Shalini N</span></p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

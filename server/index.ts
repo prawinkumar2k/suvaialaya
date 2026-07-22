@@ -31,6 +31,7 @@ import waitlistRoutes from "./routes/waitlistRoutes.ts";
 import analyticsRoutes from "./routes/analyticsRoutes.ts";
 import kitchenRoutes from "./routes/kitchenRoutes";
 import menuRoutes from "./routes/menuRoutes";
+import settingsRoutes from "./routes/settingsRoutes";
 import { getSystemHealth, getMetrics } from "./controllers/healthController";
 
 // ─── Connect to MongoDB ────────────────────────────────────────────────────────
@@ -131,8 +132,8 @@ export function createServer() {
   // ─── Razorpay webhook: raw body BEFORE express.json() ─────────────────────
   app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 
-  // ─── Body Parsing (10kb limit — prevents large payload attacks) ────────────
-  app.use("/api", express.json({ limit: "10kb" }));
+  // ─── Regular JSON body parsing ──────────────────────────────────────────
+  app.use("/api", express.json({ limit: "10mb" }));
   app.use("/api", express.urlencoded({ extended: true, limit: "10kb" }));
 
   // ─── NoSQL Injection Prevention ────────────────────────────────────────────
@@ -210,6 +211,7 @@ export function createServer() {
   app.use("/api/engines", engineRoutes);
   app.use("/api/kitchen", kitchenRoutes);
   app.use("/api/menu", menuRoutes);
+  app.use("/api/settings", settingsRoutes);
 
   // ─── Health & Observability Endpoints ────────────────────────────────────
   app.get("/api/health", getSystemHealth);    // Kubernetes liveness + readiness

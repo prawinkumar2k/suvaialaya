@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, ChefHat } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, ChefHat, UtensilsCrossed } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { toast } from "sonner";
 import axios from "axios";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { MenuCMS } from "@/components/admin/MenuCMS";
+import { SystemSettingsCMS } from "@/components/admin/SystemSettingsCMS";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -13,6 +17,17 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Dialog States
+  const [dateDialogOpen, setDateDialogOpen] = useState(false);
+  const [slotDialogOpen, setSlotDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteAction, setDeleteAction] = useState<{type: "slot"|"date", eventId: string, value: any} | null>(null);
+  const [activeEvent, setActiveEvent] = useState<any>(null);
+  const [newDateInput, setNewDateInput] = useState("");
+  const [newSlotTimeInput, setNewSlotTimeInput] = useState("");
+  const [newSlotCapacityInput, setNewSlotCapacityInput] = useState("70");
+
   const navigate = useNavigate();
 
   const userString = localStorage.getItem("user");
@@ -91,42 +106,63 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleRemoveDate = (event: any, dateToRemove: string) => {
-    if (confirm(`Are you sure you want to remove ${dateToRemove}?`)) {
-      const updatedDates = event.dates.filter((d: string) => d !== dateToRemove);
-      handleUpdateEvent(event._id, { dates: updatedDates });
-    }
+  const handleRemoveSlot = (event: any, slotIdx: number) => {
+    setDeleteAction({ type: "slot", eventId: event._id, value: slotIdx });
+    setActiveEvent(event);
+    setDeleteConfirmOpen(true);
   };
 
-  const handleRemoveSlot = (event: any, slotIdx: number) => {
-    if (confirm("Are you sure you want to remove this slot?")) {
-      const updatedSlots = event.slots.filter((_: any, idx: number) => idx !== slotIdx);
-      handleUpdateEvent(event._id, { slots: updatedSlots });
+  const handleRemoveDate = (event: any, dateToRemove: string) => {
+    setDeleteAction({ type: "date", eventId: event._id, value: dateToRemove });
+    setActiveEvent(event);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteAction || !activeEvent) return;
+    
+    if (deleteAction.type === "slot") {
+      const updatedSlots = activeEvent.slots.filter((_: any, idx: number) => idx !== deleteAction.value);
+      handleUpdateEvent(activeEvent._id, { slots: updatedSlots });
+    } else if (deleteAction.type === "date") {
+      const updatedDates = activeEvent.dates.filter((d: string) => d !== deleteAction.value);
+      handleUpdateEvent(activeEvent._id, { dates: updatedDates });
     }
+    setDeleteConfirmOpen(false);
   };
 
   const handleAddDate = (event: any) => {
-    const newDate = prompt("Enter new date (YYYY-MM-DD):");
-    if (newDate) {
-      if (isNaN(new Date(newDate).getTime())) {
-        toast.error("Invalid date format. Use YYYY-MM-DD");
-        return;
-      }
-      handleUpdateEvent(event._id, { dates: [...(event.dates || []), newDate].sort() });
+    setActiveEvent(event);
+    setNewDateInput("");
+    setDateDialogOpen(true);
+  };
+
+  const submitAddDate = () => {
+    if (!newDateInput) return;
+    if (isNaN(new Date(newDateInput).getTime())) {
+      toast.error("Invalid date format. Use YYYY-MM-DD");
+      return;
     }
+    handleUpdateEvent(activeEvent._id, { dates: [...(activeEvent.dates || []), newDateInput].sort() });
+    setDateDialogOpen(false);
   };
 
   const handleAddSlot = (event: any) => {
-    const time = prompt("Enter slot time (e.g., 10:00 AM):");
-    const capacityStr = prompt("Enter slot capacity (e.g., 70):", "70");
-    if (time && capacityStr) {
-      const capacity = parseInt(capacityStr);
-      if (isNaN(capacity) || capacity <= 0) {
-        toast.error("Invalid capacity");
-        return;
-      }
-      handleUpdateEvent(event._id, { slots: [...(event.slots || []), { time, capacity }] });
+    setActiveEvent(event);
+    setNewSlotTimeInput("");
+    setNewSlotCapacityInput("70");
+    setSlotDialogOpen(true);
+  };
+
+  const submitAddSlot = () => {
+    if (!newSlotTimeInput || !newSlotCapacityInput) return;
+    const capacity = parseInt(newSlotCapacityInput);
+    if (isNaN(capacity) || capacity <= 0) {
+      toast.error("Invalid capacity");
+      return;
     }
+    handleUpdateEvent(activeEvent._id, { slots: [...(activeEvent.slots || []), { time: newSlotTimeInput, capacity }] });
+    setSlotDialogOpen(false);
   };
 
   if (isLoading) {
@@ -227,6 +263,7 @@ export default function AdminDashboard() {
               { id: "overview", icon: LayoutDashboard, label: "Overview & Reports" },
               { id: "events", icon: CalendarDays, label: "Events & Slots" },
               { id: "bookings", icon: Users, label: "All Bookings" },
+              { id: "menu", icon: UtensilsCrossed, label: "Menu Management" },
               { id: "analytics", icon: BarChart3, label: "Detailed Analytics" },
               { id: "settings", icon: Settings, label: "Platform Settings" },
             ].map((tab) => (
@@ -563,33 +600,19 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            {activeTab === "menu" && (
+              <div className="max-w-7xl mx-auto w-full">
+                <MenuCMS />
+              </div>
+            )}
+
             {activeTab === "settings" && (
-              <div className="space-y-8 max-w-4xl mx-auto" style={{ perspective: 1000 }}>
-                <div>
+              <div className="max-w-4xl mx-auto w-full">
+                <div className="mb-8">
                   <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Platform Settings</h1>
                   <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Configure your restaurant platform</p>
                 </div>
-                <motion.div 
-                  whileHover={{ rotateX: 1, rotateY: -1, scale: 1.01 }}
-                  className="bg-white border border-gray-100 rounded-2xl p-8 shadow-[0_4px_15px_rgb(0,0,0,0.02)]"
-                >
-                  <h2 className="font-display text-2xl font-bold text-[#1a3d2b] mb-6">General Information</h2>
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Platform Name</label>
-                      <input type="text" className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" defaultValue="Suvaialaya Event Management System" />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Admin Notification Email</label>
-                      <input type="email" className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" defaultValue="admin@suvaialaya.com" />
-                    </div>
-                    <div className="pt-6 border-t border-gray-100">
-                      <button className="bg-[#1a3d2b] text-white font-bold uppercase tracking-widest text-[10px] px-6 py-3 rounded-xl hover:bg-[#2d6a4f] transition-colors shadow-md">
-                        Save Changes
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                <SystemSettingsCMS />
               </div>
             )}
 
@@ -689,6 +712,84 @@ export default function AdminDashboard() {
           </motion.div>
         </div>
       </div>
+
+      {/* Date Dialog */}
+      <Dialog open={dateDialogOpen} onOpenChange={setDateDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Event Date</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="newDate" className="text-sm font-bold text-[#1a3d2b]">Date (YYYY-MM-DD)</label>
+              <input
+                id="newDate"
+                type="date"
+                value={newDateInput}
+                onChange={(e) => setNewDateInput(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <button onClick={() => setDateDialogOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitAddDate} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Add Date</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Slot Dialog */}
+      <Dialog open={slotDialogOpen} onOpenChange={setSlotDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Time Slot</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="slotTime" className="text-sm font-bold text-[#1a3d2b]">Slot Time (e.g., 10:00 AM)</label>
+              <input
+                id="slotTime"
+                type="text"
+                value={newSlotTimeInput}
+                onChange={(e) => setNewSlotTimeInput(e.target.value)}
+                placeholder="10:00 AM"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="slotCapacity" className="text-sm font-bold text-[#1a3d2b]">Capacity (Seats)</label>
+              <input
+                id="slotCapacity"
+                type="number"
+                min="1"
+                value={newSlotCapacityInput}
+                onChange={(e) => setNewSlotCapacityInput(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <button onClick={() => setSlotDialogOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitAddSlot} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Add Slot</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Alert Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently remove the selected {deleteAction?.type === "slot" ? "time slot" : "event date"} from the schedule.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 text-white hover:bg-red-600">Remove</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }

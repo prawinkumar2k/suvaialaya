@@ -61,7 +61,7 @@ export default function SlotSelection() {
       return;
     }
     if (selectedSlot && eventData) {
-      playSoundEffect("conch");
+      playSoundEffect("success");
       
       if (rescheduleBookingId) {
         setRescheduling(true);

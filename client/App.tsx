@@ -5,6 +5,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import PlaceholderPage from "@/pages/PlaceholderPage";
+import Contact from "@/pages/Contact";
+import FAQ from "@/pages/FAQ";
+import Terms from "@/pages/Terms";
+import Privacy from "@/pages/Privacy";
 import NotFound from "@/pages/NotFound";
 
 import Index from "@/pages/Index";
@@ -73,11 +77,11 @@ export default function App() {
           <Route path="/scanner" element={<QRScanner />} />
           <Route path="/ticket/:id" element={<TicketVerification />} />
           
-          <Route path="/contact" element={<PlaceholderPage />} />
-          <Route path="/faq" element={<PlaceholderPage />} />
-          <Route path="/help" element={<PlaceholderPage />} />
-          <Route path="/terms" element={<PlaceholderPage />} />
-          <Route path="/privacy" element={<PlaceholderPage />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/help" element={<FAQ />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -2,6 +2,7 @@
   <img src="public/images/suvaialaya-logo.png" alt="Suvaialaya Logo" width="200"/>
   <h1>🎟️ Suvaialaya Event Ticket Hub</h1>
   <p><strong>Enterprise-Grade Event Management & Ticketing Platform</strong></p>
+  <p><i>Developed by Shalini N</i></p>
   
   [![Build Status](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge)]()
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge)]()

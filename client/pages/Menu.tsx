@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import { motion } from "framer-motion";
-import { ArrowLeft, Leaf, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, Leaf, UtensilsCrossed, Loader2 } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
-import { menuHighlights, welcomeItems, returnGifts } from "@/data/madurai-festival";
 
 function OrnamentalDivider() {
   return (
@@ -15,6 +16,29 @@ function OrnamentalDivider() {
 }
 
 export default function Menu() {
+  const [menuHighlights, setMenuHighlights] = useState<any[]>([]);
+  const [welcomeItems, setWelcomeItems] = useState<any[]>([]);
+  const [returnGifts, setReturnGifts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      axios.get("/api/menu"),
+      axios.get("/api/settings")
+    ])
+    .then(([menuRes, settingsRes]) => {
+      if (menuRes.data.success) {
+        setMenuHighlights(menuRes.data.data);
+      }
+      if (settingsRes.data.success) {
+        setWelcomeItems(settingsRes.data.data.welcomeItems || []);
+        setReturnGifts(settingsRes.data.data.returnGifts || []);
+      }
+    })
+    .catch((err) => console.error("Error fetching data:", err))
+    .finally(() => setLoading(false));
+  }, []);
+
   const categoryOrder = [
     "Suvaialaya Briyani",
     "Special Combo",
@@ -27,12 +51,20 @@ export default function Menu() {
     "Non-veg Tiffin",
     "Desserts"
   ];
-  const categories = Array.from(new Set(menuHighlights.map(item => item.category)))
-    .sort((a, b) => {
+  const categories = Array.from(new Set(menuHighlights.map((item: any) => item.category)))
+    .sort((a: any, b: any) => {
       const indexA = categoryOrder.indexOf(a);
       const indexB = categoryOrder.indexOf(b);
       return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
     });
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-white text-[#1a3d2b] flex items-center justify-center relative">
+        <Loader2 className="w-12 h-12 text-[#1a3d2b] animate-spin" />
+      </main>
+    );
+  }
 
   const categoryImages: Record<string, string> = {
     "Suvaialaya Briyani": "/images/food/mutton_briyani.png",
@@ -100,7 +132,7 @@ export default function Menu() {
               )}
               
               <div className="mt-8 grid gap-x-8 gap-y-6 sm:grid-cols-2" style={{ perspective: 1000 }}>
-                {menuHighlights.filter(item => item.category === category).map((dish) => (
+                {menuHighlights.filter((item: any) => item.category === category).map((dish: any) => (
                   <motion.div 
                     key={dish.name} 
                     whileHover={{ y: -5, rotateX: 2, rotateY: -2, scale: 1.02 }}
@@ -111,7 +143,10 @@ export default function Menu() {
                       <Leaf size={120} className="text-[#1a3d2b]" />
                     </div>
                     <div className="relative z-10">
-                      <h3 className="font-display font-bold text-2xl text-[#1a3d2b]">{dish.name}</h3>
+                      <div className="flex justify-between items-start mb-3">
+                         <h3 className="font-display font-bold text-2xl text-[#1a3d2b] pr-4">{dish.name}</h3>
+                         <span className="font-display font-bold text-lg text-[#c9841a] whitespace-nowrap">₹{dish.price}</span>
+                      </div>
                       <p className="mt-3 text-sm text-[#1a3d2b]/60 leading-relaxed">{dish.description}</p>
                     </div>
                   </motion.div>

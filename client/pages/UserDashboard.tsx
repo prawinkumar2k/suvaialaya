@@ -7,12 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import axios from "axios";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export default function UserDashboard() {
   const [activeTab, setActiveTab] = useState("bookings");
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  
+  // Dialog State
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   const userString = localStorage.getItem("user");
@@ -105,23 +111,41 @@ export default function UserDashboard() {
     toast.success("Logged out successfully");
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!window.confirm("Are you sure you want to cancel this booking? Refunds may take 5-7 business days.")) return;
+  const handleCancelBooking = (bookingId: string) => {
+    setBookingToCancel(bookingId);
+    setCancelDialogOpen(true);
+  };
+
+  const confirmCancelBooking = async () => {
+    if (!bookingToCancel) return;
     
     try {
-      const response = await axios.put(`/api/bookings/${bookingId}/cancel`, {}, {
+      const response = await axios.put(`/api/bookings/${bookingToCancel}/cancel`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
         toast.success("Booking cancelled successfully");
-        setBookings(bookings.map(b => b._id === bookingId ? { ...b, bookingStatus: "Cancelled" } : b));
+        setBookings(bookings.map(b => b._id === bookingToCancel ? { ...b, bookingStatus: "Cancelled" } : b));
+        setCancelDialogOpen(false);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to cancel booking");
+      setCancelDialogOpen(false);
     }
   };
 
   const handleDownloadTicket = async (booking: any) => {
+    if (booking.ticketPdfUrl) {
+      // Create a temporary link to download the base64 PDF directly
+      const link = document.createElement("a");
+      link.href = booking.ticketPdfUrl;
+      link.download = `Suvaialaya-Ticket-${booking._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    // Fallback: Generate it on the fly if not found in DB
     const { generatePremiumTicket } = await import("@/lib/ticketGenerator");
     await generatePremiumTicket(booking, user);
   };
@@ -479,6 +503,22 @@ export default function UserDashboard() {
           )}
         </motion.div>
       </div>
+
+      {/* Cancel Booking Alert Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Booking?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this booking? Refunds may take 5-7 business days to process depending on your bank.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmCancelBooking} className="bg-red-500 text-white hover:bg-red-600">Yes, Cancel Booking</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
   );
 }
