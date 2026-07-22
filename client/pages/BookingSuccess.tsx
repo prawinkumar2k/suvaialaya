@@ -193,7 +193,7 @@ export default function BookingSuccess() {
             {/* ── Logo zone ────────────────────────────────────────── */}
             <div className="pt-9 pb-4 px-10 flex flex-col items-center text-center">
               <div className="mb-3">
-                <img src="/suvaialaya-logo.png" alt="Suvaialaya Logo" className="w-20 h-20 object-contain" />
+                <img src="/logo.png" alt="Suvaialaya Logo" className="w-20 h-20 object-contain" />
               </div>
               <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-[#c9841a] mb-1">
                 The Madurai Virundhu

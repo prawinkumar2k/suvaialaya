@@ -73,7 +73,7 @@ export const generatePremiumTicket = async (
 ) => {
   try {
     const W = 90;
-    const H = 170;
+    const H = 190;
 
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [W, H] });
 
@@ -143,7 +143,7 @@ export const generatePremiumTicket = async (
     const logoX = W / 2;
     const logoY = 24;
 
-    const logoBase64 = await loadImageBase64("/suvaialaya-logo.png");
+    const logoBase64 = await loadImageBase64("/logo.png");
     if (logoBase64) {
       doc.addImage(logoBase64, "PNG", logoX - 11, logoY - 11, 22, 22);
     } else {
@@ -193,16 +193,11 @@ export const generatePremiumTicket = async (
     doc.text(`${pax}  PAX`, 41, 75);
 
     // ── Tear line ─────────────────────────────────────────────────────────
-    doc.setDrawColor("#BBBBBB");
-    doc.setLineWidth(0.15);
-    doc.setLineDashPattern([1.5, 1.5], 0);
-    doc.line(9, 82, W - 9, 82);
+    doc.setDrawColor("#c9841a");
+    doc.setLineWidth(0.2);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.line(8, 82, W - 8, 82);
     doc.setLineDashPattern([], 0);
-    // Cutout circles
-    doc.setFillColor(cream);
-    doc.setDrawColor("#AAAAAA"); doc.setLineWidth(0.15);
-    doc.circle(3, 82, 3, "FD");
-    doc.circle(W - 3, 82, 3, "FD");
 
     // ── Details section ───────────────────────────────────────────────────
     doc.setFillColor(cream2);
@@ -221,20 +216,16 @@ export const generatePremiumTicket = async (
     }
 
     // ── Tear line 2 ───────────────────────────────────────────────────────
-    doc.setDrawColor("#BBBBBB");
-    doc.setLineWidth(0.15);
-    doc.setLineDashPattern([1.5, 1.5], 0);
-    doc.line(9, 122, W - 9, 122);
+    doc.setDrawColor("#c9841a");
+    doc.setLineWidth(0.2);
+    doc.setLineDashPattern([2, 2], 0);
+    doc.line(8, 122, W - 8, 122);
     doc.setLineDashPattern([], 0);
-    doc.setFillColor(cream);
-    doc.setDrawColor("#AAAAAA"); doc.setLineWidth(0.15);
-    doc.circle(3, 122, 3, "FD");
-    doc.circle(W - 3, 122, 3, "FD");
 
     // ── QR Code ───────────────────────────────────────────────────────────
     const qrSize = 34;
     const qrX = (W - qrSize) / 2;
-    const qrY = 127;
+    const qrY = 130;
 
     const qrDataUrl = await QRCode.toDataURL(ticketId, {
       width: 200, margin: 1,
@@ -247,10 +238,10 @@ export const generatePremiumTicket = async (
     doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
 
     // Ticket ID pill
-    const idY = qrY + qrSize + 7;
+    const idY = qrY + qrSize + 8;
     doc.setFillColor("#EEF5EC");
     doc.setDrawColor(green); doc.setLineWidth(0.2);
-    doc.roundedRect(20, idY - 3.5, W - 40, 7, 2, 2, "FD");
+    doc.roundedRect(20, idY - 4.5, W - 40, 7, 2, 2, "FD");
     doc.setFont("helvetica", "normal"); doc.setFontSize(5); doc.setTextColor(gray);
     doc.text("ID:", W / 2 - 3, idY, { align: "right" });
     doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(gold);
