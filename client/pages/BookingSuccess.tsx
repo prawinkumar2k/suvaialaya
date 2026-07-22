@@ -65,8 +65,8 @@ export default function BookingSuccess() {
           <div className="absolute top-0 left-0 p-3 opacity-[0.03]"><Leaf size={40} className="text-[#1a3d2b] transform -scale-x-100" /></div>
           <div className="absolute top-0 right-0 p-3 opacity-[0.03]"><Leaf size={40} className="text-[#1a3d2b]" /></div>
           
-          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-[#1a3d2b]/5 border-2 border-[#1a3d2b]/10 mb-6 shadow-inner">
-            <Leaf className="h-10 w-10 text-[#1a3d2b]" />
+          <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white border-2 border-[#1a3d2b]/10 mb-6 shadow-sm overflow-hidden p-2 relative">
+            <img src="/logo.png" alt="Suvaialaya Logo" className="h-full w-full object-contain" />
           </div>
           
           <div className="space-y-6 py-4">
