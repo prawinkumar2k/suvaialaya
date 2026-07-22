@@ -149,6 +149,13 @@ export default function Payment() {
       paymentObject.open();
 
     } catch (error: any) {
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        toast.error("Your session has expired. Please log in again to complete your booking.");
+        navigate("/login");
+        return;
+      }
       toast.error(error.response?.data?.error || error.message || "Payment process failed. Please try again.");
     } finally {
       setIsProcessing(false);
