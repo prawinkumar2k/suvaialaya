@@ -73,7 +73,6 @@ export default function QRScanner() {
   };
 
   return (
-  return (
     <main className="min-h-screen bg-white text-[#1a3d2b] flex flex-col relative selection:bg-[#c9841a]/30">
       <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-40 mix-blend-multiply pointer-events-none" />
       
