@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Maximize, CheckCircle2, XCircle, Search, Ticket, Leaf, Loader2, LogOut } from "lucide-react";
+import { ArrowLeft, Maximize, CheckCircle2, XCircle, Search, Ticket, Leaf, Loader2, LogOut, PlusCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "sonner";
+import { Html5Qrcode } from "html5-qrcode";
 
 export default function QRScanner() {
   const [scanState, setScanState] = useState<"scanning" | "success" | "error" | "loading">("scanning");
@@ -25,14 +26,45 @@ export default function QRScanner() {
     }
   }, [navigate, token, user]);
 
-  const handleManualSubmit = async (e?: React.FormEvent) => {
+  useEffect(() => {
+    let html5QrCode: Html5Qrcode | null = null;
+    
+    if (scanState === "scanning") {
+      html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          // Success
+          html5QrCode?.stop().catch(() => {});
+          handleManualSubmit(undefined, decodedText);
+        },
+        (error) => {
+          // Failure (ignore)
+        }
+      ).catch(err => {
+         console.warn("Camera failed to start:", err);
+      });
+    }
+
+    return () => {
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().catch(() => {});
+      }
+    };
+  }, [scanState]);
+
+  const handleManualSubmit = async (e?: React.FormEvent, scannedCode?: string) => {
     if (e) e.preventDefault();
-    if (!manualCode.trim()) return;
+    const codeToSubmit = scannedCode || manualCode;
+    if (!codeToSubmit.trim()) return;
 
     // Extract ID if the scanned value is a URL
-    let bookingId = manualCode.trim();
+    let bookingId = codeToSubmit.trim();
     if (bookingId.includes("/ticket/")) {
       bookingId = bookingId.split("/ticket/")[1].split("/")[0].split("?")[0];
+    } else if (bookingId.includes("suvaialaya-ticket-")) {
+      bookingId = bookingId.split("suvaialaya-ticket-")[1];
     }
 
     setScanState("loading");
@@ -80,8 +112,8 @@ export default function QRScanner() {
       <div className="h-2 w-full bg-gradient-to-r from-[#1a3d2b] via-[#c9841a] to-[#1a3d2b]" />
       <header className="sticky top-0 z-50 border-b border-[#1a3d2b]/10 bg-white/95 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex h-20 items-center justify-between px-5 sm:px-8 relative z-10">
-          <Link to="/" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 hover:text-[#c9841a] transition-colors">
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Exit Scanner</span>
+          <Link to="/dashboard" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 hover:text-[#c9841a] transition-colors">
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Dashboard</span>
           </Link>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <BrandMark />
@@ -102,7 +134,21 @@ export default function QRScanner() {
           <p className="mt-2 text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/60">Scan guest QR codes or enter ID manually</p>
         </div>
 
-        {/* Camera Viewfinder Mock */}
+        {/* Spot Registration Button */}
+        {(scanState === "scanning" || scanState === "error") && (
+          <Link to="/slots" className="mb-8">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 bg-[#c9841a] text-white px-6 py-3 rounded-full text-xs font-bold uppercase tracking-widest shadow-[0_4px_15px_rgba(201,132,26,0.3)] hover:bg-[#e09825] transition-colors"
+            >
+              <PlusCircle size={18} />
+              Spot Registration
+            </motion.button>
+          </Link>
+        )}
+
+        {/* Camera Viewfinder Mock / Real Scanner */}
         <motion.div 
           whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
           className="relative w-full max-w-sm aspect-[3/4] bg-white border border-[#1a3d2b]/10 rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center"
@@ -116,23 +162,21 @@ export default function QRScanner() {
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-[#1a3d2b]/5"
               >
-                {/* Viewfinder brackets */}
-                <div className="absolute top-8 left-8 w-12 h-12 border-t-4 border-l-4 border-[#c9841a] rounded-tl-xl" />
-                <div className="absolute top-8 right-8 w-12 h-12 border-t-4 border-r-4 border-[#c9841a] rounded-tr-xl" />
-                <div className="absolute bottom-8 left-8 w-12 h-12 border-b-4 border-l-4 border-[#c9841a] rounded-bl-xl" />
-                <div className="absolute bottom-8 right-8 w-12 h-12 border-b-4 border-r-4 border-[#c9841a] rounded-br-xl" />
+                {/* The actual HTML5QR container */}
+                <div id="qr-reader" className="w-full h-full object-cover" />
+
+                {/* Viewfinder brackets overlay */}
+                <div className="absolute top-8 left-8 w-12 h-12 border-t-4 border-l-4 border-[#c9841a] rounded-tl-xl pointer-events-none" />
+                <div className="absolute top-8 right-8 w-12 h-12 border-t-4 border-r-4 border-[#c9841a] rounded-tr-xl pointer-events-none" />
+                <div className="absolute bottom-8 left-8 w-12 h-12 border-b-4 border-l-4 border-[#c9841a] rounded-bl-xl pointer-events-none" />
+                <div className="absolute bottom-8 right-8 w-12 h-12 border-b-4 border-r-4 border-[#c9841a] rounded-br-xl pointer-events-none" />
                 
                 {/* Scanning line animation */}
                 <motion.div 
                   animate={{ y: ["0%", "300%", "0%"] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                  className="absolute top-1/4 left-8 right-8 h-1 bg-[#c9841a] shadow-[0_0_20px_rgba(201,132,26,0.8)] z-10 rounded-full"
+                  className="absolute top-1/4 left-8 right-8 h-1 bg-[#c9841a] shadow-[0_0_20px_rgba(201,132,26,0.8)] z-10 rounded-full pointer-events-none"
                 />
-                
-                <div className="absolute inset-0 flex items-center justify-center opacity-30 flex-col gap-4">
-                  <Maximize className="text-[#1a3d2b]" size={80} strokeWidth={1} />
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Camera Disabled in Dev</p>
-                </div>
               </motion.div>
             )}
 
@@ -142,7 +186,7 @@ export default function QRScanner() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center"
+                className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center z-20"
               >
                 <Loader2 className="w-16 h-16 animate-spin text-[#c9841a] mb-6" />
                 <h2 className="font-display text-2xl font-bold text-[#1a3d2b]">Validating...</h2>
@@ -155,7 +199,7 @@ export default function QRScanner() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center"
+                className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center z-20"
               >
                 <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
                   <Leaf size={120} className="text-[#1a3d2b]" />
@@ -199,7 +243,7 @@ export default function QRScanner() {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center"
+                className="absolute inset-0 bg-white flex flex-col items-center justify-center p-8 text-center z-20"
               >
                 <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
                   <XCircle size={120} className="text-red-700" />
@@ -233,14 +277,14 @@ export default function QRScanner() {
             onSubmit={handleManualSubmit} className="mt-10 w-full max-w-sm"
           >
             <div className="relative flex items-center shadow-md rounded-xl overflow-hidden group border border-[#1a3d2b]/20 hover:border-[#c9841a] transition-colors">
-              <Ticket className="absolute left-4 text-[#1a3d2b]/50 h-5 w-5 group-hover:text-[#c9841a] transition-colors" />
+              <Ticket className="absolute left-4 text-[#1a3d2b]/50 h-5 w-5 group-hover:text-[#c9841a] transition-colors z-10 pointer-events-none" />
               <Input 
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value)}
                 placeholder="Enter Booking ID manually" 
-                className="pl-12 h-14 bg-white border-0 focus-visible:ring-0 font-bold text-[#1a3d2b] placeholder:text-[#1a3d2b]/40 uppercase shadow-none rounded-none"
+                className="pl-12 h-14 bg-white border-0 focus-visible:ring-0 font-bold text-[#1a3d2b] placeholder:text-[#1a3d2b]/40 uppercase shadow-none rounded-none w-full"
               />
-              <button type="submit" className="h-14 bg-[#1a3d2b] text-white px-6 hover:bg-[#1a3d2b]/90 transition-colors flex items-center justify-center min-w-[72px]">
+              <button type="submit" className="h-14 bg-[#1a3d2b] text-white px-6 hover:bg-[#1a3d2b]/90 transition-colors flex items-center justify-center min-w-[72px] shrink-0">
                 <Search className="h-5 w-5" />
               </button>
             </div>
