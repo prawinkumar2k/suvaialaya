@@ -115,7 +115,7 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
             className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
           >
             <img 
-              src="/images/suvaialaya-logo.png" 
+              src="/images/suvaialaya-logo.jpg" 
               alt="Suvaialaya Logo Background" 
               className="w-[800px] h-[800px] object-contain opacity-20 grayscale brightness-200 contrast-125 mix-blend-overlay"
             />

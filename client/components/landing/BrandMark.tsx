@@ -15,7 +15,7 @@ export function BrandMark({ size = "md", className = "" }: BrandMarkProps) {
       aria-label="Suvaialaya home"
     >
       <img
-        src="/logo.png"
+        src="/logo.jpg"
         alt="Suvaialaya — South Indian Multi Cuisine Restaurant"
         className={`${sizeClass} w-auto object-contain`}
         onError={(e) => {

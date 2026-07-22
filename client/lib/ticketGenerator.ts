@@ -59,10 +59,10 @@ export const generatePremiumTicket = async (booking: any, user: any = null) => {
     };
 
     // Load Logo (Centered, Larger because it contains text)
-    const logoBase64 = await loadImageBase64('/images/suvaialaya-logo.png');
+    const logoBase64 = await loadImageBase64('/images/suvaialaya-logo.jpg');
     if (logoBase64) {
       // Draw larger logo, perfectly centered
-      doc.addImage(logoBase64, "PNG", 25, 12, 40, 40);
+      doc.addImage(logoBase64, "JPEG", 25, 12, 40, 40);
     } else {
       // Fallback if logo fails
       doc.setTextColor(primaryGreen);
