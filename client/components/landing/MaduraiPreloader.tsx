@@ -108,16 +108,18 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
 
           {/* Removed Banana Trees */}
 
-          {/* Animated Logo Background */}
+          {/* Festival Temple Background */}
           <motion.div
-            animate={{ scale: [1, 1.05, 1], opacity: [0.05, 0.1, 0.05] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none"
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 0.25 }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="absolute inset-0 z-0 pointer-events-none"
           >
+            <div className="absolute inset-0 bg-primary/80 mix-blend-multiply z-10" />
             <img 
-              src="/suvaialaya-logo.png" 
-              alt="Suvaialaya Logo Background" 
-              className="w-[800px] h-[800px] object-contain opacity-20 grayscale brightness-200 contrast-125 mix-blend-overlay"
+              src="/temple-bg.png" 
+              alt="Madurai Temple Background" 
+              className="w-full h-full object-cover object-top filter contrast-125 sepia-[.3]"
             />
           </motion.div>
 
