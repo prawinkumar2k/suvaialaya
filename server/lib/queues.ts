@@ -98,7 +98,6 @@ export async function scheduleSeatRelease(
     logger.info("Seat release scheduled", { bookingId, delayMs });
   } catch (e: any) {
     logger.warn("Redis unavailable, skipped seat release scheduling");
-    throw e;
   }
 }
 
