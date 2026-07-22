@@ -31,19 +31,7 @@ export default function SlotSelection() {
   const { playSoundEffect } = useAudio();
 
   useEffect(() => {
-    const userString = localStorage.getItem("user");
-    if (userString) {
-      const user = JSON.parse(userString);
-      if (user.role === "admin" || user.role === "owner") {
-        navigate("/admin");
-        return;
-
-        return;
-      } else if (user.role === "scanner" || user.role === "receptionist") {
-        navigate("/scanner");
-        return;
-      }
-    }
+    // Allow anyone to view slots. Role-based redirects should only protect dashboards, not public pages.
 
     const fetchEvent = async () => {
       try {
