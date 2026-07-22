@@ -92,45 +92,50 @@ export default function BookingForm() {
 
             <div className="grid gap-8 sm:grid-cols-2 relative z-10">
               <div className="space-y-3">
-                <Label htmlFor="fullName" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Full Name</Label>
+                <Label htmlFor="fullName" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Full Name *</Label>
                 <div className="relative">
                   <User className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
                   <Input id="fullName" name="fullName" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="Enter full name" />
                 </div>
               </div>
               <div className="space-y-3">
-                <Label htmlFor="age" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Age</Label>
+                <Label htmlFor="gender" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Gender *</Label>
                 <div className="relative">
                   <Users className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
-                  <Input id="age" name="age" type="number" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="e.g. 28" min="18" />
+                  <select id="gender" name="gender" required defaultValue="" className="pl-11 h-12 w-full bg-gray-50 border border-gray-200 focus-visible:ring-1 focus-visible:ring-[#1a3d2b] focus-visible:outline-none rounded-xl text-sm appearance-none">
+                    <option value="" disabled>Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
               <div className="space-y-3">
-                <Label htmlFor="email" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
-                  <Input id="email" name="email" type="email" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="you@example.com" />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <Label htmlFor="phone" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Phone Number</Label>
+                <Label htmlFor="phone" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Phone Number *</Label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
                   <Input id="phone" name="phone" type="tel" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="+91 98765 43210" />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="email" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Email Address *</Label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
+                  <Input id="email" name="email" type="email" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="you@example.com" />
                 </div>
               </div>
               <div className="space-y-3 sm:col-span-1">
                 <Label htmlFor="city" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">City of Residence</Label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
-                  <Input id="city" name="city" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="e.g. Madurai" />
+                  <Input id="city" name="city" className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="e.g. Madurai (Optional)" />
                 </div>
               </div>
               <div className="space-y-3 sm:col-span-1">
                 <Label htmlFor="emergency" className="text-[#1a3d2b]/70 font-bold uppercase tracking-widest text-[10px]">Emergency Contact</Label>
                 <div className="relative">
                   <HeartPulse className="absolute left-4 top-3.5 h-4 w-4 text-[#1a3d2b]/40" />
-                  <Input id="emergency" name="emergency" type="tel" required className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="Family / Friend phone" />
+                  <Input id="emergency" name="emergency" type="tel" className="pl-11 h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#1a3d2b] focus-visible:border-[#1a3d2b] rounded-xl text-sm" placeholder="Family / Friend (Optional)" />
                 </div>
               </div>
             </div>
