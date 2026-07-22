@@ -248,22 +248,57 @@ export default function Index() {
       </motion.nav>
 
       {/* ── HERO ── */}
-      <section className="min-h-screen pt-20 flex flex-col lg:flex-row">
+      <section className="relative min-h-screen pt-20 flex flex-col lg:flex-row overflow-hidden">
+        {/* Cinematic Background "Video" Slider */}
+        <div className="absolute inset-0 z-0">
+          <AnimatePresence>
+            <motion.div
+              key={activeMenu} // We can repurpose activeMenu state or just create a new one, but let's just do a simple CSS animation loop instead to avoid complex state in the render for the background.
+              className="absolute inset-0 w-full h-full"
+            >
+               {/* We will use a CSS keyframe animation for the Ken Burns effect */}
+               <style>
+                 {`
+                   @keyframes kenBurns {
+                     0% { transform: scale(1) translate(0, 0); opacity: 0; }
+                     5% { opacity: 0.6; }
+                     25% { opacity: 0.6; }
+                     30% { opacity: 0; transform: scale(1.1) translate(-2%, -2%); }
+                     100% { opacity: 0; }
+                   }
+                   .bg-slide-1 { animation: kenBurns 24s infinite; }
+                   .bg-slide-2 { animation: kenBurns 24s infinite; animation-delay: 6s; }
+                   .bg-slide-3 { animation: kenBurns 24s infinite; animation-delay: 12s; }
+                   .bg-slide-4 { animation: kenBurns 24s infinite; animation-delay: 18s; }
+                 `}
+               </style>
+               <div className="absolute inset-0 bg-slide-1 bg-cover bg-center opacity-0" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=1600&q=80')` }} />
+               <div className="absolute inset-0 bg-slide-2 bg-cover bg-center opacity-0" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=1600&q=80')` }} />
+               <div className="absolute inset-0 bg-slide-3 bg-cover bg-center opacity-0" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=1600&q=80')` }} />
+               <div className="absolute inset-0 bg-slide-4 bg-cover bg-center opacity-0" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=1600&q=80')` }} />
+               
+               {/* Dark/Green Gradient Overlay to make text readable */}
+               <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-transparent z-10" />
+               <div className="absolute inset-0 bg-[#1a3d2b]/10 z-10 mix-blend-overlay" />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
         {/* Left text */}
-        <div className="flex-1 flex flex-col justify-center px-8 md:px-14 lg:px-20 py-16">
+        <div className="relative z-20 flex-1 flex flex-col justify-center px-8 md:px-14 lg:px-20 py-16">
           <motion.div custom={0} variants={fade} initial="hidden" animate="show"
-            className="inline-flex items-center gap-2 bg-[#1a3d2b]/8 border border-[#1a3d2b]/20 text-[#1a3d2b] text-[10px] font-bold tracking-[0.3em] uppercase px-4 py-2 rounded-full w-fit mb-6">
+            className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-[#1a3d2b]/20 text-[#1a3d2b] text-[10px] font-bold tracking-[0.3em] uppercase px-4 py-2 rounded-full w-fit mb-6 shadow-sm">
             <Star size={10} fill="currentColor" /> From Madurai · To Bangalore
           </motion.div>
 
           <motion.h1 custom={1} variants={fade} initial="hidden" animate="show"
-            className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-4 text-[#1a3d2b]">
+            className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-4 text-[#1a3d2b] drop-shadow-sm">
             Authentic<br />South Indian<br />Multi Cuisine
           </motion.h1>
 
           <motion.p custom={2} variants={fade} initial="hidden" animate="show"
-            className="text-[#1a3d2b]/60 text-base leading-relaxed max-w-md mb-6">
-            From the <strong className="text-[#1a3d2b]">Heart of Madurai</strong> to the <strong className="text-[#1a3d2b]">Soul of Bangalore</strong> —
+            className="text-[#1a3d2b]/80 font-medium text-base leading-relaxed max-w-md mb-6 drop-shadow-sm">
+            From the <strong className="text-[#1a3d2b] font-bold">Heart of Madurai</strong> to the <strong className="text-[#1a3d2b] font-bold">Soul of Bangalore</strong> —
             experience legendary Biryani, grand Kari Virundhu feasts, and the iconic Madurai Jigarthanda.
           </motion.p>
 
@@ -273,52 +308,52 @@ export default function Index() {
               { icon: Clock, text: "Open: 11 AM – 11 PM" },
               { icon: CalendarDays, text: "Grand Event Coming Soon" },
             ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-2 text-xs text-[#1a3d2b]/60 font-medium bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">
-                <Icon size={12} className="text-[#1a3d2b]" /> {text}
+              <div key={text} className="flex items-center gap-2 text-xs text-[#1a3d2b]/70 font-bold bg-white/70 backdrop-blur-md border border-[#1a3d2b]/10 px-3 py-1.5 rounded-full shadow-sm">
+                <Icon size={12} className="text-[#c9841a]" /> {text}
               </div>
             ))}
           </motion.div>
 
           <motion.div custom={4} variants={fade} initial="hidden" animate="show" className="flex flex-col sm:flex-row gap-4 mb-12">
-            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/slots")} className="group flex items-center justify-center gap-3 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors">
+            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/slots")} className="group flex items-center justify-center gap-3 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors shadow-lg">
               <Ticket size={16} /> Reserve Your Seat
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </motion.button>
-            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/menu")} className="group flex items-center justify-center gap-3 border-2 border-[#1a3d2b]/30 hover:border-[#1a3d2b] text-[#1a3d2b] font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors">
+            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/menu")} className="group flex items-center justify-center gap-3 bg-white/80 backdrop-blur-sm border-2 border-[#1a3d2b]/30 hover:border-[#1a3d2b] text-[#1a3d2b] font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors shadow-sm">
               <UtensilsCrossed size={16} /> View Full Menu
             </motion.button>
           </motion.div>
 
-          <motion.div custom={5} variants={fade} initial="hidden" animate="show" className="flex gap-10 border-t border-gray-200 pt-8">
+          <motion.div custom={5} variants={fade} initial="hidden" animate="show" className="flex gap-10 border-t border-[#1a3d2b]/10 pt-8">
             {[{ value: "500+", label: "Guests Daily" }, { value: "80+", label: "Menu Items" }, { value: "10+", label: "Years of Service" }].map(({ value, label }) => (
               <div key={label}>
-                <p className="text-3xl font-display font-extrabold text-[#1a3d2b]">{value}</p>
-                <p className="text-[10px] uppercase tracking-widest text-[#1a3d2b]/40 mt-1">{label}</p>
+                <p className="text-3xl font-display font-extrabold text-[#1a3d2b] drop-shadow-sm">{value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mt-1">{label}</p>
               </div>
             ))}
           </motion.div>
         </div>
 
-        {/* Right image */}
+        {/* Right Feature Card */}
         <motion.div
           initial={{ x: 80, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.9, ease: "easeOut" }}
-          className="w-full lg:w-[48%] flex-shrink-0 flex items-center justify-center p-8 lg:p-12 bg-gray-50"
+          className="relative z-20 w-full lg:w-[48%] flex-shrink-0 flex items-center justify-center p-8 lg:p-12"
           style={{ perspective: 1000 }}
         >
           <motion.div 
             whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
-            className="relative w-full max-w-[500px] rounded-2xl overflow-hidden border border-gray-200 bg-white"
+            className="relative w-full max-w-[500px] rounded-2xl overflow-hidden border border-white/20 bg-white/10 backdrop-blur-md shadow-2xl"
           >
-            <img src={BRAND_IMG} alt="Suvaialaya South Indian Cuisine Restaurant" className="w-full h-auto block"
+            <img src={BRAND_IMG} alt="Suvaialaya South Indian Cuisine Restaurant" className="w-full h-auto block opacity-90"
               onError={(e) => { e.currentTarget.style.display = "none"; }} />
-            <div className="bg-white border-t border-gray-100 px-6 py-4 flex items-center justify-between">
+            <div className="bg-white/95 backdrop-blur-xl border-t border-gray-100 px-6 py-5 flex items-center justify-between">
               <div>
                 <p className="text-[#1a3d2b] font-bold text-sm">A Grand Event is Coming!</p>
-                <p className="text-[#1a3d2b]/50 text-xs">Stay tuned for exclusive announcements</p>
+                <p className="text-[#1a3d2b]/60 font-medium text-xs mt-0.5">Stay tuned for exclusive announcements</p>
               </div>
-              <button onClick={() => navigate("/slots")} className="flex items-center gap-1.5 bg-[#1a3d2b] text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-[#2d6a4f] transition-colors">
+              <button onClick={() => navigate("/slots")} className="flex items-center gap-1.5 bg-[#c9841a] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#a66d15] transition-colors shadow-md">
                 Reserve <ChevronRight size={13} />
               </button>
             </div>
