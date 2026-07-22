@@ -112,8 +112,8 @@ export default function QRScanner() {
       <div className="h-2 w-full bg-gradient-to-r from-[#1a3d2b] via-[#c9841a] to-[#1a3d2b]" />
       <header className="sticky top-0 z-50 border-b border-[#1a3d2b]/10 bg-white/95 backdrop-blur-md shadow-sm">
         <div className="mx-auto flex h-20 items-center justify-between px-5 sm:px-8 relative z-10">
-          <Link to="/dashboard" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 hover:text-[#c9841a] transition-colors">
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Dashboard</span>
+          <Link to="/reception" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 hover:text-[#c9841a] transition-colors">
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Reception Dashboard</span>
           </Link>
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <BrandMark />

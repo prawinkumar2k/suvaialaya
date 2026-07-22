@@ -39,9 +39,8 @@ export default function Login() {
         const role = response.data.data.role;
         if (role === "admin" || role === "owner") {
           navigate("/admin");
-
         } else if (role === "scanner" || role === "receptionist") {
-          navigate("/scanner");
+          navigate("/reception");
         } else {
           navigate("/dashboard");
         }

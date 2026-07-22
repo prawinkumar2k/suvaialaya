@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, CheckCircle, XCircle, AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { Search, CheckCircle, XCircle, AlertCircle, Loader2, ArrowLeft, QrCode, PlusCircle, LogOut } from 'lucide-react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { BrandMark } from "@/components/landing/BrandMark";
 
 export default function ReceptionDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [recentCheckIns, setRecentCheckIns] = useState<any[]>([]);
+  const navigate = useNavigate();
 
-  // We could fetch a fresh list on mount, but for a true fallback, we search on demand.
-  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+    toast.success("Logged out successfully");
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     
     setIsSearching(true);
     try {
-      // In a real production app, we would have a dedicated search endpoint.
-      // Here we will use the admin booking list and filter it locally if no search endpoint exists,
-      // or rely on a new search API if we build one.
       const res = await axios.get('/api/bookings', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
@@ -54,7 +57,6 @@ export default function ReceptionDashboard() {
       });
       if (res.data.success) {
         toast.success("Guest successfully checked in!");
-        // Update local state to reflect check-in
         setSearchResults(prev => prev.map(b => b._id === bookingId ? { ...b, bookingStatus: 'Attended' } : b));
       }
     } catch (err: any) {
@@ -69,15 +71,20 @@ export default function ReceptionDashboard() {
       <div className="h-2 w-full bg-gradient-to-r from-[#1a3d2b] via-[#c9841a] to-[#1a3d2b]" />
       
       <header className="sticky top-0 z-50 border-b border-[#1a3d2b]/10 bg-white/95 backdrop-blur-md shadow-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <div className="flex items-center gap-4">
-            <Link to="/admin" className="text-[#1a3d2b] hover:text-[#c9841a] transition-colors">
-              <ArrowLeft size={20} />
-            </Link>
-            <h1 className="font-display text-xl font-bold text-[#1a3d2b] uppercase tracking-widest">
-              Reception Desk <span className="text-[#c9841a] ml-2 text-sm">Fall-back Mode</span>
-            </h1>
+        <div className="mx-auto flex h-20 items-center justify-between px-5 sm:px-8 relative z-10">
+          <Link to="/" className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 hover:text-[#c9841a] transition-colors">
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Home</span>
+          </Link>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <BrandMark />
           </div>
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-red-700 border border-red-200 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-md transition-colors shadow-sm"
+          >
+            <LogOut size={16} />
+            <span className="hidden sm:inline">Sign Out</span>
+          </button>
         </div>
       </header>
 
@@ -86,36 +93,79 @@ export default function ReceptionDashboard() {
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} 
           className="mb-8"
         >
-          <p className="text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 mb-2">Emergency Override</p>
-          <h2 className="font-display text-3xl font-bold text-[#1a3d2b] mb-4">Manual Guest Search</h2>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/70 mb-2">Front Desk Operations</p>
+          <h2 className="font-display text-4xl font-bold text-[#1a3d2b] mb-4">Reception Dashboard</h2>
           <p className="text-sm font-medium text-[#1a3d2b]/70 max-w-2xl leading-relaxed">
-            Use this dashboard if the QR scanner hardware fails or if a customer's phone battery dies. Search by Name, Phone Number, or exact Booking ID.
+            Manage incoming guests, scan tickets, register walk-ins, and search for reservations manually.
           </p>
         </motion.div>
 
-        <motion.form 
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-          onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4 mb-10"
-        >
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1a3d2b]/50" size={20} />
-            <input 
-              type="text" 
-              placeholder="Search by name, phone, or ID..."
-              className="w-full h-14 pl-12 pr-4 bg-white border border-[#1a3d2b]/20 shadow-sm rounded-lg text-[#1a3d2b] font-medium focus:outline-none focus:ring-2 focus:ring-[#c9841a] focus:border-transparent transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <motion.button 
-            whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
-            type="submit" 
-            disabled={isSearching}
-            className="h-14 px-8 bg-[#1a3d2b] text-white font-bold uppercase tracking-widest rounded-lg hover:bg-[#1a3d2b]/90 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center min-w-[140px]"
+        {/* QUICK ACTIONS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12">
+          <Link to="/scanner">
+            <motion.div 
+              whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
+              className="bg-[#1a3d2b] text-white p-8 rounded-2xl shadow-xl flex items-center justify-between group overflow-hidden relative cursor-pointer"
+            >
+              <div className="absolute -right-8 -top-8 opacity-10 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                <QrCode size={180} />
+              </div>
+              <div>
+                <h3 className="font-display text-2xl font-bold mb-2">Scan Tickets</h3>
+                <p className="text-xs font-medium text-white/70">Launch the QR code scanner to quickly check-in arriving guests.</p>
+              </div>
+              <div className="bg-white/10 p-4 rounded-full group-hover:bg-white/20 transition-colors z-10">
+                <QrCode size={28} />
+              </div>
+            </motion.div>
+          </Link>
+
+          <Link to="/slots">
+            <motion.div 
+              whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
+              className="bg-[#c9841a] text-white p-8 rounded-2xl shadow-xl flex items-center justify-between group overflow-hidden relative cursor-pointer"
+            >
+              <div className="absolute -right-8 -top-8 opacity-10 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                <PlusCircle size={180} />
+              </div>
+              <div>
+                <h3 className="font-display text-2xl font-bold mb-2">Spot Registration</h3>
+                <p className="text-xs font-medium text-white/70">Book tickets for walk-in guests directly at the reception counter.</p>
+              </div>
+              <div className="bg-white/10 p-4 rounded-full group-hover:bg-white/20 transition-colors z-10">
+                <PlusCircle size={28} />
+              </div>
+            </motion.div>
+          </Link>
+        </div>
+
+        {/* MANUAL SEARCH */}
+        <div className="mb-10 pt-8 border-t border-[#1a3d2b]/10">
+          <h3 className="font-display text-2xl font-bold text-[#1a3d2b] mb-4">Manual Search & Override</h3>
+          <motion.form 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4"
           >
-            {isSearching ? <Loader2 className="animate-spin" size={20} /> : "Search"}
-          </motion.button>
-        </motion.form>
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#1a3d2b]/50" size={20} />
+              <input 
+                type="text" 
+                placeholder="Search by guest name, phone number, or booking ID..."
+                className="w-full h-14 pl-12 pr-4 bg-white border border-[#1a3d2b]/20 shadow-sm rounded-lg text-[#1a3d2b] font-medium focus:outline-none focus:ring-2 focus:ring-[#c9841a] focus:border-transparent transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <motion.button 
+              whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
+              type="submit" 
+              disabled={isSearching}
+              className="h-14 px-8 bg-[#1a3d2b] text-white font-bold uppercase tracking-widest rounded-lg hover:bg-[#1a3d2b]/90 transition-colors shadow-md disabled:opacity-50 flex items-center justify-center min-w-[140px]"
+            >
+              {isSearching ? <Loader2 className="animate-spin" size={20} /> : "Search"}
+            </motion.button>
+          </motion.form>
+        </div>
 
         {searchResults.length > 0 && (
           <motion.div 
