@@ -140,11 +140,27 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
     );
 
     if (!lockAcquired) {
-      
+      // Check if they are just retrying a payment for an already-locked booking
+      const existingPending = await Booking.findOne({
+        user: req.user._id,
+        event: eventId,
+        date,
+        slotTime,
+        paymentStatus: "Pending",
+        bookingStatus: "Confirmed",
+      });
+
+      if (existingPending && existingPending.numberOfGuests === numberOfGuests) {
+        existingPending.totalAmount = totalAmount;
+        existingPending.guestDetails = guestDetails;
+        await existingPending.save();
+        return res.status(200).json({ success: true, data: existingPending });
+      }
+
       logger.warn("Seat lock already held by user", { userId: req.user._id, slotTime });
       return res.status(409).json({
         success: false,
-        error: "You already have a pending reservation. Please complete your payment.",
+        error: "You already have a pending reservation. Please complete your payment from the dashboard.",
       });
     }
 
