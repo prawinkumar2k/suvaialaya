@@ -135,7 +135,7 @@ export default function Login() {
             <div className="grid grid-cols-2 gap-2">
               <button type="button" onClick={() => handleAutoFill("admin@suvaialaya.com", "admin123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Admin</button>
               <button type="button" onClick={() => handleAutoFill("scanner@suvaialaya.com", "scanner123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Scanner</button>
-              <button type="button" onClick={() => handleAutoFill("kitchen@suvaialaya.com", "kitchen123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Kitchen</button>
+              <button type="button" onClick={() => handleAutoFill("john@example.com", "password123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Guest</button>
               <button type="button" onClick={() => handleAutoFill("reception@suvaialaya.com", "reception123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Reception</button>
             </div>
           </div>
