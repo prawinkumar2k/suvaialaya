@@ -1,9 +1,46 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { motion } from "framer-motion";
-import { ArrowLeft, ChefHat, Heart, Leaf, MapPin, Users } from "lucide-react";
+import { ArrowLeft, ChefHat, Heart, Leaf, MapPin, Users, Loader2 } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
 
 export default function About() {
+  const [aboutSettings, setAboutSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get("/api/settings")
+      .then(res => {
+        if (res.data.success) {
+          setAboutSettings(res.data.data.aboutPage || null);
+        }
+      })
+      .catch(err => console.error("Failed to load settings:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-white text-[#1a3d2b] flex items-center justify-center relative">
+        <Loader2 className="w-12 h-12 text-[#1a3d2b] animate-spin" />
+      </main>
+    );
+  }
+
+  const getIcon = (name: string) => {
+    switch (name) {
+      case 'ChefHat': return ChefHat;
+      case 'Leaf': return Leaf;
+      case 'Users': return Users;
+      case 'MapPin': return MapPin;
+      case 'Heart': return Heart;
+      default: return ChefHat;
+    }
+  };
+
+  const features = aboutSettings?.features || [];
+
   return (
     <main className="min-h-screen bg-white text-[#1a3d2b] relative overflow-hidden">
       {/* ── BACKGROUND ACCENTS ── */}
@@ -23,44 +60,38 @@ export default function About() {
 
       <div className="mx-auto max-w-4xl px-5 py-20 sm:px-8 lg:py-28 relative z-10 text-center">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">Our Story</p>
-          <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b]">
-            A celebration of Madurai's <br className="hidden md:block"/> rich culinary heritage.
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">{aboutSettings?.heroEyebrow || "Our Story"}</p>
+          <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b] whitespace-pre-line">
+            {aboutSettings?.heroTitle || "A celebration of Madurai's\nrich culinary heritage."}
           </h1>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mt-12 space-y-8 text-lg leading-relaxed text-[#1a3d2b]/70 max-w-2xl mx-auto">
-          <p>
-            Madurai Kari Virundhu was born from a simple idea: to bring the authentic, unfiltered flavors of Madurai to a communal table. We believe that food is more than sustenance; it is a story, a memory, and a bridge between generations.
-          </p>
-          <p>
-            For nine days, we transform a beautiful venue into a haven of hospitality. Our chefs are not just cooks; they are custodians of recipes passed down through families, utilizing traditional cooking methods that are rarely seen in modern kitchens.
-          </p>
+          <p>{aboutSettings?.heroDescription1 || "Madurai Kari Virundhu was born from a simple idea: to bring the authentic, unfiltered flavors of Madurai to a communal table. We believe that food is more than sustenance; it is a story, a memory, and a bridge between generations."}</p>
+          <p>{aboutSettings?.heroDescription2 || "For nine days, we transform a beautiful venue into a haven of hospitality. Our chefs are not just cooks; they are custodians of recipes passed down through families, utilizing traditional cooking methods that are rarely seen in modern kitchens."}</p>
         </motion.div>
 
         <div className="mt-20 grid gap-6 sm:grid-cols-2" style={{ perspective: 1000 }}>
-          {[
-            { icon: ChefHat, title: "Master Chefs", desc: "Local culinary legends bringing decades of experience." },
-            { icon: Leaf, title: "Fresh Ingredients", desc: "Sourced daily from the local markets of Madurai." },
-            { icon: Users, title: "Communal Dining", desc: "Long tables designed for shared experiences and new friends." },
-            { icon: Heart, title: "Made with Love", desc: "Every dish is prepared with the utmost care and passion." }
-          ].map((feature, i) => (
-            <motion.div 
-              key={i} 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
-              viewport={{ once: true }} 
-              transition={{ delay: 0.2 + i * 0.1, type: "spring", stiffness: 300, damping: 20 }} 
-              className="rounded-2xl border border-gray-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center text-center group"
-            >
-              <div className="w-16 h-16 rounded-full bg-[#1a3d2b]/5 flex items-center justify-center mb-6 group-hover:bg-[#1a3d2b]/10 transition-colors">
-                <feature.icon className="h-8 w-8 text-[#1a3d2b]" />
-              </div>
-              <h3 className="font-display text-2xl font-bold text-[#1a3d2b]">{feature.title}</h3>
-              <p className="mt-3 text-sm text-[#1a3d2b]/60 leading-relaxed">{feature.desc}</p>
-            </motion.div>
-          ))}
+          {features.map((feature: any, i: number) => {
+            const Icon = getIcon(feature.iconName);
+            return (
+              <motion.div 
+                key={i} 
+                initial={{ opacity: 0, y: 20 }} 
+                whileInView={{ opacity: 1, y: 0 }} 
+                whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
+                viewport={{ once: true }} 
+                transition={{ delay: 0.2 + i * 0.1, type: "spring", stiffness: 300, damping: 20 }} 
+                className="rounded-2xl border border-gray-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 flex flex-col items-center text-center group"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#1a3d2b]/5 flex items-center justify-center mb-6 group-hover:bg-[#1a3d2b]/10 transition-colors">
+                  <Icon className="h-8 w-8 text-[#1a3d2b]" />
+                </div>
+                <h3 className="font-display text-2xl font-bold text-[#1a3d2b]">{feature.title}</h3>
+                <p className="mt-3 text-sm text-[#1a3d2b]/60 leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
     </main>

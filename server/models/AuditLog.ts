@@ -24,6 +24,10 @@ const auditLogSchema = new mongoose.Schema(
         "auth.register",
         "auth.logout",
         "auth.token.refresh",
+        "auth.forgot_password",
+        "auth.verify_otp",
+        "auth.reset_password",
+        "user.profile.update",
         // Booking
         "booking.created",
         "booking.cancelled",

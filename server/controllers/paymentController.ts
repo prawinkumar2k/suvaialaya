@@ -121,6 +121,27 @@ export const verifyPayment = async (req: Request, res: Response, next: NextFunct
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// @desc    Mock Payment (for development / testing without Razorpay keys)
+// @route   POST /api/payments/mock
+// @access  Private
+// ─────────────────────────────────────────────────────────────────────────────
+export const mockPayment = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { bookingId } = req.body;
+    
+    // Simulate Razorpay ID
+    const mockPaymentId = `pay_mock_${Date.now()}`;
+    
+    await handlePaymentSuccess(bookingId, mockPaymentId, req);
+    
+    res.status(200).json({ success: true, message: "Mock payment successful" });
+  } catch (error: any) {
+    logger.error("Mock payment failed", { error: error.message });
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Razorpay Webhook Handler (async, server-to-server — most reliable)
 // @route   POST /api/payments/webhook
 // @access  Public (verified via HMAC signature)

@@ -28,28 +28,62 @@ export default function QRScanner() {
 
   useEffect(() => {
     let html5QrCode: Html5Qrcode | null = null;
+    let isMounted = true;
     
     if (scanState === "scanning") {
       html5QrCode = new Html5Qrcode("qr-reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          // Success
-          html5QrCode?.stop().catch(() => {});
-          handleManualSubmit(undefined, decodedText);
-        },
-        (error) => {
-          // Failure (ignore)
+      
+      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      
+      const startCamera = async () => {
+        try {
+          // Attempt back camera first (this triggers the permission prompt)
+          await html5QrCode?.start(
+            { facingMode: "environment" },
+            config,
+            (decodedText) => {
+              if (isMounted) {
+                html5QrCode?.stop().catch(() => {});
+                handleManualSubmit(undefined, decodedText);
+              }
+            },
+            () => {} // ignore scan failures
+          );
+        } catch (err) {
+          console.warn("Environment camera failed (possibly not found). Trying front camera...", err);
+          if (isMounted) {
+            try {
+              // Fallback to front camera or default camera
+              await html5QrCode?.start(
+                { facingMode: "user" },
+                config,
+                (decodedText) => {
+                  if (isMounted) {
+                    html5QrCode?.stop().catch(() => {});
+                    handleManualSubmit(undefined, decodedText);
+                  }
+                },
+                () => {}
+              );
+            } catch (fallbackErr) {
+              console.warn("Front camera also failed:", fallbackErr);
+              toast.error("Could not access camera. Please check permissions or use HTTPS.");
+            }
+          }
         }
-      ).catch(err => {
-         console.warn("Camera failed to start:", err);
-      });
+      };
+
+      startCamera();
     }
 
     return () => {
+      isMounted = false;
       if (html5QrCode && html5QrCode.isScanning) {
-        html5QrCode.stop().catch(() => {});
+        html5QrCode.stop().then(() => {
+          html5QrCode?.clear();
+        }).catch(() => {});
+      } else {
+        try { html5QrCode?.clear(); } catch(e) {}
       }
     };
   }, [scanState]);

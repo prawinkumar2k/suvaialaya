@@ -6,11 +6,9 @@ import path from "node:path";
 export default defineConfig(({ mode }) => ({
   publicDir: "./client/public",
   server: {
-    host: "0.0.0.0", // Bind to all interfaces (use localhost if ERR_NETWORK_CHANGED persists)
+    host: "0.0.0.0",
     port: 8080,
-    headers: {
-      "Origin-Agent-Cluster": "?1"
-    },
+    // Origin-Agent-Cluster header removed — caused browser warnings on IP access
     fs: {
       allow: ["./client", "./shared", "index.html"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
@@ -31,16 +29,23 @@ export default defineConfig(({ mode }) => ({
 function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
-    apply: "serve", // Only apply during development (serve mode)
+    apply: "serve",
     async configureServer(server) {
       if (process.env.VITEST) {
         return;
       }
+
+      // ─── CRITICAL: Load .env BEFORE importing Express server ────────────────
+      // Vite strips dotenv imports from ES modules. Must be loaded explicitly
+      // here so process.env is populated before any server code runs.
+      const { config } = await import("dotenv");
+      config();
+
       const { createServer } = await import("./server");
       const app = createServer();
 
-      // Add Express app as middleware to Vite dev server
       server.middlewares.use(app);
     },
   };
 }
+

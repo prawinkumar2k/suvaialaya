@@ -1,6 +1,7 @@
 import { Queue, Worker, QueueEvents } from "bullmq";
 import { redisConnection, getRedisClient } from "./redis";
 import { logger } from "./logger";
+import QRCode from "qrcode";
 
 // ─── Queue Names ──────────────────────────────────────────────────────────────
 export const QUEUE_NAMES = {
@@ -82,8 +83,31 @@ export async function addQRGenerationJob(bookingId: string) {
     await qrGenerationQueue.add("generate", { bookingId });
     logger.info("QR generation job enqueued", { bookingId });
   } catch (e) {
-    logger.warn("Redis unavailable, skipped QR generation job");
+    // ─── Redis offline fallback: generate QR directly into MongoDB ────────────
+    logger.warn("Redis unavailable — generating QR code synchronously", { bookingId });
+    generateQRDirectly(bookingId).catch((err) =>
+      logger.error("Fallback QR generation failed", { bookingId, error: err.message })
+    );
   }
+}
+
+// ─── Direct QR generation — used as Redis-offline fallback ────────────────────
+async function generateQRDirectly(bookingId: string) {
+  const { Booking } = await import("../models/Booking");
+  const booking = await Booking.findById(bookingId);
+  if (!booking || booking.qrCodeUrl) return; // idempotent
+
+  const qrPayload = JSON.stringify({ id: booking._id.toString(), ts: Date.now() });
+  const qrCodeDataUrl = await QRCode.toDataURL(qrPayload, {
+    errorCorrectionLevel: "H",
+    margin: 2,
+    width: 300,
+    color: { dark: "#0F3B28", light: "#F9F6F0" },
+  });
+
+  booking.qrCodeUrl = qrCodeDataUrl;
+  await booking.save();
+  logger.info("QR code generated (sync fallback) and saved to DB", { bookingId });
 }
 
 // ─── Helper: Schedule seat release on payment timeout ────────────────────────

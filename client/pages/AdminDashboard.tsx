@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, ChefHat, UtensilsCrossed } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, UtensilsCrossed, FileText, UserCog, PackageOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { toast } from "sonner";
@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { MenuCMS } from "@/components/admin/MenuCMS";
 import { SystemSettingsCMS } from "@/components/admin/SystemSettingsCMS";
+import { StaffCMS } from "@/components/admin/StaffCMS";
+import { AddonCMS } from "@/components/admin/AddonCMS";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -27,6 +29,18 @@ export default function AdminDashboard() {
   const [newDateInput, setNewDateInput] = useState("");
   const [newSlotTimeInput, setNewSlotTimeInput] = useState("");
   const [newSlotCapacityInput, setNewSlotCapacityInput] = useState("70");
+
+  const [editEventOpen, setEditEventOpen] = useState(false);
+  const [editEventData, setEditEventData] = useState<any>(null);
+
+  const [editSlotOpen, setEditSlotOpen] = useState(false);
+  const [editSlotData, setEditSlotData] = useState<{eventId: string, slotIdx: number, time: string, capacity: string} | null>(null);
+
+  const [editDateOpen, setEditDateOpen] = useState(false);
+  const [editDateData, setEditDateData] = useState<{eventId: string, oldDate: string, newDate: string} | null>(null);
+
+  const [editBookingOpen, setEditBookingOpen] = useState(false);
+  const [editBookingData, setEditBookingData] = useState<any>(null);
 
   const navigate = useNavigate();
 
@@ -106,6 +120,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const submitEditBooking = async () => {
+    if (!editBookingData) return;
+    try {
+      const response = await axios.put(`/api/bookings/${editBookingData._id}`, {
+        guestDetails: {
+          fullName: editBookingData.guestDetails?.fullName || "",
+          email: editBookingData.guestDetails?.email || "",
+          phone: editBookingData.guestDetails?.phone || "",
+          city: editBookingData.guestDetails?.city || ""
+        }
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      
+      if (response.data.success) {
+        toast.success("Booking updated successfully");
+        setBookings(prev => prev.map(b => b._id === editBookingData._id ? response.data.data : b));
+        setEditBookingOpen(false);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to update booking");
+    }
+  };
+
   const handleRemoveSlot = (event: any, slotIdx: number) => {
     setDeleteAction({ type: "slot", eventId: event._id, value: slotIdx });
     setActiveEvent(event);
@@ -129,6 +165,54 @@ export default function AdminDashboard() {
       handleUpdateEvent(activeEvent._id, { dates: updatedDates });
     }
     setDeleteConfirmOpen(false);
+  };
+
+  const submitEditEvent = () => {
+    if (!editEventData) return;
+    
+    handleUpdateEvent(editEventData._id, {
+      title: editEventData.title,
+      venue: editEventData.venue,
+      basePrice: Number(editEventData.basePrice)
+    });
+    setEditEventOpen(false);
+  };
+
+  const submitEditSlot = () => {
+    if (!editSlotData) return;
+    const event = events.find(e => e._id === editSlotData.eventId);
+    if (!event) return;
+    
+    const capacity = parseInt(editSlotData.capacity);
+    if (isNaN(capacity) || capacity <= 0) {
+      toast.error("Invalid capacity");
+      return;
+    }
+    
+    const newSlots = [...event.slots];
+    newSlots[editSlotData.slotIdx] = { ...newSlots[editSlotData.slotIdx], time: editSlotData.time, capacity };
+    
+    handleUpdateEvent(event._id, { slots: newSlots });
+    setEditSlotOpen(false);
+  };
+
+  const submitEditDate = () => {
+    if (!editDateData) return;
+    if (isNaN(new Date(editDateData.newDate).getTime())) {
+      toast.error("Invalid date format. Use YYYY-MM-DD");
+      return;
+    }
+    const event = events.find(e => e._id === editDateData.eventId);
+    if (!event) return;
+
+    // Filter out the old date, add the new one, and sort
+    const updatedDates = event.dates
+      .filter((d: string) => d !== editDateData.oldDate)
+      .concat(editDateData.newDate)
+      .sort();
+      
+    handleUpdateEvent(event._id, { dates: updatedDates });
+    setEditDateOpen(false);
   };
 
   const handleAddDate = (event: any) => {
@@ -238,9 +322,7 @@ export default function AdminDashboard() {
             </span>
           </div>
           <div className="flex items-center gap-6">
-            <Link to="/kitchen" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
-              <ChefHat size={16} /> Open Kitchen
-            </Link>
+
             <Link to="/reception" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
               <Users size={16} /> Open Reception
             </Link>
@@ -264,6 +346,9 @@ export default function AdminDashboard() {
               { id: "events", icon: CalendarDays, label: "Events & Slots" },
               { id: "bookings", icon: Users, label: "All Bookings" },
               { id: "menu", icon: UtensilsCrossed, label: "Menu Management" },
+              { id: "staff", icon: UserCog, label: "Staff Management" },
+              { id: "addons", icon: PackageOpen, label: "E-Commerce Add-ons" },
+              { id: "pages", icon: FileText, label: "Database Pages" },
               { id: "analytics", icon: BarChart3, label: "Detailed Analytics" },
               { id: "settings", icon: Settings, label: "Platform Settings" },
             ].map((tab) => (
@@ -397,6 +482,15 @@ export default function AdminDashboard() {
                                 <DropdownMenuContent align="end" className="w-48 bg-white border-gray-100 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
                                   <DropdownMenuLabel className="text-[#1a3d2b] font-bold uppercase tracking-widest text-[10px]">Actions</DropdownMenuLabel>
                                   <DropdownMenuSeparator className="bg-gray-100" />
+                                  <DropdownMenuItem 
+                                    className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] focus:bg-gray-50 focus:text-[#1a3d2b] gap-2"
+                                    onClick={() => {
+                                      setEditBookingData(b);
+                                      setEditBookingOpen(true);
+                                    }}
+                                  >
+                                    <Settings size={14} className="text-[#c9841a]" /> Edit Details
+                                  </DropdownMenuItem>
                                   <DropdownMenuItem 
                                     className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] focus:bg-gray-50 focus:text-[#1a3d2b] gap-2"
                                     onClick={() => handleUpdateBookingStatus(b._id, 'check-in')}
@@ -542,7 +636,16 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex justify-between items-start mb-4 relative z-10">
                           <div>
-                            <h3 className="font-display text-xl font-bold text-[#1a3d2b]">{event.title}</h3>
+                            <h3 className="font-display text-xl font-bold text-[#1a3d2b] flex items-center gap-2">
+                              {event.title}
+                              <button 
+                                onClick={() => { setEditEventData(event); setEditEventOpen(true); }}
+                                className="text-[#c9841a] hover:bg-[#c9841a]/10 p-1.5 rounded-md transition-colors"
+                                title="Edit Event Details"
+                              >
+                                <Settings size={14} />
+                              </button>
+                            </h3>
                             <p className="text-[10px] uppercase tracking-widest text-[#1a3d2b]/60 mt-1 font-bold">{event.venue}</p>
                           </div>
                           <span className="text-[9px] font-bold uppercase tracking-widest bg-[#c9841a]/10 text-[#c9841a] px-3 py-1.5 rounded-full border border-[#c9841a]/20">₹{event.basePrice}</span>
@@ -561,22 +664,30 @@ export default function AdminDashboard() {
                           </div>
                           {event.dates?.map((dateObj: any, index: number) => (
                             <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                              <div className="font-bold text-[#1a3d2b] text-xs uppercase tracking-widest mb-3 border-b border-gray-100 pb-2 flex justify-between items-center">
-                                {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                              <div className="font-bold text-[#1a3d2b] text-xs uppercase tracking-widest mb-3 border-b border-gray-100 pb-2 flex justify-between items-center group/date">
+                                <div className="flex items-center gap-2">
+                                  {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                  <button onClick={() => { setEditDateData({ eventId: event._id, oldDate: dateObj, newDate: dateObj }); setEditDateOpen(true); }} className="text-[#c9841a] hover:bg-[#c9841a]/10 p-1 rounded-md transition-colors opacity-0 group-hover/date:opacity-100" title="Edit Date">
+                                    <Settings size={12} />
+                                  </button>
+                                </div>
                                 <button onClick={() => handleRemoveDate(event, dateObj)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-colors" title="Remove Date">
                                   <XCircle size={14} />
                                 </button>
                               </div>
                               <div className="space-y-3">
-                                {event.slots?.map((slot: any, slotIdx: number) => {
+                                {((event.dateSlots && event.dateSlots[dateObj]) || event.slots)?.map((slot: any, slotIdx: number) => {
                                   const booked = slot.booked || 0;
                                   const total = slot.capacity;
                                   const percentage = Math.round((booked / total) * 100);
                                   return (
                                     <div key={slotIdx} className="flex justify-between items-center text-xs group/slot bg-gray-50 p-2 rounded-lg">
                                       <div className="flex items-center gap-2">
-                                        <button onClick={() => handleRemoveSlot(event, slotIdx)} className="text-red-400 hover:text-red-600 transition-colors opacity-0 group-hover/slot:opacity-100 p-1 rounded-md hover:bg-red-50">
+                                        <button onClick={() => handleRemoveSlot(event, slotIdx)} className="text-red-400 hover:text-red-600 transition-colors opacity-0 group-hover/slot:opacity-100 p-1 rounded-md hover:bg-red-50" title="Delete Slot">
                                           <XCircle size={12} />
+                                        </button>
+                                        <button onClick={() => { setEditSlotData({ eventId: event._id, slotIdx, time: slot.time, capacity: slot.capacity.toString() }); setEditSlotOpen(true); }} className="text-[#c9841a] hover:text-[#c9841a] transition-colors opacity-0 group-hover/slot:opacity-100 p-1 rounded-md hover:bg-[#c9841a]/10" title="Edit Slot">
+                                          <Settings size={12} />
                                         </button>
                                         <span className="font-bold text-[#1a3d2b]">{slot.time}</span>
                                       </div>
@@ -606,13 +717,39 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            { activeTab === "pages" && (
+              <div className="max-w-4xl mx-auto w-full">
+                <div className="mb-8">
+                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Database Pages</h1>
+                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Manage Landing, About, Gallery, and Menu Content</p>
+                </div>
+                <SystemSettingsCMS />
+              </div>
+            )}
+
+            {activeTab === "staff" && (
+              <div className="max-w-7xl mx-auto w-full">
+                <StaffCMS />
+              </div>
+            )}
+
+            {activeTab === "addons" && (
+              <div className="max-w-7xl mx-auto w-full">
+                <AddonCMS />
+              </div>
+            )}
+
             {activeTab === "settings" && (
               <div className="max-w-4xl mx-auto w-full">
                 <div className="mb-8">
                   <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Platform Settings</h1>
                   <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Configure your restaurant platform</p>
                 </div>
-                <SystemSettingsCMS />
+                <div className="bg-white p-8 rounded-2xl border border-gray-100 text-center shadow-sm">
+                  <Settings className="mx-auto text-gray-300 mb-4" size={48} />
+                  <h3 className="text-[#1a3d2b] font-bold">System Configuration</h3>
+                  <p className="text-sm text-gray-500 mt-2">Core settings have been moved to the database. Page content can now be edited under the "Database Pages" tab.</p>
+                </div>
               </div>
             )}
 
@@ -790,6 +927,164 @@ export default function AdminDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Booking Dialog */}
+      <Dialog open={editBookingOpen} onOpenChange={setEditBookingOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Booking Details</DialogTitle>
+          </DialogHeader>
+          {editBookingData && (
+            <div className="grid gap-4 py-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Guest Name</label>
+                <input
+                  type="text"
+                  value={editBookingData.guestDetails?.fullName || editBookingData.user?.name || ""}
+                  onChange={(e) => setEditBookingData({...editBookingData, guestDetails: {...editBookingData.guestDetails, fullName: e.target.value}})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Email</label>
+                <input
+                  type="email"
+                  value={editBookingData.guestDetails?.email || editBookingData.user?.email || ""}
+                  onChange={(e) => setEditBookingData({...editBookingData, guestDetails: {...editBookingData.guestDetails, email: e.target.value}})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Phone Number</label>
+                <input
+                  type="text"
+                  value={editBookingData.guestDetails?.phone || ""}
+                  onChange={(e) => setEditBookingData({...editBookingData, guestDetails: {...editBookingData.guestDetails, phone: e.target.value}})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">City</label>
+                <input
+                  type="text"
+                  value={editBookingData.guestDetails?.city || ""}
+                  onChange={(e) => setEditBookingData({...editBookingData, guestDetails: {...editBookingData.guestDetails, city: e.target.value}})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <button onClick={() => setEditBookingOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitEditBooking} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Save Changes</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Edit Event Dialog */}
+      <Dialog open={editEventOpen} onOpenChange={setEditEventOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Event Details</DialogTitle>
+          </DialogHeader>
+          {editEventData && (
+            <div className="grid gap-4 py-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Event Title</label>
+                <input
+                  type="text"
+                  value={editEventData.title || ""}
+                  onChange={(e) => setEditEventData({...editEventData, title: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Venue</label>
+                <input
+                  type="text"
+                  value={editEventData.venue || ""}
+                  onChange={(e) => setEditEventData({...editEventData, venue: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Base Price (₹)</label>
+                <input
+                  type="number"
+                  value={editEventData.basePrice || 0}
+                  onChange={(e) => setEditEventData({...editEventData, basePrice: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <button onClick={() => setEditEventOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitEditEvent} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Save Changes</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Edit Slot Dialog */}
+      <Dialog open={editSlotOpen} onOpenChange={setEditSlotOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Time Slot</DialogTitle>
+          </DialogHeader>
+          {editSlotData && (
+            <div className="grid gap-4 py-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Slot Time</label>
+                <input
+                  type="text"
+                  value={editSlotData.time}
+                  onChange={(e) => setEditSlotData({...editSlotData, time: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Capacity (Seats)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={editSlotData.capacity}
+                  onChange={(e) => setEditSlotData({...editSlotData, capacity: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <button onClick={() => setEditSlotOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitEditSlot} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Save Changes</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Date Dialog */}
+      <Dialog open={editDateOpen} onOpenChange={setEditDateOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Event Date</DialogTitle>
+          </DialogHeader>
+          {editDateData && (
+            <div className="grid gap-4 py-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-[#1a3d2b]">Date (YYYY-MM-DD)</label>
+                <input
+                  type="date"
+                  value={editDateData.newDate}
+                  onChange={(e) => setEditDateData({...editDateData, newDate: e.target.value})}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <button onClick={() => setEditDateOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitEditDate} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Save Changes</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </main>
   );
 }

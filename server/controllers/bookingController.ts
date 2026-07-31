@@ -85,7 +85,12 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
     }
 
     // ─── 2. Check capacity ────────────────────────────────────────────────────
-    const remainingSeats = slot.capacity - slot.booked;
+    const bookingsAgg = await Booking.aggregate([
+      { $match: { event: new mongoose.Types.ObjectId(eventId), date, slotTime, bookingStatus: { $ne: 'Cancelled' } } },
+      { $group: { _id: null, total: { $sum: "$numberOfGuests" } } }
+    ]);
+    const totalBooked = bookingsAgg[0]?.total || 0;
+    const remainingSeats = slot.capacity - totalBooked;
     if (remainingSeats < numberOfGuests) {
       
 
@@ -164,39 +169,16 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       });
     }
 
-    // ─── 4. ATOMIC seat reservation using $inc with $expr guard ───────────────
-    // This is the BookMyShow standard — single atomic DB operation
-    let seatsIncremented = false;
-    const updatedEvent = await Event.findOneAndUpdate(
-      {
-        _id: eventId,
-        "slots.time": slotTime,
-        "slots.booked": { $lte: slot.capacity - numberOfGuests }, // Atomic capacity check
-      },
-      {
-        $inc: { "slots.$.booked": numberOfGuests },
-      },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!updatedEvent) {
-      // The slot filled up between our check and the update — race condition caught
-      
-      await releaseSeatLock(eventId, date, slotTime, req.user._id.toString());
-
-      logger.warn("Race condition detected — slot filled during booking", {
-        userId: req.user._id,
-        slotTime,
-      });
-      return res.status(409).json({
-        success: false,
-        error: "Slot just filled up. Please try another time slot.",
-      });
+    // ─── 4. Seat reservation check (using real-time aggregate) ───────────────
+    // We already checked capacity above, and we have a Redis user lock.
+    let seatsIncremented = true;
+    const updatedEvent = event; 
+    
+    // We no longer rely on `$inc: { "slots.$.booked": numberOfGuests }` because 
+    // it was improperly mutating the global event slot instead of date-specific.
+    if (remainingSeats < numberOfGuests) {
+      seatsIncremented = false;
     }
-    seatsIncremented = true;
 
     // ─── 5. Create booking record ──────────────────────────────────────────────
     try {
@@ -236,13 +218,8 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       res.status(201).json({ success: true, data: booking });
     } catch (bookingError: any) {
       // Rollback! If booking fails (e.g. schema validation), reverse the atomic increment and release lock
-      if (seatsIncremented) {
-        await Event.findOneAndUpdate(
-          { _id: eventId, "slots.time": slotTime },
-          { $inc: { "slots.$.booked": -numberOfGuests } }
-        );
-        await releaseSeatLock(eventId, date, slotTime, req.user._id.toString());
-      }
+      // Seat capacity is naturally managed by Booking documents now, no rollback needed on Event.    
+      await releaseSeatLock(eventId, date, slotTime, req.user._id.toString());
       throw bookingError;
     }
   } catch (error: any) {
@@ -350,10 +327,7 @@ export const cancelBooking = async (req: Request, res: Response, next: NextFunct
     }
 
     // ─── Atomic seat release ───────────────────────────────────────────────
-    await Event.findOneAndUpdate(
-      { _id: booking.event, "slots.time": booking.slotTime },
-      { $inc: { "slots.$.booked": -booking.numberOfGuests } }
-    );
+      // Event seat capacity is now dynamically derived, no need to decrement here
 
     booking.bookingStatus = "Cancelled";
     booking.cancelledAt = new Date();
@@ -473,6 +447,41 @@ export const checkInBooking = async (req: Request, res: Response, next: NextFunc
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// @desc    Update booking details (Admin)
+// @route   PUT /api/bookings/:id
+// @access  Private/Admin
+// ─────────────────────────────────────────────────────────────────────────────
+export const updateBooking = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ success: false, error: "Not authorized" });
+    }
+
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ success: false, error: "Booking not found" });
+    }
+
+    const { guestDetails, paymentStatus, bookingStatus, numberOfGuests } = req.body;
+
+    if (guestDetails) {
+      booking.guestDetails = { ...booking.guestDetails, ...guestDetails };
+    }
+    if (paymentStatus) booking.paymentStatus = paymentStatus;
+    if (bookingStatus) booking.bookingStatus = bookingStatus;
+    
+    // Changing numberOfGuests would require atomic capacity checks on the event, 
+    // so we skip it for now unless properly implemented. We just allow guest detail updates.
+    
+    await booking.save();
+
+    res.status(200).json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Verify booking details (Public/QR Code Scans)
 // @route   GET /api/bookings/verify/:id
 // @access  Public
@@ -529,19 +538,18 @@ export const rescheduleBooking = async (req: Request, res: Response, next: NextF
       return res.status(400).json({ success: false, error: "Please select a different date or time to reschedule." });
     }
 
-    if (newSlot.capacity - newSlot.booked < booking.numberOfGuests) {
+    // Check new capacity using aggregation
+    const bookingsAgg = await Booking.aggregate([
+      { $match: { event: new mongoose.Types.ObjectId(booking.event), date: newDate, slotTime: newSlotTime, bookingStatus: { $ne: 'Cancelled' } } },
+      { $group: { _id: null, total: { $sum: "$numberOfGuests" } } }
+    ]);
+    const totalBooked = bookingsAgg[0]?.total || 0;
+    
+    if (newSlot.capacity - totalBooked < booking.numberOfGuests) {
       return res.status(400).json({ success: false, error: "Not enough seats in the new slot" });
     }
 
-    // Atomic update: Deduct from new slot, add to old slot
-    await Event.updateOne(
-      { _id: event._id, "slots.time": newSlotTime },
-      { $inc: { "slots.$.booked": booking.numberOfGuests } }
-    );
-    await Event.updateOne(
-      { _id: event._id, "slots.time": booking.slotTime },
-      { $inc: { "slots.$.booked": -booking.numberOfGuests } }
-    );
+    // Event seat capacity is now dynamically derived, no need to increment/decrement here
 
     booking.date = newDate;
     booking.slotTime = newSlotTime;

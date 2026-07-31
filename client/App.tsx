@@ -4,7 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import PlaceholderPage from "@/pages/PlaceholderPage";
+import Organizers from "@/pages/Organizers";
+import EventDetails from "@/pages/EventDetails";
 import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
 import Terms from "@/pages/Terms";
@@ -29,7 +30,7 @@ import UserDashboard from "@/pages/UserDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import QRScanner from "@/pages/QRScanner";
 import TicketVerification from "@/pages/TicketVerification";
-import KitchenDashboard from "@/pages/KitchenDashboard";
+
 import ReceptionDashboard from "@/pages/ReceptionDashboard";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { AuraCursor } from "@/components/shared/AuraCursor";
@@ -49,8 +50,8 @@ export default function App() {
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <Routes>
             <Route path="/" element={<Index />} />
-          <Route path="/organizers" element={<PlaceholderPage />} /> 
-          <Route path="/events/:eventId" element={<PlaceholderPage />} />
+          <Route path="/organizers" element={<Organizers />} /> 
+          <Route path="/events/:eventId" element={<EventDetails />} />
           
           <Route path="/about" element={<About />} />
           <Route path="/menu" element={<Menu />} />
@@ -73,7 +74,7 @@ export default function App() {
           <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/reception" element={<ReceptionDashboard />} />
-          <Route path="/kitchen" element={<KitchenDashboard />} />
+
           <Route path="/scanner" element={<QRScanner />} />
           <Route path="/ticket/:id" element={<TicketVerification />} />
           

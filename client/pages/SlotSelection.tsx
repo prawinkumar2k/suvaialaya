@@ -202,7 +202,7 @@ export default function SlotSelection() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-5" style={{ perspective: 1000 }}>
-            {eventData.slots.map((slot: any) => {
+            {(eventData.dateSlots && eventData.dateSlots[selectedDate] ? eventData.dateSlots[selectedDate] : eventData.slots).map((slot: any) => {
               const remaining = slot.capacity - slot.booked;
               const isFull = remaining <= 0;
               const statusText = isFull ? "Sold Out" : remaining < 15 ? "Filling Fast" : "Available";

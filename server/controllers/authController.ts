@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 import { User } from "../models/User";
 import { audit } from "../lib/audit";
 import { logger } from "../lib/logger";
+import { sendPasswordResetOTPEmail } from "../services/emailService";
 
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes
@@ -192,21 +194,24 @@ export const updateUserProfile = async (req: Request, res: Response, next: NextF
 // @route   POST /api/auth/forgot-password
 // @access  Public
 // ─────────────────────────────────────────────────────────────────────────────
+
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email });
+    if (!email) {
+      return res.status(400).json({ success: false, error: "Email address is required" });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (!user) {
-      // Security: Do not reveal if user exists
-      return res.status(200).json({ success: true, message: "If an account exists, an OTP has been sent." });
+      return res.status(404).json({ success: false, error: "No account registered with this email address." });
     }
 
     // Generate 6 digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     
     // Hash it for DB storage
-    const bcrypt = require("bcryptjs");
     const salt = await bcrypt.genSalt(10);
     const hashedOtp = await bcrypt.hash(otp, salt);
 
@@ -214,11 +219,12 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins expiry
     await user.save({ validateBeforeSave: false });
 
-    // Mock Email Send (Replace with SES/SendGrid)
-    logger.info(`[MOCK EMAIL] Password Reset OTP for ${email} is: ${otp}`);
+    // Send actual OTP Email
+    await sendPasswordResetOTPEmail(user.email, otp);
+
     audit({ action: "auth.forgot_password", userId: user._id.toString(), ip: req.ip, status: "success" });
 
-    res.status(200).json({ success: true, message: "If an account exists, an OTP has been sent." });
+    res.status(200).json({ success: true, message: `An OTP code has been sent to ${user.email}.` });
   } catch (error) {
     next(error);
   }
@@ -237,18 +243,28 @@ export const verifyOTP = async (req: Request, res: Response, next: NextFunction)
       return res.status(400).json({ success: false, error: "Email and OTP are required" });
     }
 
-    const user = await User.findOne({ email }).select("+otpCode +otpExpiry");
+    const cleanEmail = email.toLowerCase().trim();
+    const cleanOtp = String(otp).trim();
 
-    if (!user || !user.otpCode || !user.otpExpiry || user.otpExpiry < new Date()) {
-      return res.status(400).json({ success: false, error: "Invalid or expired OTP" });
+    const user = await User.findOne({ email: cleanEmail }).select("+otpCode +otpExpiry");
+
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User account not found" });
     }
 
-    const bcrypt = require("bcryptjs");
-    const isValid = await bcrypt.compare(otp, user.otpCode);
+    if (!user.otpCode || !user.otpExpiry) {
+      return res.status(400).json({ success: false, error: "No OTP requested. Please request a new code." });
+    }
+
+    if (user.otpExpiry < new Date()) {
+      return res.status(400).json({ success: false, error: "OTP code has expired. Please request a new one." });
+    }
+
+    const isValid = await bcrypt.compare(cleanOtp, user.otpCode);
 
     if (!isValid) {
       audit({ action: "auth.verify_otp", userId: user._id.toString(), ip: req.ip, status: "failure", errorMessage: "Invalid OTP" });
-      return res.status(400).json({ success: false, error: "Invalid or expired OTP" });
+      return res.status(400).json({ success: false, error: "Invalid OTP code. Please check your email." });
     }
 
     // OTP verified successfully, clear OTP but issue a temporary reset token

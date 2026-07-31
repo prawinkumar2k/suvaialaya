@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { motion } from "framer-motion";
 import { ArrowLeft, Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
@@ -8,6 +9,17 @@ import { toast } from "sonner";
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [contactSettings, setContactSettings] = useState<any>(null);
+
+  useEffect(() => {
+    axios.get("/api/settings")
+      .then(res => {
+        if (res.data.success && res.data.data.contactPage) {
+          setContactSettings(res.data.data.contactPage);
+        }
+      })
+      .catch(err => console.error("Failed to load Contact settings:", err));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,12 +34,24 @@ export default function Contact() {
     setIsSubmitting(false);
   };
 
-  const info = [
-    { icon: Phone, label: "Phone", value: "+91 98765 43210", sub: "Mon–Sun, 10 AM – 10 PM" },
-    { icon: Mail, label: "Email", value: "hello@suvaialaya.com", sub: "We reply within 24 hours" },
-    { icon: MapPin, label: "Venue", value: "Madurai, Tamil Nadu", sub: "Festival grounds, main entrance" },
-    { icon: Clock, label: "Event Hours", value: "10 AM – 10 PM", sub: "All 9 days of the festival" },
+  const defaultInfo = [
+    { iconName: "Phone", label: "Phone", value: "+91 98765 43210", sub: "Mon–Sun, 10 AM – 10 PM" },
+    { iconName: "Mail", label: "Email", value: "hello@suvaialaya.com", sub: "We reply within 24 hours" },
+    { iconName: "MapPin", label: "Venue", value: "Madurai, Tamil Nadu", sub: "Festival grounds, main entrance" },
+    { iconName: "Clock", label: "Event Hours", value: "10 AM – 10 PM", sub: "All 9 days of the festival" },
   ];
+
+  const info = contactSettings?.info && contactSettings.info.length > 0 ? contactSettings.info : defaultInfo;
+
+  const getIcon = (name: string) => {
+    switch (name) {
+      case 'Phone': return Phone;
+      case 'Mail': return Mail;
+      case 'MapPin': return MapPin;
+      case 'Clock': return Clock;
+      default: return Phone;
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white text-[#1a3d2b] relative overflow-hidden">
@@ -45,19 +69,21 @@ export default function Contact() {
 
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center mb-16">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">Get In Touch</p>
-          <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b]">We'd love to hear from you.</h1>
-          <p className="mt-4 text-[#1a3d2b]/70 max-w-lg mx-auto">Have questions about the festival, your booking, or the menu? Our team is ready to help.</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">{contactSettings?.heroEyebrow || "Get In Touch"}</p>
+          <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b] whitespace-pre-line">{contactSettings?.heroTitle || "We'd love to hear from you."}</h1>
+          <p className="mt-4 text-[#1a3d2b]/70 max-w-lg mx-auto">{contactSettings?.heroDescription || "Have questions about the festival, your booking, or the menu? Our team is ready to help."}</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-12">
           {/* Info Cards */}
           <div className="lg:col-span-2 space-y-4">
-            {info.map((item, i) => (
+            {info.map((item: any, i: number) => {
+              const Icon = getIcon(item.iconName);
+              return (
               <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.1 }}
                 className="flex items-start gap-4 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                 <div className="w-10 h-10 rounded-xl bg-[#1a3d2b]/5 flex items-center justify-center flex-shrink-0">
-                  <item.icon size={18} className="text-[#1a3d2b]" />
+                  <Icon size={18} className="text-[#1a3d2b]" />
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/50 mb-1">{item.label}</p>
@@ -65,7 +91,7 @@ export default function Contact() {
                   <p className="text-xs text-[#1a3d2b]/60 mt-0.5">{item.sub}</p>
                 </div>
               </motion.div>
-            ))}
+            )})}
           </div>
 
           {/* Form */}

@@ -1,19 +1,34 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
 
 export default function Gallery() {
-  // Mock image placeholders
-  const images = [
-    { id: 1, src: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=600&auto=format&fit=crop", alt: "Food preparation", className: "col-span-2 row-span-2" },
-    { id: 2, src: "https://images.unsplash.com/photo-1514326640560-7d063ef2aed5?q=80&w=400&auto=format&fit=crop", alt: "Spices", className: "col-span-1 row-span-1" },
-    { id: 3, src: "https://images.unsplash.com/photo-1626804475297-41609ea0d4eb?q=80&w=400&auto=format&fit=crop", alt: "Cooking", className: "col-span-1 row-span-1" },
-    { id: 4, src: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop", alt: "Feast", className: "col-span-2 row-span-1" },
-    { id: 5, src: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=400&auto=format&fit=crop", alt: "Curry", className: "col-span-1 row-span-2" },
-    { id: 6, src: "https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=400&auto=format&fit=crop", alt: "Sweets", className: "col-span-1 row-span-1" },
-    { id: 7, src: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?q=80&w=400&auto=format&fit=crop", alt: "Biryani", className: "col-span-1 row-span-1" },
-  ];
+  const [gallerySettings, setGallerySettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get("/api/settings")
+      .then(res => {
+        if (res.data.success) {
+          setGallerySettings(res.data.data.galleryPage || null);
+        }
+      })
+      .catch(err => console.error("Failed to load settings:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-white text-[#1a3d2b] flex items-center justify-center relative">
+        <Loader2 className="w-12 h-12 text-[#1a3d2b] animate-spin" />
+      </main>
+    );
+  }
+
+  const images = gallerySettings?.images || [];
 
   return (
     <main className="min-h-screen bg-white text-[#1a3d2b] relative overflow-hidden">
@@ -34,17 +49,17 @@ export default function Gallery() {
 
       <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-center max-w-3xl mx-auto">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">Gallery</p>
-          <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b]">
-            A glimpse into the feast.
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">{gallerySettings?.heroEyebrow || "Gallery"}</p>
+          <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b] whitespace-pre-line">
+            {gallerySettings?.heroTitle || "A glimpse into the feast."}
           </h1>
-          <p className="mt-4 text-[#1a3d2b]/70">The sights, colors, and textures of Madurai Kari Virundhu.</p>
+          <p className="mt-4 text-[#1a3d2b]/70 whitespace-pre-line">{gallerySettings?.heroDescription || "The sights, colors, and textures of Madurai Kari Virundhu."}</p>
         </motion.div>
 
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 auto-rows-[250px]" style={{ perspective: 1000 }}>
-          {images.map((img, i) => (
+          {images.map((img: any, i: number) => (
             <motion.div 
-              key={img.id} 
+              key={img._id || i} 
               initial={{ opacity: 0, scale: 0.95 }} 
               whileInView={{ opacity: 1, scale: 1 }} 
               whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02, zIndex: 10 }}

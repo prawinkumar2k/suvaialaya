@@ -37,7 +37,7 @@ export default function UserDashboard() {
     e.preventDefault();
     setIsUpdating(true);
     try {
-      const response = await axios.put("/api/auth/profile", { name: profileName, phone: profilePhone }, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await axios.put("/api/users/profile", { name: profileName, phone: profilePhone }, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
         toast.success("Profile updated successfully");
         localStorage.setItem("user", JSON.stringify(response.data.data));
@@ -52,7 +52,7 @@ export default function UserDashboard() {
   const handleUpdatePreferences = async () => {
     setIsUpdating(true);
     try {
-      const response = await axios.put("/api/auth/profile", { preferences: prefs }, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await axios.put("/api/users/profile", { preferences: prefs }, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
         toast.success("Preferences saved successfully");
         localStorage.setItem("user", JSON.stringify(response.data.data));
@@ -61,6 +61,31 @@ export default function UserDashboard() {
       toast.error("Failed to update preferences");
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentPassword || !newPassword) {
+      toast.error("Please enter both current and new password");
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      const response = await axios.put("/api/users/password", { currentPassword, newPassword }, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        toast.success("Password changed successfully");
+        setCurrentPassword("");
+        setNewPassword("");
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to change password");
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -74,10 +99,8 @@ export default function UserDashboard() {
     if (user.role === "admin" || user.role === "owner") {
       navigate("/admin");
       return;
-
-      return;
-    } else if (user.role === "scanner" || user.role === "receptionist") {
-      navigate("/scanner");
+    } else if (user.role === "scanner" || user.role === "receptionist" || user.role === "kitchen_staff") {
+      navigate("/reception");
       return;
     }
 
@@ -362,6 +385,28 @@ export default function UserDashboard() {
                     </button>
                   </div>
                 </form>
+
+                <div className="mt-12 pt-12 border-t border-gray-100 relative z-10">
+                  <h2 className="font-display text-2xl font-bold text-[#1a3d2b] mb-6">Change Password</h2>
+                  <form className="space-y-8" onSubmit={handleChangePassword}>
+                    <div className="grid sm:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <Label htmlFor="currentPassword" className="text-[#1a3d2b] font-bold uppercase tracking-widest text-[10px]">Current Password</Label>
+                        <Input id="currentPassword" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#c9841a] rounded-xl" />
+                      </div>
+                      <div className="space-y-3">
+                        <Label htmlFor="newPassword" className="text-[#1a3d2b] font-bold uppercase tracking-widest text-[10px]">New Password</Label>
+                        <Input id="newPassword" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="h-12 bg-gray-50 border-gray-200 focus-visible:ring-[#c9841a] rounded-xl" />
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-4">
+                      <button type="submit" disabled={isChangingPassword} className="px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white bg-[#1a3d2b] hover:bg-[#2d6a4f] transition-colors shadow-md flex items-center disabled:opacity-50">
+                        {isChangingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Update Password
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </motion.div>
             </div>
           )}

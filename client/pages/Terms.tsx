@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Scale, ShieldCheck, AlertCircle, CheckCircle2 } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
 
-const sections = [
+const defaultSections = [
   {
-    icon: CheckCircle2,
+    iconName: "CheckCircle2",
     title: "Acceptance of Terms",
     content: [
       "By accessing or using the Suvaialaya event management platform, you agree to be bound by these Terms and Conditions.",
@@ -13,7 +13,7 @@ const sections = [
     ]
   },
   {
-    icon: Scale,
+    iconName: "Scale",
     title: "Booking & Payment Policy",
     content: [
       "All bookings are subject to seat availability. A booking is only confirmed upon successful payment via the Razorpay payment gateway.",
@@ -22,7 +22,7 @@ const sections = [
     ]
   },
   {
-    icon: AlertCircle,
+    iconName: "AlertCircle",
     title: "Cancellation & Refund Policy",
     content: [
       "Cancellations made before the day of the booking are eligible for a full refund, which will be processed within 5–7 business days.",
@@ -31,7 +31,7 @@ const sections = [
     ]
   },
   {
-    icon: ShieldCheck,
+    iconName: "ShieldCheck",
     title: "User Responsibilities",
     content: [
       "You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately of any unauthorized use of your account.",
@@ -41,7 +41,34 @@ const sections = [
   },
 ];
 
+import { useState, useEffect } from "react";
+import axios from "axios";
+
 export default function Terms() {
+  const [pageSettings, setPageSettings] = useState<any>(null);
+
+  useEffect(() => {
+    axios.get("/api/settings")
+      .then(res => {
+        if (res.data.success && res.data.data.termsPage) {
+          setPageSettings(res.data.data.termsPage);
+        }
+      })
+      .catch(err => console.error("Failed to load terms settings:", err));
+  }, []);
+
+  const sections = pageSettings?.sections && pageSettings.sections.length > 0 ? pageSettings.sections : defaultSections;
+
+  const getIcon = (name: string) => {
+    switch(name) {
+      case 'CheckCircle2': return CheckCircle2;
+      case 'Scale': return Scale;
+      case 'AlertCircle': return AlertCircle;
+      case 'ShieldCheck': return ShieldCheck;
+      default: return CheckCircle2;
+    }
+  };
+
   return (
     <main className="min-h-screen bg-white text-[#1a3d2b] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
@@ -57,23 +84,25 @@ export default function Terms() {
 
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-8 lg:py-28 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">Legal</p>
-          <h1 className="font-display mt-4 text-4xl font-bold sm:text-5xl text-[#1a3d2b]">Terms & Conditions</h1>
-          <p className="mt-4 text-sm text-[#1a3d2b]/60">Last updated: July 2026</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">{pageSettings?.heroEyebrow || "Legal"}</p>
+          <h1 className="font-display mt-4 text-4xl font-bold sm:text-5xl text-[#1a3d2b] whitespace-pre-line">{pageSettings?.heroTitle || "Terms & Conditions"}</h1>
+          <p className="mt-4 text-sm text-[#1a3d2b]/60 whitespace-pre-line">{pageSettings?.heroDescription || "Last updated: July 2026"}</p>
         </motion.div>
 
         <div className="space-y-8">
-          {sections.map((sec, i) => (
+          {sections.map((sec: any, i: number) => {
+            const Icon = getIcon(sec.iconName);
+            return (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-[#1a3d2b]/5 flex items-center justify-center flex-shrink-0">
-                  <sec.icon size={16} className="text-[#1a3d2b]" />
+                  <Icon size={16} className="text-[#1a3d2b]" />
                 </div>
                 <h2 className="font-display font-bold text-lg text-[#1a3d2b]">{sec.title}</h2>
               </div>
               <ul className="space-y-3">
-                {sec.content.map((p, pi) => (
+                {sec.content.map((p: string, pi: number) => (
                   <li key={pi} className="flex gap-3 text-sm text-[#1a3d2b]/70 leading-relaxed">
                     <span className="text-[#c9841a] mt-1 flex-shrink-0">•</span>
                     <span>{p}</span>
@@ -81,7 +110,7 @@ export default function Terms() {
                 ))}
               </ul>
             </motion.div>
-          ))}
+          )})}
         </div>
 
         <p className="mt-10 text-sm text-[#1a3d2b]/60 text-center">

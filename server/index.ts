@@ -29,10 +29,20 @@ import authRoutes from "./routes/authRoutes";
 import engineRoutes from "./routes/engineRoutes";
 import waitlistRoutes from "./routes/waitlistRoutes.ts";
 import analyticsRoutes from "./routes/analyticsRoutes.ts";
-import kitchenRoutes from "./routes/kitchenRoutes";
+
 import menuRoutes from "./routes/menuRoutes";
 import settingsRoutes from "./routes/settingsRoutes";
+import pageRoutes from "./routes/pageRoutes";
+import galleryImageRoutes from "./routes/galleryImageRoutes";
+import aboutFeatureRoutes from "./routes/aboutFeatureRoutes";
+import landingStatRoutes from "./routes/landingStatRoutes";
+import landingSpecialRoutes from "./routes/landingSpecialRoutes";
+import organizerRoutes from "./routes/organizerRoutes";
+import userProfileRoutes from "./routes/userProfileRoutes";
+import addonRoutes from "./routes/addonRoutes";
+import staffRoutes from "./routes/staffRoutes";
 import { getSystemHealth, getMetrics } from "./controllers/healthController";
+import { cacheRoute } from "./middlewares/cacheMiddleware";
 
 // ─── Connect to MongoDB ────────────────────────────────────────────────────────
 connectDB();
@@ -107,6 +117,7 @@ export function createServer() {
       crossOriginEmbedderPolicy: false,
       crossOriginOpenerPolicy: process.env.NODE_ENV === "production" ? { policy: "same-origin" } : false,
       crossOriginResourcePolicy: process.env.NODE_ENV === "production" ? { policy: "same-origin" } : false,
+      originAgentCluster: false,
       hsts: false, // Disable Strict-Transport-Security in development
     })
   );
@@ -202,16 +213,25 @@ export function createServer() {
 
   // ─── API Routes ────────────────────────────────────────────────────────────
   app.use("/api/auth", authRoutes);
-  app.use("/api/events", eventRoutes);
+  app.use("/api/events", cacheRoute(300), eventRoutes); // 5 min cache for events
   app.use("/api/bookings", bookingRoutes);
   app.use("/api/payments", paymentRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/waitlist", waitlistRoutes);
   app.use("/api/analytics", analyticsRoutes);
   app.use("/api/engines", engineRoutes);
-  app.use("/api/kitchen", kitchenRoutes);
-  app.use("/api/menu", menuRoutes);
-  app.use("/api/settings", settingsRoutes);
+
+  app.use("/api/menu", cacheRoute(3600), menuRoutes);
+  app.use("/api/settings", cacheRoute(3600), settingsRoutes);
+  app.use("/api/pages", cacheRoute(3600), pageRoutes);
+  app.use("/api/galleryimages", cacheRoute(3600), galleryImageRoutes);
+  app.use("/api/aboutfeatures", cacheRoute(3600), aboutFeatureRoutes);
+  app.use("/api/landingstats", cacheRoute(3600), landingStatRoutes);
+  app.use("/api/landingspecials", cacheRoute(3600), landingSpecialRoutes);
+  app.use("/api/organizers", cacheRoute(3600), organizerRoutes);
+  app.use("/api/users", userProfileRoutes);
+  app.use("/api/addons", cacheRoute(3600), addonRoutes);
+  app.use("/api/staff", staffRoutes);
 
   // ─── Health & Observability Endpoints ────────────────────────────────────
   app.get("/api/health", getSystemHealth);    // Kubernetes liveness + readiness
@@ -236,7 +256,7 @@ export function createServer() {
     /^\/dashboard$/,
     /^\/admin$/,
     /^\/reception$/,
-    /^\/kitchen$/,
+
     /^\/scanner$/,
     /^\/organizers$/,
     /^\/contact$/,

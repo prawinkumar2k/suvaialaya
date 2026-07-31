@@ -1,35 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
 
-const faqs = [
+const DEFAULT_FAQS = [
   {
     category: "Booking",
     items: [
       { q: "How do I book a seat?", a: "Select your preferred date and time slot on the Slots page, fill in your guest details, and complete the payment via Razorpay. You'll receive an e-ticket instantly by email." },
       { q: "Can I book for a group?", a: "Yes! You can book for up to the maximum seat capacity per slot. For large groups over 20 people, please contact us directly via the Contact page for a dedicated arrangement." },
-      { q: "Is my booking confirmed immediately?", a: "Yes. Upon successful payment, your booking is instantly confirmed and an e-ticket PDF is available for download from your dashboard." },
-      { q: "What if a slot is full?", a: "You'll be automatically added to the waitlist. If a seat opens up due to a cancellation, you'll be notified and given priority access." },
     ]
-  },
-  {
-    category: "Payments & Refunds",
-    items: [
-      { q: "What payment methods are accepted?", a: "We accept all major UPI apps, credit/debit cards, and net banking via Razorpay — India's most trusted payment gateway." },
-      { q: "How do I cancel and get a refund?", a: "You can cancel from your dashboard up to the day before your booking date. Refunds are processed within 5–7 business days back to your original payment method." },
-      { q: "Can I reschedule instead of cancelling?", a: "Absolutely. From your dashboard, you can reschedule to any available slot without incurring an extra charge, subject to seat availability." },
-    ]
-  },
-  {
-    category: "The Experience",
-    items: [
-      { q: "What is included in the meal?", a: "A traditional Madurai Kari Virundhu feast: Seeraga Samba Briyani, Mutton/Chicken curries, freshly made Bun Parotta, Rasam, Curd, Desserts, and much more — served in authentic banana leaf style." },
-      { q: "Are there vegetarian options?", a: "We cater to vegetarian guests with a curated set of dishes. Please contact us in advance to arrange a special vegetarian thali." },
-      { q: "Is there parking at the venue?", a: "Yes, ample parking is available near the festival grounds. Detailed venue and parking instructions are included in your e-ticket." },
-    ]
-  },
+  }
 ];
 
 function FAQItem({ q, a }: { q: string; a: string }) {
@@ -54,6 +37,22 @@ function FAQItem({ q, a }: { q: string; a: string }) {
 }
 
 export default function FAQ() {
+  const [faqSettings, setFaqSettings] = useState<any>(null);
+
+  useEffect(() => {
+    axios.get("/api/settings")
+      .then(res => {
+        if (res.data.success && res.data.data.faqPage) {
+          setFaqSettings(res.data.data.faqPage);
+        }
+      })
+      .catch(err => console.error("Failed to load FAQ settings:", err));
+  }, []);
+
+  const faqs = faqSettings?.categories && faqSettings.categories.length > 0 
+    ? faqSettings.categories 
+    : DEFAULT_FAQS;
+
   return (
     <main className="min-h-screen bg-white text-[#1a3d2b] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
@@ -69,9 +68,9 @@ export default function FAQ() {
 
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-8 lg:py-28 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-16">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">Frequently Asked Questions</p>
-          <h1 className="font-display mt-4 text-4xl font-bold sm:text-5xl text-[#1a3d2b]">Everything you need to know.</h1>
-          <p className="mt-4 text-[#1a3d2b]/70">Can't find your answer? <Link to="/contact" className="underline text-[#c9841a] hover:text-[#a66d15]">Contact us directly.</Link></p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">{faqSettings?.heroEyebrow || "Frequently Asked Questions"}</p>
+          <h1 className="font-display mt-4 text-4xl font-bold sm:text-5xl text-[#1a3d2b] whitespace-pre-line">{faqSettings?.heroTitle || "Everything you need to know."}</h1>
+          <p className="mt-4 text-[#1a3d2b]/70">{faqSettings?.heroDescription || "Can't find your answer?"} <Link to="/contact" className="underline text-[#c9841a] hover:text-[#a66d15]">Contact us directly.</Link></p>
         </motion.div>
 
         <div className="space-y-10">

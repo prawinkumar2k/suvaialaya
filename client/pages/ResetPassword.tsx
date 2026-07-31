@@ -6,6 +6,8 @@ import { BrandMark } from "@/components/landing/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,33 +28,28 @@ export default function ResetPassword() {
     e.preventDefault();
     
     if (newPassword !== confirmPassword) {
-      import("sonner").then(({ toast }) => toast.error("Passwords do not match"));
+      toast.error("Passwords do not match");
       return;
     }
     if (newPassword.length < 8) {
-      import("sonner").then(({ toast }) => toast.error("Password must be at least 8 characters"));
+      toast.error("Password must be at least 8 characters");
       return;
     }
     
     setIsLoading(true);
     
     try {
-      import("axios").then(async (axios) => {
-        const { toast } = await import("sonner");
-        const response = await axios.default.post("/api/auth/reset-password", { 
-          resetToken, 
-          newPassword 
-        });
-        
-        if (response.data.success) {
-          toast.success("Password reset successfully. You can now log in.");
-          navigate("/login");
-        }
+      const response = await axios.post("/api/auth/reset-password", { 
+        resetToken, 
+        newPassword 
       });
+      
+      if (response.data.success) {
+        toast.success("Password reset successfully. You can now log in.");
+        navigate("/login");
+      }
     } catch (error: any) {
-      import("sonner").then(({ toast }) => {
-        toast.error(error.response?.data?.error || "Failed to reset password");
-      });
+      toast.error(error.response?.data?.error || "Failed to reset password");
     } finally {
       setIsLoading(false);
     }

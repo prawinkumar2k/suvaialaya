@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Event } from "../models/Event";
+import { Booking } from "../models/Booking";
 import { getRedisClient } from "../lib/redis";
 
 const CACHE_TTL_SECONDS = 30;
@@ -30,7 +31,29 @@ export const getEvents = async (req: Request, res: Response, next: NextFunction)
     }
 
     const events = await Event.find({ isActive: true }).lean();
-    const responseData = { success: true, count: events.length, data: events };
+    
+    // Compute dynamic dateSlots based on actual bookings
+    const bookingsAgg = await Booking.aggregate([
+      { $match: { bookingStatus: { $ne: 'Cancelled' } } },
+      { $group: { _id: { event: "$event", date: "$date", slotTime: "$slotTime" }, total: { $sum: "$numberOfGuests" } } }
+    ]);
+
+    const enrichedEvents = events.map(event => {
+      const dateSlots: Record<string, any[]> = {};
+      event.dates.forEach((date: string) => {
+        dateSlots[date] = event.slots.map((slot: any) => {
+          const matched = bookingsAgg.find(b => 
+            b._id.event.toString() === event._id.toString() && 
+            b._id.date === date && 
+            b._id.slotTime === slot.time
+          );
+          return { ...slot, booked: matched ? matched.total : 0 };
+        });
+      });
+      return { ...event, dateSlots };
+    });
+
+    const responseData = { success: true, count: enrichedEvents.length, data: enrichedEvents };
 
     if (redis.status === "ready") {
       await redis.set(cacheKey, JSON.stringify(responseData), "EX", CACHE_TTL_SECONDS);
@@ -59,7 +82,21 @@ export const getEvent = async (req: Request, res: Response, next: NextFunction) 
     if (!event) {
       return res.status(404).json({ success: false, error: "Event not found" });
     }
-    const responseData = { success: true, data: event };
+
+    const bookingsAgg = await Booking.aggregate([
+      { $match: { event: event._id, bookingStatus: { $ne: 'Cancelled' } } },
+      { $group: { _id: { date: "$date", slotTime: "$slotTime" }, total: { $sum: "$numberOfGuests" } } }
+    ]);
+
+    const dateSlots: Record<string, any[]> = {};
+    event.dates.forEach((date: string) => {
+      dateSlots[date] = event.slots.map((slot: any) => {
+        const matched = bookingsAgg.find(b => b._id.date === date && b._id.slotTime === slot.time);
+        return { ...slot, booked: matched ? matched.total : 0 };
+      });
+    });
+
+    const responseData = { success: true, data: { ...event, dateSlots } };
 
     if (redis.status === "ready") {
       await redis.set(cacheKey, JSON.stringify(responseData), "EX", CACHE_TTL_SECONDS);

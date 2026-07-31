@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { Button } from "@/components/ui/button";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function VerifyOTP() {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,18 +35,13 @@ export default function VerifyOTP() {
     
     setIsLoading(true);
     try {
-      import("axios").then(async (axios) => {
-        const { toast } = await import("sonner");
-        const response = await axios.default.post("/api/auth/verify-otp", { email, otp });
-        if (response.data.success) {
-          toast.success("OTP verified successfully");
-          navigate("/reset-password", { state: { resetToken: response.data.resetToken } });
-        }
-      });
+      const response = await axios.post("/api/auth/verify-otp", { email, otp });
+      if (response.data.success) {
+        toast.success("OTP verified successfully");
+        navigate("/reset-password", { state: { resetToken: response.data.resetToken } });
+      }
     } catch (error: any) {
-      import("sonner").then(({ toast }) => {
-        toast.error(error.response?.data?.error || "Invalid OTP");
-      });
+      toast.error(error.response?.data?.error || "Invalid OTP");
     } finally {
       setIsLoading(false);
     }
@@ -53,13 +50,12 @@ export default function VerifyOTP() {
   const handleResend = async () => {
     setCountdown(30);
     try {
-      import("axios").then(async (axios) => {
-        const { toast } = await import("sonner");
-        await axios.default.post("/api/auth/forgot-password", { email });
-        toast.success("OTP resent successfully");
-      });
-    } catch (error) {
-      // Ignore
+      const response = await axios.post("/api/auth/forgot-password", { email });
+      if (response.data.success) {
+        toast.success("OTP resent successfully. Check your email!");
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to resend OTP");
     }
   };
 

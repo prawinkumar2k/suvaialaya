@@ -2,7 +2,17 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAudio } from "@/contexts/AudioContext";
 
-export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
+export function MaduraiPreloader({ 
+  onComplete,
+  texts = [
+    "DIGITAL SOUL OF MADURAI",
+    "WELCOME TO SUVAIALAYA",
+    "THE CITY WHERE TRADITION IS SERVED WITH LOVE"
+  ]
+}: { 
+  onComplete: () => void,
+  texts?: string[]
+}) {
   const [stage, setStage] = useState(0);
   const { toggleAudio, isPlaying, playSoundEffect } = useAudio();
 
@@ -134,44 +144,46 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
                   transition={{ duration: 1 }}
                   className="flex flex-col items-center"
                 >
-                  <svg viewBox="0 0 100 100" className="w-16 h-16 text-temple-gold mb-6 animate-pulse" fill="currentColor">
+                  <svg viewBox="0 0 100 100" className="w-16 h-16 text-temple-gold animate-pulse" fill="currentColor">
                     <path d="M50 10 C60 30, 80 40, 90 50 C80 60, 60 70, 50 90 C40 70, 20 60, 10 50 C20 40, 40 30, 50 10 Z" />
                   </svg>
-                  <p className="text-xs font-bold uppercase tracking-[0.4em] text-temple-gold/60">Tap anywhere to enter</p>
                 </motion.div>
               )}
 
               {stage === 1 && (
                 <motion.div
                   key="stage1"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
-                  transition={{ duration: 1.5 }}
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  className="absolute inset-0 flex items-center justify-center text-center px-4"
                 >
-                  <h1 className="font-display text-4xl md:text-6xl font-bold tracking-widest text-temple-gold uppercase">
-                    SUVAIALAYA
-                  </h1>
-                  <p className="mt-4 text-sm font-bold uppercase tracking-[0.5em] text-primary-foreground/70">
-                    Digital Soul Of Madurai
-                  </p>
+                  <div className="flex flex-col items-center">
+                    <h1 className="font-display text-4xl md:text-6xl text-[#c9841a] font-bold tracking-wider leading-tight drop-shadow-[0_0_15px_rgba(201,132,26,0.3)]">
+                      {texts[0] || "DIGITAL SOUL OF MADURAI"}
+                    </h1>
+                  </div>
                 </motion.div>
               )}
 
+              {/* Stage 2: Welcome message */}
               {stage === 2 && (
                 <motion.div
                   key="stage2"
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 1.05 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, filter: "blur(10px)" }}
-                  transition={{ duration: 1.5 }}
+                  exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                  transition={{ duration: 1.5, ease: "easeInOut" }}
+                  className="absolute inset-0 flex items-center justify-center text-center px-4"
                 >
-                  <h2 className="font-display text-5xl md:text-7xl font-extrabold tracking-wider text-temple-orange uppercase leading-none drop-shadow-[0_0_30px_rgba(255,122,0,0.5)]">
-                    Welcome to<br />Madurai Festival
+                  <h2 className="font-display text-3xl md:text-5xl text-white font-bold tracking-wide drop-shadow-2xl">
+                    {texts[1] || "WELCOME TO SUVAIALAYA"}
                   </h2>
                 </motion.div>
               )}
 
+              {/* Stage 3: Poetic line */}
               {stage === 3 && (
                 <motion.div
                   key="stage3"
@@ -182,7 +194,7 @@ export function MaduraiPreloader({ onComplete }: { onComplete: () => void }) {
                   className="max-w-xl"
                 >
                   <p className="font-display text-3xl md:text-4xl italic text-temple-gold leading-relaxed">
-                    "The city where tradition is served with love."
+                    {texts[2] || `"The city where tradition is served with love."`}
                   </p>
                 </motion.div>
               )}

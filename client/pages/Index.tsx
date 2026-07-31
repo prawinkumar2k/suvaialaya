@@ -223,7 +223,9 @@ export default function Index() {
   const [done, setDone] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
   const [basePrice, setBasePrice] = useState(1499);
+  const [landingSettings, setLandingSettings] = useState<any>(null);
   const [menuHighlights, setMenuHighlights] = useState<any[]>(MENU_HIGHLIGHTS); // Default to static, override with DB
+  const [specials, setSpecials] = useState<any[]>(SPECIALS); // Default to static, override with DB
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -235,6 +237,18 @@ export default function Index() {
         }
       })
       .catch((err) => console.error("Error fetching event:", err));
+
+    // Fetch Settings
+    axios.get("/api/settings")
+      .then((res) => {
+        if (res.data.success && res.data.data.landing) {
+          setLandingSettings(res.data.data.landing);
+          if (res.data.data.landing.specials && res.data.data.landing.specials.length > 0) {
+            setSpecials(res.data.data.landing.specials);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching settings:", err));
 
     // Fetch Menu Items from Database
     axios.get("/api/menu")
@@ -333,18 +347,17 @@ export default function Index() {
         <div className="relative z-20 flex-1 flex flex-col justify-center px-8 md:px-14 lg:px-20 py-16">
           <motion.div custom={0} variants={fade} initial="hidden" animate="show"
             className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-[#1a3d2b]/20 text-[#1a3d2b] text-[10px] font-bold tracking-[0.3em] uppercase px-4 py-2 rounded-full w-fit mb-6 shadow-sm">
-            <Star size={10} fill="currentColor" /> From Madurai · To Bangalore
+            <Star size={10} fill="currentColor" /> {landingSettings?.heroEyebrow || "From Madurai · To Bangalore"}
           </motion.div>
 
           <motion.h1 custom={1} variants={fade} initial="hidden" animate="show"
-            className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-4 text-[#1a3d2b] drop-shadow-sm">
-            Authentic<br />South Indian<br />Multi Cuisine
+            className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-4 text-[#1a3d2b] drop-shadow-sm whitespace-pre-line">
+            {landingSettings?.heroTitle || "Authentic\nSouth Indian\nMulti Cuisine"}
           </motion.h1>
 
           <motion.p custom={2} variants={fade} initial="hidden" animate="show"
             className="text-[#1a3d2b]/80 font-medium text-base leading-relaxed max-w-md mb-6 drop-shadow-sm">
-            From the <strong className="text-[#1a3d2b] font-bold">Heart of Madurai</strong> to the <strong className="text-[#1a3d2b] font-bold">Soul of Bangalore</strong> —
-            experience legendary Biryani, grand Kari Virundhu feasts, and the iconic Madurai Jigarthanda.
+            {landingSettings?.heroDescription || "From the Heart of Madurai to the Soul of Bangalore — experience legendary Biryani, grand Kari Virundhu feasts, and the iconic Madurai Jigarthanda."}
           </motion.p>
 
           <motion.div custom={3} variants={fade} initial="hidden" animate="show" className="flex flex-wrap gap-3 mb-8">
@@ -370,7 +383,11 @@ export default function Index() {
           </motion.div>
 
           <motion.div custom={5} variants={fade} initial="hidden" animate="show" className="flex gap-10 border-t border-[#1a3d2b]/10 pt-8">
-            {[{ value: "500+", label: "Guests Daily" }, { value: "80+", label: "Menu Items" }, { value: "10+", label: "Years of Service" }].map(({ value, label }) => (
+            {(landingSettings?.stats || [
+              { value: "500+", label: "Guests Daily" },
+              { value: "80+", label: "Menu Items" },
+              { value: "10+", label: "Years of Service" }
+            ]).map(({ value, label }: any) => (
               <div key={label}>
                 <p className="text-3xl font-display font-extrabold text-[#1a3d2b] drop-shadow-sm">{value}</p>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mt-1">{label}</p>
@@ -489,7 +506,7 @@ export default function Index() {
           <p className="text-center text-[10px] font-bold tracking-[0.4em] uppercase text-[#1a3d2b]/40 mb-2">Best Value</p>
           <h2 className="text-center font-display text-3xl font-bold text-[#1a3d2b] mb-10">Suvaialaya Specials</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ perspective: 1000 }}>
-            {SPECIALS.map(({ name, price, desc, tag }, i) => (
+            {specials.map(({ name, price, desc, tag }, i) => (
               <motion.div key={name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
                 onClick={() => navigate("/slots")} className="group cursor-pointer bg-white border border-gray-200 hover:border-[#1a3d2b]/40 rounded-xl p-6 transition-all shadow-[0_4px_15px_rgb(0,0,0,0.02)]">

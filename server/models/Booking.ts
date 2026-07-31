@@ -42,6 +42,15 @@ const bookingSchema = new mongoose.Schema(
     numberOfGuests: { type: Number, required: true, min: 1 },
     totalAmount: { type: Number, required: true },
 
+    // ─── Add-ons ────────────────────────────────────────────────────────────
+    addons: [
+      {
+        addonId: { type: mongoose.Schema.Types.ObjectId, ref: "Addon" },
+        quantity: { type: Number, default: 1 },
+        priceAtBooking: { type: Number, required: true },
+      },
+    ],
+
     // ─── Payment ────────────────────────────────────────────────────────────
     paymentStatus: {
       type: String,

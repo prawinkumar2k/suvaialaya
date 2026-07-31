@@ -11,7 +11,7 @@ export default function Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { eventId: string; eventTitle?: string; date: string; slotTime: string; numberOfGuests: number; totalAmount: number; guestDetails: any } | null;
+  const state = location.state as { eventId: string; eventTitle?: string; date: string; slotTime: string; numberOfGuests: number; totalAmount: number; guestDetails: any; addons?: any[] } | null;
 
   useEffect(() => {
     // Basic check for auth, if not logged in, prompt them
@@ -27,7 +27,7 @@ export default function Payment() {
     return <Navigate to="/slots" replace />;
   }
 
-  const { eventId, eventTitle, numberOfGuests, totalAmount, date, slotTime, guestDetails } = state;
+  const { eventId, eventTitle, numberOfGuests, totalAmount, date, slotTime, guestDetails, addons } = state;
   // Calculate a mock tax breakdown
   const tax = Math.round(totalAmount * 0.18);
   const finalTotal = totalAmount + tax;
@@ -52,6 +52,7 @@ export default function Payment() {
           slotTime,
           guestDetails,
           numberOfGuests,
+          addons: addons || [],
           totalAmount: finalTotal,
         },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -67,7 +68,13 @@ export default function Payment() {
       const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
       if (!razorpayKey) {
-        // MOCK FLOW: If no keys are set, just instantly confirm it (like we were doing)
+        // MOCK FLOW: Hit the mock endpoint to trigger success emails and QR generation
+        await axios.post(
+          "/api/payments/mock",
+          { bookingId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
         toast.success("Mock Payment Successful!");
         navigate("/success", {
           state: { bookingId, date, slotTime, numberOfGuests, finalTotal }
@@ -267,7 +274,7 @@ export default function Payment() {
             
             <div className="space-y-6 text-sm relative z-10">
               <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                <span className="text-[#1a3d2b]/60 font-bold uppercase tracking-widest text-[10px]">{numberOfGuests}x Guest Reservation</span>
+                <span className="text-[#1a3d2b]/60 font-bold uppercase tracking-widest text-[10px]">Subtotal (Guests + Add-ons)</span>
                 <span className="font-display font-bold text-lg text-[#1a3d2b]">₹{totalAmount.toLocaleString("en-IN")}</span>
               </div>
               <div className="flex justify-between items-center pb-4 border-b border-gray-100 text-[#1a3d2b]/60">

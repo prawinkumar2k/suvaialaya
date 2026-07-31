@@ -1,5 +1,5 @@
 import express from "express";
-import { createBooking, getMyBookings, getBookings, cancelBooking, checkInBooking, verifyBooking, uploadTicket, rescheduleBooking } from "../controllers/bookingController";
+import { createBooking, getMyBookings, getBookings, cancelBooking, checkInBooking, verifyBooking, uploadTicket, rescheduleBooking, updateBooking } from "../controllers/bookingController";
 import { protect, authorize } from "../middlewares/auth";
 
 const router = express.Router();
@@ -17,5 +17,6 @@ router.route("/:id/reschedule").put(protect, rescheduleBooking);
 // Admin routes
 router.route("/").get(protect, authorize("admin", "owner", "receptionist", "finance"), getBookings);
 router.route("/:id/check-in").put(protect, authorize("admin", "scanner", "receptionist", "owner"), checkInBooking);
+router.route("/:id").put(protect, authorize("admin"), updateBooking);
 
 export default router;

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, User, Phone, Mail, MapPin, Users, HeartPulse, Minus, Plus, Leaf, UtensilsCrossed } from "lucide-react";
+import axios from "axios";
+import { ArrowLeft, User, Phone, Mail, MapPin, Users, HeartPulse, Minus, Plus, Leaf, UtensilsCrossed, Package, IndianRupee } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,18 @@ export default function BookingForm() {
   const state = location.state as { eventId: string; eventTitle: string; date: string; slotTime: string; basePrice: number } | null;
 
   const [numberOfGuests, setNumberOfGuests] = useState(1);
+  const [availableAddons, setAvailableAddons] = useState<any[]>([]);
+  const [selectedAddons, setSelectedAddons] = useState<{[key: string]: number}>({});
+
+  useEffect(() => {
+    axios.get("/api/addons")
+      .then(res => {
+        if (res.data.success) {
+          setAvailableAddons(res.data.data.filter((a: any) => a.isActive));
+        }
+      })
+      .catch(err => console.error("Failed to load add-ons", err));
+  }, []);
 
   if (!state) {
     navigate("/slots");
@@ -31,7 +44,12 @@ export default function BookingForm() {
   }
 
   const { eventId, eventTitle, date, slotTime, basePrice } = state;
-  const totalAmount = basePrice * numberOfGuests;
+  const addonsTotal = Object.entries(selectedAddons).reduce((acc, [addonId, qty]) => {
+    const addon = availableAddons.find(a => a._id === addonId);
+    return acc + (addon ? addon.price * qty : 0);
+  }, 0);
+
+  const totalAmount = (basePrice * numberOfGuests) + addonsTotal;
 
   const handleContinue = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,6 +65,16 @@ export default function BookingForm() {
         guestDetails,
         numberOfGuests,
         totalAmount,
+        addons: Object.entries(selectedAddons)
+          .filter(([_, qty]) => qty > 0)
+          .map(([addonId, qty]) => {
+             const addon = availableAddons.find(a => a._id === addonId);
+             return {
+               addonId,
+               quantity: qty,
+               priceAtBooking: addon?.price || 0
+             };
+          })
       }
     });
   };
@@ -140,6 +168,53 @@ export default function BookingForm() {
               </div>
             </div>
 
+            {availableAddons.length > 0 && (
+              <div className="pt-8 border-t border-gray-100 relative z-10">
+                <div className="mb-6">
+                  <h2 className="font-display font-bold text-2xl text-[#1a3d2b] flex items-center gap-2"><Package size={24} className="text-[#c9841a]" /> Enhance Your Experience</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mt-1">Optional Add-ons</p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {availableAddons.map(addon => {
+                    const qty = selectedAddons[addon._id] || 0;
+                    return (
+                      <div key={addon._id} className="border border-gray-100 rounded-xl p-4 bg-gray-50 flex flex-col justify-between hover:border-[#c9841a]/30 transition-colors">
+                        <div>
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-bold text-[#1a3d2b] text-sm">{addon.name}</h3>
+                            <span className="font-bold text-[#c9841a] text-sm flex items-center"><IndianRupee size={12} />{addon.price}</span>
+                          </div>
+                          <p className="text-xs text-[#1a3d2b]/60 line-clamp-2 mb-4">{addon.description}</p>
+                        </div>
+                        <div className="flex items-center justify-between border-t border-gray-200 pt-3">
+                           <span className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/50">Quantity</span>
+                           <div className="flex items-center gap-3 bg-white rounded-lg p-1 border border-gray-100 shadow-sm">
+                             <button 
+                               type="button" 
+                               className="h-6 w-6 flex items-center justify-center text-[#1a3d2b] hover:bg-gray-100 rounded transition-colors disabled:opacity-30" 
+                               onClick={() => setSelectedAddons(prev => ({...prev, [addon._id]: Math.max(0, qty - 1)}))}
+                               disabled={qty <= 0}
+                             >
+                               <Minus size={12} />
+                             </button>
+                             <span className="font-bold font-display text-sm w-4 text-center text-[#1a3d2b]">{qty}</span>
+                             <button 
+                               type="button" 
+                               className="h-6 w-6 flex items-center justify-center text-[#1a3d2b] hover:bg-gray-100 rounded transition-colors disabled:opacity-30" 
+                               onClick={() => setSelectedAddons(prev => ({...prev, [addon._id]: qty + 1}))}
+                               disabled={addon.stock !== undefined && addon.stock !== null && qty >= addon.stock}
+                             >
+                               <Plus size={12} />
+                             </button>
+                           </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="pt-8 border-t border-gray-100 relative z-10">
               <div className="flex items-start space-x-4">
                 <Checkbox id="terms" required className="mt-1 border-gray-300 data-[state=checked]:bg-[#1a3d2b] data-[state=checked]:border-[#1a3d2b] text-white" />
@@ -195,6 +270,28 @@ export default function BookingForm() {
                 </div>
                 <p className="text-[10px] text-[#1a3d2b]/50 text-right mt-3 font-semibold">₹{basePrice.toLocaleString("en-IN")} per guest</p>
               </div>
+
+              {addonsTotal > 0 && (
+                <div className="pt-2 pb-4 border-b border-gray-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[#1a3d2b]/60 font-bold uppercase tracking-widest text-[10px]">Add-ons</span>
+                    <span className="font-display font-bold text-lg text-[#1a3d2b]">₹{addonsTotal.toLocaleString("en-IN")}</span>
+                  </div>
+                  <div className="space-y-1">
+                    {Object.entries(selectedAddons).map(([addonId, qty]) => {
+                      if (qty === 0) return null;
+                      const addon = availableAddons.find(a => a._id === addonId);
+                      if (!addon) return null;
+                      return (
+                        <div key={addonId} className="flex justify-between text-xs text-[#1a3d2b]/60">
+                          <span>{qty}x {addon.name}</span>
+                          <span>₹{(addon.price * qty).toLocaleString("en-IN")}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="pt-4 flex flex-col justify-between">
                 <span className="text-[#1a3d2b]/60 font-bold uppercase tracking-widest text-[10px] mb-1">Total Amount</span>

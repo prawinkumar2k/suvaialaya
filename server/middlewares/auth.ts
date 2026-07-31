@@ -12,6 +12,33 @@ declare global {
   }
 }
 
+// ─── Short-lived user cache (30s TTL) ─────────────────────────────────────────
+// Prevents a MongoDB round-trip on every authenticated request.
+// At high concurrency (200k users), this is critical for DB offload.
+const userCache = new Map<string, { user: any; expiresAt: number }>();
+const USER_CACHE_TTL_MS = 30_000; // 30 seconds
+
+function getCachedUser(userId: string) {
+  const entry = userCache.get(userId);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    userCache.delete(userId);
+    return null;
+  }
+  return entry.user;
+}
+
+function setCachedUser(userId: string, user: any) {
+  userCache.set(userId, { user, expiresAt: Date.now() + USER_CACHE_TTL_MS });
+  // Prevent unbounded cache growth — evict old entries if > 10k entries
+  if (userCache.size > 10_000) {
+    const now = Date.now();
+    for (const [key, val] of userCache) {
+      if (now > val.expiresAt) userCache.delete(key);
+    }
+  }
+}
+
 // ─── JWT Protection Middleware ────────────────────────────────────────────────
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
   let token: string | undefined;
@@ -26,13 +53,21 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    const user = await User.findById(decoded.id).select("-password");
+
+    // ─── Try cache first — avoid DB hit on every request ──────────────────
+    let user = getCachedUser(decoded.id);
+
+    if (!user) {
+      user = await User.findById(decoded.id).select("-password").lean();
+      if (user) setCachedUser(decoded.id, user);
+    }
 
     if (!user) {
       return res.status(401).json({ success: false, error: "User no longer exists" });
     }
 
     if (!user.isActive) {
+      userCache.delete(decoded.id); // Force fresh check next time for deactivated accounts
       return res.status(401).json({ success: false, error: "Account deactivated. Contact support." });
     }
 

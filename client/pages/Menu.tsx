@@ -19,6 +19,7 @@ export default function Menu() {
   const [menuHighlights, setMenuHighlights] = useState<any[]>([]);
   const [welcomeItems, setWelcomeItems] = useState<any[]>([]);
   const [returnGifts, setReturnGifts] = useState<any[]>([]);
+  const [menuPageSettings, setMenuPageSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function Menu() {
       if (settingsRes.data.success) {
         setWelcomeItems(settingsRes.data.data.welcomeItems || []);
         setReturnGifts(settingsRes.data.data.returnGifts || []);
+        setMenuPageSettings(settingsRes.data.data.menuPage || null);
       }
     })
     .catch((err) => console.error("Error fetching data:", err))
@@ -101,12 +103,14 @@ export default function Menu() {
       <div className="mx-auto max-w-5xl px-5 py-12 sm:px-8 lg:py-20 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="text-center flex flex-col items-center">
           <UtensilsCrossed size={40} className="text-[#c9841a] mb-6" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#1a3d2b]/40">The Official Menu</p>
-          <h1 className="font-display mt-6 text-5xl font-bold leading-[1.1] sm:text-6xl text-[#1a3d2b]">
-            A feast curated <br className="hidden sm:block" /> for the soul.
+          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#1a3d2b]/40">
+            {menuPageSettings?.heroEyebrow || "The Official Menu"}
+          </p>
+          <h1 className="font-display mt-6 text-5xl font-bold leading-[1.1] sm:text-6xl text-[#1a3d2b] whitespace-pre-line">
+            {menuPageSettings?.heroTitle || "A feast curated\nfor the soul."}
           </h1>
           <p className="mt-6 text-lg text-[#1a3d2b]/70 max-w-xl text-center leading-relaxed">
-            Prepared fresh daily, served hot on a banana leaf. Experience authentic Madurai flavors crafted from generations-old recipes.
+            {menuPageSettings?.heroDescription || "Prepared fresh daily, served hot on a banana leaf. Experience authentic Madurai flavors crafted from generations-old recipes."}
           </p>
           <OrnamentalDivider />
         </motion.div>

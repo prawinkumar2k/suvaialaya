@@ -1,5 +1,7 @@
 import cron from "node-cron";
 import { execSync } from "child_process";
+import fs from "fs";
+import path from "path";
 import { logger } from "./logger";
 import { alerts } from "./alerts";
 import { queueDepthGauge, waitlistSizeGauge } from "./metrics";
@@ -70,9 +72,6 @@ export function startWaitlistMonitor() {
 // ─── BACKUP ENGINE ────────────────────────────────────────────────────────────
 // Runs MongoDB dump every 6 hours and maintains rotational retention locally
 export function startBackupScheduler() {
-  const fs = require("fs");
-  const path = require("path");
-
   // Every 6 hours: 0 */6 * * *
   cron.schedule("0 */6 * * *", async () => {
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");

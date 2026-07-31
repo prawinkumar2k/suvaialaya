@@ -6,6 +6,8 @@ import { BrandMark } from "@/components/landing/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import axios from "axios";
 
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,18 +20,13 @@ export default function ForgotPassword() {
     setIsLoading(true);
     
     try {
-      import("axios").then(async (axios) => {
-        const { toast } = await import("sonner");
-        const response = await axios.default.post("/api/auth/forgot-password", { email });
-        if (response.data.success) {
-          toast.success(response.data.message);
-          navigate("/verify-otp", { state: { email } });
-        }
-      });
+      const response = await axios.post("/api/auth/forgot-password", { email });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        navigate("/verify-otp", { state: { email } });
+      }
     } catch (error: any) {
-      import("sonner").then(({ toast }) => {
-        toast.error(error.response?.data?.error || "Failed to send reset code");
-      });
+      toast.error(error.response?.data?.error || "Failed to send reset code");
     } finally {
       setIsLoading(false);
     }
