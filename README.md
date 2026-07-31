@@ -95,18 +95,29 @@ sequenceDiagram
 ## 🧩 Module Breakdown
 
 *   **Public Access**: High-fidelity landing page, dynamic slot availability polling, masonry food galleries, and secure booking flows.
-*   **Authentication Layer**: Stateless JWT mechanism featuring HttpOnly secure cookies and robust BCrypt hashing.
-*   **Admin Dashboard**: Real-time revenue insights, booking ledger, dynamic capacity management, and CSV ledger exporting.
-*   **Kitchen Dashboard**: Filtered operational views for dietary requirements and aggregate pax counting.
-*   **Ticketing & Verification**: QR Code based tickets with a dedicated `/scanner` module for instant validation at the venue door.
+*   **Authentication Layer**: Stateless JWT mechanism featuring HttpOnly secure cookies, robust BCrypt hashing, and hardened OTP recovery flows with input sanitization.
+*   **Dynamic Admin CMS**: Fully database-driven content management system for landing page features, statistics, special offers, and organizer details without needing code deployments.
+*   **Operational Dashboards**: Real-time revenue insights, booking ledger, dynamic capacity management, staff assignments, and CSV ledger exporting.
+*   **Ticketing & Verification**: QR Code based tickets with a dedicated `/scanner` module for instant validation at the venue door, complete with synchronous MongoDB fallbacks to guarantee generation even during Redis outages.
 
 ---
 
 ## ✨ Features
 
-*   **Basic**: Event exploration, slot reservation, standard user authentication.
-*   **Advanced**: Background email processing, PDF ticket generation, and real-time dashboard updates.
+*   **Basic**: Event exploration, slot reservation, standard user authentication, and dynamic content rendering.
+*   **Advanced**: Database-backed CMS, background email processing (lazy-initialized for robust environment loading), PDF ticket generation, and real-time dashboard updates.
 *   **Expert**: Idempotent payment processing, Prometheus metric observability, and Redis-backed rate limiting to prevent DoS.
+
+---
+
+## 🛠️ Advanced Infrastructure & SRE
+
+To ensure enterprise-grade stability, Suvaialaya incorporates an advanced **Site Reliability Engineering (SRE)** module:
+*   **Memory Watchdog**: Continuous monitoring (30s intervals) with automatic alerts if heap usage exceeds 500MB, preventing OOM crashes.
+*   **Queue Monitor & Waitlist**: Actively tracks BullMQ queue health and automatically processes waitlisted users when capacity opens up.
+*   **Automated Backup Scheduler**: Local MongoDB rotation with auditing, and automated Redis BGSAVE snapshots to guarantee zero data loss.
+*   **QR/PDF Resilience Fallbacks**: If the primary asynchronous BullMQ/Redis ticket worker fails or goes offline, the system instantly fails over to a synchronous DB-write strategy, ensuring every booking reliably gets a QR code and PDF ticket.
+*   **No-Show Detection**: Hourly background jobs detect past-due checked-in states and automatically flag them as no-shows for accurate analytics.
 
 ---
 
