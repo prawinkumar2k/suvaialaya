@@ -132,7 +132,8 @@ export default function AdminDashboard() {
       const response = await axios.put(`/api/events/${eventId}`, updateData, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {
         toast.success("Event updated successfully");
-        setEvents(events.map(e => e._id === eventId ? response.data.data : e));
+        const eventsRes = await axios.get("/api/events");
+        setEvents(eventsRes.data.data);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to update event");
@@ -473,28 +474,25 @@ export default function AdminDashboard() {
   const adminInitials = user?.name ? user.name.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase() : "AD";
 
   return (
-    <main className="min-h-screen bg-white text-[#1a3d2b] flex flex-col relative overflow-hidden">
+    <main className="min-h-screen bg-white text-[#1a3d2b] flex flex-col relative">
       {/* ── BACKGROUND ACCENTS ── */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none fixed" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none fixed" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#1a3d2b]/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3" />
+      </div>
       
       {/* Top Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div className="mx-auto flex h-20 items-center justify-between px-5 sm:px-8 relative z-10">
           <div className="flex items-center gap-6">
             <BrandMark />
-            <span className="hidden md:inline-flex items-center rounded-sm bg-[#c9841a]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#c9841a] border border-[#c9841a]/20">
-              SEMS Admin
-            </span>
           </div>
           <div className="flex items-center gap-6">
 
             <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white bg-[#c9841a] px-4 py-2 rounded-xl shadow-sm hover:bg-[#b07216] transition-all">
               <ScanLine size={16} /> QR Scanner
             </Link>
-            <Link to="/reception" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
-              <Users size={16} /> Open Reception
-            </Link>
+
             <div className="h-10 w-10 rounded-full bg-[#1a3d2b]/5 border-2 border-[#1a3d2b]/10 flex items-center justify-center font-display font-bold text-[#1a3d2b] shadow-inner">
               {adminInitials}
             </div>
@@ -505,18 +503,16 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col lg:flex-row relative z-10">
         
         {/* Sidebar */}
-        <aside className="w-full lg:w-64 shrink-0 border-r border-gray-100 bg-white/50 backdrop-blur-sm">
-          <nav className="flex flex-row lg:flex-col gap-2 p-5 overflow-x-auto lg:overflow-y-auto scrollbar-hide" style={{ perspective: 1000 }}>
+        <aside className="w-full lg:w-64 shrink-0 border-r border-gray-100 bg-white/50 backdrop-blur-sm lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] overflow-hidden flex flex-col">
+          <nav className="flex flex-row lg:flex-col gap-2 p-5 overflow-x-auto lg:overflow-y-auto scrollbar-hide flex-1" style={{ perspective: 1000 }}>
             {[
               { id: "overview", icon: LayoutDashboard, label: "Overview & Reports" },
               { id: "events", icon: CalendarDays, label: "Events & Slots" },
               { id: "bookings", icon: Users, label: "All Bookings" },
               { id: "menu", icon: UtensilsCrossed, label: "Menu Management" },
               { id: "staff", icon: UserCog, label: "Staff Management" },
-              { id: "addons", icon: PackageOpen, label: "E-Commerce Add-ons" },
               { id: "pages", icon: FileText, label: "Database Pages" },
               { id: "analytics", icon: BarChart3, label: "Detailed Analytics" },
-              { id: "settings", icon: Settings, label: "Platform Settings" },
             ].map((tab) => (
               <motion.button
                 key={tab.id}
@@ -797,7 +793,7 @@ export default function AdminDashboard() {
                   <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Events & Slots</h1>
                   <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Manage your venue schedule</p>
                 </div>
-                <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
+                <div className="grid gap-8 grid-cols-1">
                   {events.length === 0 ? (
                     <div className="col-span-full text-center py-20 border border-dashed border-gray-200 rounded-2xl bg-gray-50">
                       <p className="text-[#1a3d2b]/40 uppercase tracking-widest font-bold text-[10px]">No Events Found</p>

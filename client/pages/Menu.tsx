@@ -70,7 +70,7 @@ export default function Menu() {
 
   const categoryImages: Record<string, string> = {
     "Suvaialaya Briyani": "/images/food/mutton_briyani.png",
-    "Special Combo": "/images/food/kongu_meals.png",
+    "Special Combo": "/images/food/nonveg_combo.png",
     "Meals": "/images/food/kongu_meals.png",
     "Mutton Starters": "/images/food/mutton_kola_urundai.png",
     "Chicken Starters": "/images/food/chettinad_chicken.png",

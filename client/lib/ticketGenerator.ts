@@ -251,7 +251,7 @@ export const generatePremiumTicket = async (
     doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(green);
     doc.text("Suvaialaya Welcomes You", W / 2, 174, { align: "center" });
     doc.setFont("helvetica", "normal"); doc.setFontSize(4.5); doc.setTextColor(gray);
-    doc.text("Present this ticket at the entrance  •  Madurai", W / 2, 178, { align: "center" });
+    doc.text("Present this ticket at the entrance  •  Bengaluru", W / 2, 178, { align: "center" });
 
     // ── Save or Return ───────────────────────────────────────────────────
     if (options.returnBase64) {

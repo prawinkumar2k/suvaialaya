@@ -1,0 +1,37 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTINGER_VPS_IP }}
+          username: ${{ secrets.HOSTINGER_VPS_USER }}
+          key: ${{ secrets.HOSTINGER_VPS_KEY }}
+          script: |
+            # Navigate to project directory (create if it doesn't exist)
+            mkdir -p /opt/suvaialaya
+            cd /opt/suvaialaya
+
+            # Initialize git repository if not already done
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://github.com/${{ github.repository }}.git
+            fi
+
+            # Fetch the latest code and forcefully reset to main
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Build and deploy the Docker containers using the lean Hostinger config
+            docker compose -f docker-compose.hostinger.yml up --build -d
+
+            # Clean up old dangling Docker images to save VPS disk space
+            docker image prune -f

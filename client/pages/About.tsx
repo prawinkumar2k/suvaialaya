@@ -62,13 +62,13 @@ export default function About() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9841a]">{aboutSettings?.heroEyebrow || "Our Story"}</p>
           <h1 className="font-display mt-4 text-4xl font-bold leading-tight sm:text-5xl text-[#1a3d2b] whitespace-pre-line">
-            {aboutSettings?.heroTitle || "A celebration of Madurai's\nrich culinary heritage."}
+            {aboutSettings?.heroTitle || "A celebration of South India's\nrich culinary heritage."}
           </h1>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="mt-12 space-y-8 text-lg leading-relaxed text-[#1a3d2b]/70 max-w-2xl mx-auto">
-          <p>{aboutSettings?.heroDescription1 || "Madurai Kari Virundhu was born from a simple idea: to bring the authentic, unfiltered flavors of Madurai to a communal table. We believe that food is more than sustenance; it is a story, a memory, and a bridge between generations."}</p>
-          <p>{aboutSettings?.heroDescription2 || "For nine days, we transform a beautiful venue into a haven of hospitality. Our chefs are not just cooks; they are custodians of recipes passed down through families, utilizing traditional cooking methods that are rarely seen in modern kitchens."}</p>
+          <p>{aboutSettings?.heroDescription1 || "Our Kari Virundhu was born from a simple idea: to bring authentic, unfiltered traditional flavors to a communal table. We believe that food is more than sustenance; it is a story, a memory, and a bridge between generations."}</p>
+          <p>{aboutSettings?.heroDescription2 || "For 3 days, we transform a beautiful venue into a haven of hospitality. Our chefs are not just cooks; they are custodians of recipes passed down through families, utilizing traditional cooking methods that are rarely seen in modern kitchens."}</p>
         </motion.div>
 
         <div className="mt-20 grid gap-6 sm:grid-cols-2" style={{ perspective: 1000 }}>

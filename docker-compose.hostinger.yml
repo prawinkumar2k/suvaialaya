@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  # Database
+  sems-db:
+    image: mongo:6.0
+    container_name: suvaialaya-db
+    restart: unless-stopped
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - suvaialaya-db-data:/data/db
+    networks:
+      - suvaialaya-network
+    healthcheck:
+      test: |
+        mongosh --eval "
+          try { rs.status() } catch(e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }
+        "
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # Redis Cache
+  sems-redis:
+    image: redis:7-alpine
+    container_name: suvaialaya-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - suvaialaya-redis-data:/data
+    networks:
+      - suvaialaya-network
+
+  # Main Application
+  suvaialaya-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: suvaialaya-application
+    restart: unless-stopped
+    ports:
+      - "8080:8080" # Maps port 8080 to the VPS. Use Hostinger's proxy (like Nginx/Cloudpane) to map domain 80/443 to this port.
+    env_file:
+      - .env # Automatically pulls environment variables from .env on the server
+    environment:
+      - NODE_ENV=production
+      - PORT=8080
+      - MONGODB_URI=mongodb://sems-db:27017/suvaialaya?replicaSet=rs0
+      - REDIS_HOST=sems-redis
+      - REDIS_PORT=6379
+    volumes:
+      - suvaialaya-logs:/app/logs
+    depends_on:
+      sems-db:
+        condition: service_healthy
+    networks:
+      - suvaialaya-network
+
+volumes:
+  suvaialaya-db-data:
+  suvaialaya-redis-data:
+  suvaialaya-logs:
+
+networks:
+  suvaialaya-network:
+    driver: bridge

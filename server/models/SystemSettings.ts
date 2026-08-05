@@ -45,12 +45,12 @@ const systemSettingsSchema = new mongoose.Schema(
     },
     aboutPage: {
       heroEyebrow: { type: String, default: "Our Story" },
-      heroTitle: { type: String, default: "A celebration of Madurai's\nrich culinary heritage." },
-      heroDescription1: { type: String, default: "Madurai Kari Virundhu was born from a simple idea: to bring the authentic, unfiltered flavors of Madurai to a communal table. We believe that food is more than sustenance; it is a story, a memory, and a bridge between generations." },
-      heroDescription2: { type: String, default: "For nine days, we transform a beautiful venue into a haven of hospitality. Our chefs are not just cooks; they are custodians of recipes passed down through families, utilizing traditional cooking methods that are rarely seen in modern kitchens." },
+      heroTitle: { type: String, default: "A celebration of South India's\nrich culinary heritage." },
+      heroDescription1: { type: String, default: "Our Kari Virundhu was born from a simple idea: to bring authentic, unfiltered traditional flavors to a communal table. We believe that food is more than sustenance; it is a story, a memory, and a bridge between generations." },
+      heroDescription2: { type: String, default: "For 3 days, we transform a beautiful venue into a haven of hospitality. Our chefs are not just cooks; they are custodians of recipes passed down through families, utilizing traditional cooking methods that are rarely seen in modern kitchens." },
       features: { type: [{ iconName: String, title: String, desc: String }], default: [
         { iconName: "ChefHat", title: "Master Chefs", desc: "Local culinary legends bringing decades of experience." },
-        { iconName: "Leaf", title: "Fresh Ingredients", desc: "Sourced daily from the local markets of Madurai." },
+        { iconName: "Leaf", title: "Fresh Ingredients", desc: "Sourced daily from the local markets." },
         { iconName: "Users", title: "Communal Dining", desc: "Long tables designed for shared experiences and new friends." },
         { iconName: "Heart", title: "Made with Love", desc: "Every dish is prepared with the utmost care and passion." }
       ]}

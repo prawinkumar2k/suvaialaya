@@ -35,10 +35,10 @@ export default function Contact() {
   };
 
   const defaultInfo = [
-    { iconName: "Phone", label: "Phone", value: "+91 98765 43210", sub: "Mon–Sun, 10 AM – 10 PM" },
+    { iconName: "Phone", label: "Phone", value: "+91 90350 05335", sub: "Mon–Sun, 11 AM – 11 PM" },
     { iconName: "Mail", label: "Email", value: "hello@suvaialaya.com", sub: "We reply within 24 hours" },
-    { iconName: "MapPin", label: "Venue", value: "Madurai, Tamil Nadu", sub: "Festival grounds, main entrance" },
-    { iconName: "Clock", label: "Event Hours", value: "10 AM – 10 PM", sub: "All 9 days of the festival" },
+    { iconName: "MapPin", label: "Venue", value: "Bommasandra, Bengaluru", sub: "N, 256/B, nearby Narayana Hrudayalaya Hospital, Karnataka 560099" },
+    { iconName: "Clock", label: "Event Hours", value: "11 AM – 11 PM", sub: "Open all days" },
   ];
 
   const info = contactSettings?.info && contactSettings.info.length > 0 ? contactSettings.info : defaultInfo;

@@ -275,7 +275,7 @@ export const bulkImportBookings = async (req: Request, res: Response, next: Next
           totalAmount: totalAmount,
           bookingStatus: "Confirmed",
           paymentStatus: "Completed",
-          bookingSource: "bulk_import",
+          bookingSource: "admin",
         });
 
         // Queue ticket delivery email
@@ -550,10 +550,40 @@ export const updateBooking = async (req: Request, res: Response, next: NextFunct
 // ─────────────────────────────────────────────────────────────────────────────
 export const verifyBooking = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const booking = await Booking.findById(req.params.id)
-      .populate("event", "title venue")
-      .populate("user", "name email")
-      .lean();
+    const searchId = req.params.id;
+    let booking = null;
+
+    if (mongoose.Types.ObjectId.isValid(searchId) && searchId.length === 24) {
+      booking = await Booking.findById(searchId)
+        .populate("event", "title venue")
+        .populate("user", "name email")
+        .lean();
+    } else {
+      // Support matching the short ID (last characters of ObjectId)
+      // E.g. "DDADD6C7" or "07AUG11-D6C7"
+      const parts = searchId.split("-");
+      const shortId = parts[parts.length - 1]; // "D6C7" or "DDADD6C7"
+
+      const matches = await Booking.aggregate([
+        { $addFields: { idStr: { $toString: "$_id" } } },
+        { $match: { idStr: { $regex: new RegExp(shortId + "$", "i") } } }
+      ]);
+      
+      // If multiple matches (rare but possible with 4 chars), try to find the one matching the date prefix if provided
+      let matchedBookingId = matches.length > 0 ? matches[0]._id : null;
+      
+      if (matches.length > 1 && parts.length > 1) {
+         // advanced resolution could go here, but taking the first match is usually enough for 4-char hex in a small dataset
+         matchedBookingId = matches[matches.length - 1]._id; // take the latest
+      }
+
+      if (matchedBookingId) {
+        booking = await Booking.findById(matchedBookingId)
+          .populate("event", "title venue")
+          .populate("user", "name email")
+          .lean();
+      }
+    }
 
     if (!booking) {
       return res.status(404).json({ success: false, error: "Ticket not found or invalid ID" });

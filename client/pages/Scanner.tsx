@@ -14,6 +14,8 @@ export default function Scanner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasCameraError, setHasCameraError] = useState(false);
   
+  const [manualBookingId, setManualBookingId] = useState("");
+  
   // Camera selection states
   const [cameras, setCameras] = useState<{ id: string; label: string }[]>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>("");
@@ -41,7 +43,11 @@ export default function Scanner() {
   useEffect(() => {
     if (isProcessing || scanResult || error || scannedBooking || !selectedCameraId) {
       if (html5QrCode.current && html5QrCode.current.getState && html5QrCode.current.getState() === 2) {
-        html5QrCode.current.stop().catch(console.error);
+        try {
+          html5QrCode.current.stop().catch(() => {});
+        } catch (e) {
+          // Ignore state transition errors
+        }
       }
       return;
     }
@@ -54,7 +60,7 @@ export default function Scanner() {
         
         // If already scanning, stop it before restarting with new camera
         if (html5QrCode.current.getState && html5QrCode.current.getState() === 2) {
-          await html5QrCode.current.stop();
+          try { await html5QrCode.current.stop(); } catch (e) {}
         }
 
         await html5QrCode.current.start(
@@ -66,16 +72,23 @@ export default function Scanner() {
           async (decodedText) => {
             // Stop scanning immediately
             if (html5QrCode.current && html5QrCode.current.getState && html5QrCode.current.getState() === 2) {
-              await html5QrCode.current.stop();
+              try { await html5QrCode.current.stop(); } catch (e) {}
             }
             
             setIsProcessing(true);
             try {
-              const payload = JSON.parse(decodedText);
-              if (!payload.id) throw new Error("Invalid QR code format");
+              let bookingIdToVerify = decodedText;
+              try {
+                 const payload = JSON.parse(decodedText);
+                 if (payload.id) bookingIdToVerify = payload.id;
+              } catch (e) {
+                 // Not JSON, likely a plain ticket string like "07AUG11-D6C7"
+              }
+
+              if (!bookingIdToVerify) throw new Error("Invalid QR code format");
 
               // Fetch booking details first
-              const response = await axios.get(`/api/bookings/verify/${payload.id}`);
+              const response = await axios.get(`/api/bookings/verify/${bookingIdToVerify.trim()}`);
               
               if (response.data.success) {
                 const booking = response.data.data;
@@ -106,10 +119,34 @@ export default function Scanner() {
 
     return () => {
       if (html5QrCode.current && html5QrCode.current.getState && html5QrCode.current.getState() === 2) {
-        html5QrCode.current.stop().catch(console.error);
+        try { html5QrCode.current.stop().catch(() => {}); } catch(e) {}
       }
     };
   }, [isProcessing, scanResult, error, scannedBooking, selectedCameraId, toast]);
+
+  const handleManualVerify = async () => {
+    if (!manualBookingId.trim()) return;
+    
+    setIsProcessing(true);
+    try {
+      const response = await axios.get(`/api/bookings/verify/${manualBookingId.trim()}`);
+      
+      if (response.data.success) {
+        const booking = response.data.data;
+        if (booking.bookingStatus === "Attended") {
+          setError("Ticket already checked in — DUPLICATE SCAN DETECTED");
+        } else if (booking.bookingStatus === "Cancelled") {
+          setError("Ticket is cancelled — DENY ENTRY");
+        } else {
+          setScannedBooking(booking);
+          setManualBookingId(""); // Clear input on success
+        }
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message || "Failed to fetch ticket details");
+    }
+    setIsProcessing(false);
+  };
 
   const handleCompletePaymentAndCheckIn = async () => {
     setIsProcessing(true);
@@ -164,31 +201,57 @@ export default function Scanner() {
           </div>
 
           {!scanResult && !error && !scannedBooking && !isProcessing && (
-            <div className="relative">
-              {cameras.length > 1 && (
-                <div className="mb-4">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Select Camera</label>
-                  <select 
-                    value={selectedCameraId}
-                    onChange={(e) => setSelectedCameraId(e.target.value)}
-                    className="w-full text-sm border-gray-200 rounded-lg p-2 bg-gray-50 text-[#1a3d2b] focus:ring-[#1a3d2b] focus:border-[#1a3d2b]"
-                  >
-                    {cameras.map(c => (
-                      <option key={c.id} value={c.id}>{c.label || `Camera ${c.id.substring(0,5)}`}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              {hasCameraError ? (
-                <div className="w-full bg-red-50 p-6 rounded-xl border border-red-100 text-center">
-                  <Camera className="w-10 h-10 text-red-400 mx-auto mb-3" />
-                  <h3 className="text-red-700 font-bold mb-1">Camera Access Denied</h3>
-                  <p className="text-sm text-red-600/80 mb-4">Please allow camera permissions in your browser to scan tickets.</p>
-                  <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg">Try Again</button>
-                </div>
-              ) : (
-                <div id="reader" className="w-full overflow-hidden rounded-xl border-2 border-dashed border-[#1a3d2b]/20 bg-gray-50/50 min-h-[250px]"></div>
-              )}
+            <div className="relative space-y-6">
+              <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+                {cameras.length > 1 && (
+                  <div className="mb-4">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Select Camera</label>
+                    <select 
+                      value={selectedCameraId}
+                      onChange={(e) => setSelectedCameraId(e.target.value)}
+                      className="w-full text-sm border-gray-200 rounded-lg p-2 bg-gray-50 text-[#1a3d2b] focus:ring-[#1a3d2b] focus:border-[#1a3d2b]"
+                    >
+                      {cameras.map(c => (
+                        <option key={c.id} value={c.id}>{c.label || `Camera ${c.id.substring(0,5)}`}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {hasCameraError ? (
+                  <div className="w-full bg-red-50 p-6 rounded-xl border border-red-100 text-center">
+                    <Camera className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                    <h3 className="text-red-700 font-bold mb-1">Camera Access Denied</h3>
+                    <p className="text-sm text-red-600/80 mb-4">Please allow camera permissions in your browser to scan tickets.</p>
+                    <button onClick={() => window.location.reload()} className="px-4 py-2 bg-red-600 text-white text-xs font-bold uppercase tracking-widest rounded-lg">Try Again</button>
+                  </div>
+                ) : (
+                  <div id="reader" className="w-full overflow-hidden rounded-xl border-2 border-dashed border-[#1a3d2b]/20 bg-white min-h-[250px]"></div>
+                )}
+              </div>
+
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-gray-200"></div>
+                <span className="flex-shrink-0 mx-4 text-gray-400 text-xs font-bold uppercase tracking-widest">Or enter manually</span>
+                <div className="flex-grow border-t border-gray-200"></div>
+              </div>
+
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder="Enter Booking ID..." 
+                  value={manualBookingId}
+                  onChange={(e) => setManualBookingId(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleManualVerify(); }}
+                  className="flex-1 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] focus:ring-1 focus:ring-[#c9841a] text-[#1a3d2b] font-bold text-sm uppercase"
+                />
+                <button 
+                  onClick={handleManualVerify}
+                  disabled={!manualBookingId.trim()}
+                  className="bg-[#1a3d2b] text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#2d6a4f] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Verify
+                </button>
+              </div>
             </div>
           )}
 

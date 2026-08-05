@@ -89,7 +89,7 @@ export const sendBookingConfirmationEmail = async (bookingId: string, type: 'con
         
         <div style="text-align: center; margin-top: 30px; color: #777; font-size: 12px;">
           <p>${isCancellation ? 'If you have any queries, please reply directly to this email.' : 'Please present this email or your E-Ticket at the entrance.'}</p>
-          <p>Suvaialaya Restaurant, 123 Heritage Road, Madurai</p>
+          <p>N, 256/B, nearby Narayana Hrudayalaya Hospital, Bommasandra Industrial Area, Bommasandra, Karnataka 560099</p>
         </div>
       </div>
     `;
@@ -232,7 +232,7 @@ export const sendBookingConfirmationEmail = async (bookingId: string, type: 'con
         doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(green);
         doc.text("Suvaialaya Welcomes You", W / 2, 174, { align: "center" });
         doc.setFont("helvetica", "normal"); doc.setFontSize(4.5); doc.setTextColor(gray);
-        doc.text("Present this ticket at the entrance  •  Madurai", W / 2, 178, { align: "center" });
+        doc.text("Present this ticket at the entrance  •  Bengaluru", W / 2, 178, { align: "center" });
 
         const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
         

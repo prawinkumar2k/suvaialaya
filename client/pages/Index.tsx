@@ -338,7 +338,7 @@ export default function Index() {
       >
         <BrandMark size="md" />
         <div className="hidden md:flex items-center gap-8">
-          {[{ label: "Home", href: "/" }, { label: "Menu", href: "/menu" }, { label: "Gallery", href: "/gallery" }, { label: "About", href: "/about" }, { label: "Staff Login", href: "/login" }].map(({ label, href }) => (
+          {[{ label: "Home", href: "/" }, { label: "Menu", href: "/menu" }, { label: "About", href: "/about" }, { label: "Staff Login", href: "/login" }].map(({ label, href }) => (
             <Link key={label} to={href} className="text-xs font-semibold tracking-widest uppercase text-[#1a3d2b]/60 hover:text-[#1a3d2b] transition-colors">{label}</Link>
           ))}
         </div>
@@ -403,7 +403,7 @@ export default function Index() {
 
           <motion.div custom={3} variants={fade} initial="hidden" animate="show" className="flex flex-wrap gap-3 mb-8">
             {[
-              { icon: MapPin, text: "Madurai & Bangalore" },
+              { icon: MapPin, text: "Bommasandra, Bengaluru" },
               { icon: Clock, text: "Open: 11 AM – 11 PM" },
               { icon: CalendarDays, text: "Grand Event Coming Soon" },
             ].map(({ icon: Icon, text }) => (
@@ -465,30 +465,22 @@ export default function Index() {
       </section>
 
       {/* ── GRAND EVENT BANNER ── */}
-      <section className="bg-[#f5f0e8] border-y border-[#1a3d2b]/10 px-8 md:px-16 py-14">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto text-center">
-          <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#1a3d2b]/50 mb-3">Announcement</p>
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold text-[#1a3d2b] mb-2">Something <span className="italic">Grand</span></h2>
-          <h3 className="font-display text-2xl md:text-3xl font-bold text-[#c9841a] mb-6">Is Coming Soon</h3>
-          <p className="text-[#1a3d2b]/60 text-sm mb-10 max-w-lg mx-auto">From the heart of Madurai to the soul of Bangalore — an exclusive dining event unlike anything before.</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-            {[
-              { icon: CalendarDays, label: "Exclusive Event Announcement" },
-              { icon: Sparkles, label: "Extraordinary Experiences" },
-              { icon: Gift, label: "Surprises That Delight" },
-              { icon: Users, label: "Memories That Last" },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-col items-center gap-3">
-                <div className="w-14 h-14 rounded-full border-2 border-[#1a3d2b]/20 bg-white flex items-center justify-center">
-                  <Icon size={22} className="text-[#1a3d2b]" />
-                </div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/70 text-center leading-relaxed">{label}</p>
-              </div>
-            ))}
+      <section className="bg-[#f5f0e8] border-y border-[#1a3d2b]/10 px-4 md:px-16 py-10 md:py-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-5xl mx-auto text-center">
+          <div className="relative inline-block w-full max-w-4xl mx-auto">
+            <img 
+              src="/image.png" 
+              alt="Madurai Kari Virundhu - Pandiyanaadu Fest" 
+              className="w-full h-auto rounded-2xl shadow-[0_20px_50px_rgba(26,61,43,0.15)] border-[8px] border-white cursor-pointer hover:scale-[1.01] transition-transform duration-500"
+              onClick={() => setShowCallModal(true)}
+            />
+            {/* Call to action overlay on mobile for better conversion */}
+            <div className="md:hidden mt-6">
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="inline-flex items-center justify-center w-full gap-2 bg-[#1a3d2b] text-white font-bold px-8 py-4 rounded-xl text-sm tracking-wide shadow-lg">
+                <Ticket size={16} /> Book Your Table Now
+              </a>
+            </div>
           </div>
-          <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="inline-flex items-center gap-2 bg-[#1a3d2b] text-white font-bold px-8 py-3.5 rounded-full text-sm tracking-wide hover:bg-[#2d6a4f] transition-colors">
-            Stay Tuned — Call for Info <ArrowRight size={14} />
-          </a>
         </motion.div>
       </section>
 
@@ -511,30 +503,41 @@ export default function Index() {
           <AnimatePresence mode="wait">
             {menuHighlights.length > 0 && activeMenu < menuHighlights.length && (
               <motion.div key={activeMenu} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}
-                className="flex flex-col md:flex-row bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden">
-                {/* Food image */}
-                <div className="md:w-48 flex-shrink-0">
-                  <img src={menuHighlights[activeMenu].img} alt={menuHighlights[activeMenu].category}
-                    className="w-full h-48 md:h-full object-cover" />
-                </div>
+                className="flex flex-col bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 {/* Items */}
-                <div className="flex-1">
+                <motion.div 
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+                  }}
+                  className="flex-1"
+                >
                   {menuHighlights[activeMenu].items.map((item: any, i: number) => (
-                    <div key={item.name} className={`px-5 py-3 ${i !== menuHighlights[activeMenu].items.length - 1 ? "border-b border-gray-200" : ""}`}>
+                    <motion.div 
+                      key={item.name} 
+                      variants={{
+                        hidden: { opacity: 0, x: -20 },
+                        visible: { opacity: 1, x: 0 }
+                      }}
+                      whileHover={{ x: 10, backgroundColor: "rgba(26, 61, 43, 0.03)" }}
+                      className={`px-6 py-4 transition-all cursor-default ${i !== menuHighlights[activeMenu].items.length - 1 ? "border-b border-gray-200" : ""}`}
+                    >
                       <div className="flex items-center justify-between">
-                        <p className="text-[#1a3d2b] font-semibold text-sm">{item.name}</p>
-                        <p className="text-[#1a3d2b] font-bold text-sm font-display ml-4 flex-shrink-0">{item.price}</p>
+                        <p className="text-[#1a3d2b] font-bold text-sm md:text-base">{item.name}</p>
+                        <p className="text-[#c9841a] font-extrabold text-sm md:text-base font-display ml-4 flex-shrink-0">{item.price}</p>
                       </div>
-                      {item.note && <p className="text-[#1a3d2b]/45 text-[10px] mt-0.5 leading-relaxed">{item.note}</p>}
-                    </div>
+                      {item.note && <p className="text-[#1a3d2b]/60 text-xs mt-1.5 leading-relaxed">{item.note}</p>}
+                    </motion.div>
                   ))}
-                <div className="px-5 py-3 bg-[#1a3d2b]/5 flex items-center justify-between">
-                  <p className="text-[#1a3d2b]/60 text-xs">Showing highlights</p>
-                  <button onClick={() => navigate("/menu")} className="flex items-center gap-1 text-[#1a3d2b] text-xs font-bold hover:underline">
-                    Full Menu <ChevronRight size={11} />
+                <div className="px-6 py-4 bg-white flex items-center justify-between border-t border-gray-200">
+                  <p className="text-[#1a3d2b]/50 text-xs font-semibold uppercase tracking-wider">Highlights for {menuHighlights[activeMenu].category}</p>
+                  <button onClick={() => navigate("/menu")} className="flex items-center gap-1 text-[#1a3d2b] text-xs font-bold hover:text-[#c9841a] transition-colors group">
+                    Full Menu <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
             )}
           </AnimatePresence>
@@ -560,6 +563,45 @@ export default function Index() {
                 <p className="text-[#1a3d2b]/50 text-xs leading-relaxed">{desc}</p>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ── LOCATION & MAP ── */}
+      <section className="bg-white border-t border-gray-100 px-8 md:px-16 py-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 items-center">
+          <div className="flex-1 space-y-6">
+            <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#1a3d2b]/40">Find Us</p>
+            <h2 className="font-display text-3xl font-bold text-[#1a3d2b]">Our Location</h2>
+            <a 
+              href="https://www.google.com/maps/place/SUVAIALAYA+RESTAURANT/@12.8091759,77.6968595,1049m/data=!3m1!1e3!4m6!3m5!1s0x3bae6d1e664524af:0x38fc1d835ac3baad!8m2!3d12.808841!4d77.696655!16s%2Fg%2F11x85qd51h"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-start gap-4 p-6 bg-gray-50 hover:bg-[#1a3d2b]/5 rounded-2xl border border-gray-100 hover:border-[#1a3d2b]/20 shadow-sm transition-all"
+            >
+              <div className="w-12 h-12 rounded-full bg-[#1a3d2b]/10 group-hover:bg-[#1a3d2b] transition-colors flex items-center justify-center flex-shrink-0 mt-1">
+                <MapPin size={24} className="text-[#1a3d2b] group-hover:text-white transition-colors" />
+              </div>
+              <div>
+                <p className="text-[#1a3d2b] font-bold text-lg mb-2 flex items-center gap-2">
+                  Suvaialaya Restaurant
+                  <ArrowRight size={14} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-[#c9841a]" />
+                </p>
+                <p className="text-[#1a3d2b]/70 leading-relaxed font-medium group-hover:text-[#1a3d2b]/90 transition-colors">N, 256/B, nearby Narayana Hrudayalaya Hospital, Bommasandra Industrial Area, Bommasandra, Karnataka 560099</p>
+                <p className="text-[#c9841a] text-xs font-bold uppercase tracking-wider mt-3">Open in Google Maps</p>
+              </div>
+            </a>
+          </div>
+          <div className="flex-1 w-full rounded-2xl overflow-hidden border border-gray-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-[350px]">
+            <iframe 
+              src="https://maps.google.com/maps?q=12.808841,77.696655&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              width="100%" 
+              height="100%" 
+              style={{ border: 0 }} 
+              allowFullScreen={true} 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
           </div>
         </motion.div>
       </section>
@@ -618,7 +660,6 @@ export default function Index() {
                 {[
                   { label: "Home", href: "/" },
                   { label: "Menu", href: "/menu" },
-                  { label: "Gallery", href: "/gallery" },
                   { label: "About Us", href: "/about" },
                 ].map(({ label, href }) => (
                   <li key={label}><Link to={href} className="text-xs hover:text-white transition-colors">{label}</Link></li>
@@ -671,7 +712,7 @@ export default function Index() {
               <Link to="/privacy" className="text-[10px] hover:text-white/60 transition-colors">Privacy</Link>
               <Link to="/contact" className="text-[10px] hover:text-white/60 transition-colors">Contact</Link>
             </div>
-            <p className="text-[10px] text-white/20">Developed by <span className="text-[#c9841a] font-bold">Shalini N</span></p>
+            <p className="text-[10px] text-white/20">Developed by <span className="text-[#c9841a] font-bold">Dealpost Private Limited</span></p>
           </div>
         </div>
       </footer>

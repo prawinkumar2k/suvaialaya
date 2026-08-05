@@ -44,7 +44,6 @@ export default function App() {
           
           <Route path="/about" element={<About />} />
           <Route path="/menu" element={<Menu />} />
-          <Route path="/gallery" element={<Gallery />} />
           
           {/* Authentication UI */}
           <Route path="/login" element={<Login />} />
