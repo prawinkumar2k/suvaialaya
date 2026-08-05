@@ -115,8 +115,8 @@ export function createServer() {
         },
       },
       crossOriginEmbedderPolicy: false,
-      crossOriginOpenerPolicy: process.env.NODE_ENV === "production" ? { policy: "same-origin" } : false,
-      crossOriginResourcePolicy: process.env.NODE_ENV === "production" ? { policy: "same-origin" } : false,
+      crossOriginOpenerPolicy: false, // Disabled to prevent console warnings when serving over HTTP without SSL
+      crossOriginResourcePolicy: false, // Disabled to prevent console warnings when serving over HTTP without SSL
       originAgentCluster: false,
       hsts: false, // Disable Strict-Transport-Security in development
     })
