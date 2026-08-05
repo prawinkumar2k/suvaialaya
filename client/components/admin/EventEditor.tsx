@@ -151,8 +151,8 @@ export const EventEditor = ({ event, token, onUpdate, onCancel }: { event: any, 
               <Calendar size={14} /> Available Dates
             </h3>
             <div className="flex gap-2 mb-5">
-              <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="flex-1 p-3 rounded-xl border border-gray-100 text-sm font-bold text-[#1a3d2b] focus:outline-none focus:border-[#c9841a] shadow-sm"/>
-              <button onClick={handleAddDate} className="bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white px-5 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-2">
+              <input type="date" value={newDate} onChange={e => setNewDate(e.target.value)} className="flex-1 min-w-0 p-3 rounded-xl border border-gray-100 text-sm font-bold text-[#1a3d2b] focus:outline-none focus:border-[#c9841a] shadow-sm"/>
+              <button onClick={handleAddDate} className="shrink-0 whitespace-nowrap bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white px-5 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-2">
                 <Plus size={14} /> Add Date
               </button>
             </div>
@@ -172,9 +172,9 @@ export const EventEditor = ({ event, token, onUpdate, onCancel }: { event: any, 
               <Clock size={14} /> Daily Time Slots
             </h3>
             <div className="flex gap-2 mb-5">
-              <input type="text" placeholder="10:00 AM" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} className="flex-[2] p-3 rounded-xl border border-gray-100 text-sm font-bold text-[#1a3d2b] focus:outline-none focus:border-[#c9841a] shadow-sm"/>
-              <input type="number" placeholder="Cap" value={newSlotCapacity} onChange={e => setNewSlotCapacity(e.target.value)} className="flex-[1] p-3 rounded-xl border border-gray-100 text-sm font-bold text-[#1a3d2b] focus:outline-none focus:border-[#c9841a] shadow-sm"/>
-              <button onClick={handleAddSlot} className="bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white px-5 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-2">
+              <input type="text" placeholder="10:00 AM" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} className="flex-[2] min-w-0 p-3 rounded-xl border border-gray-100 text-sm font-bold text-[#1a3d2b] focus:outline-none focus:border-[#c9841a] shadow-sm"/>
+              <input type="number" placeholder="Cap" value={newSlotCapacity} onChange={e => setNewSlotCapacity(e.target.value)} className="flex-[1] min-w-0 p-3 rounded-xl border border-gray-100 text-sm font-bold text-[#1a3d2b] focus:outline-none focus:border-[#c9841a] shadow-sm"/>
+              <button onClick={handleAddSlot} className="shrink-0 whitespace-nowrap bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white px-5 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shadow-md flex items-center gap-2">
                 <Plus size={14} /> Add Slot
               </button>
             </div>
