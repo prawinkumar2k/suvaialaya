@@ -835,15 +835,39 @@ export default function AdminDashboard() {
                               </button>
                             </div>
                             
-                            <div className="mt-6 flex gap-6 text-sm font-bold text-[#1a3d2b]/70 border-t border-gray-100 pt-4">
-                              <div className="flex items-center gap-2">
-                                <Calendar size={16} className="text-[#c9841a]" />
-                                {event.dates?.length || 0} Dates Scheduled
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Clock size={16} className="text-[#c9841a]" />
-                                {event.slots?.length || 0} Daily Slots
-                              </div>
+                            <div className="mt-6 space-y-4 relative z-10 border-t border-gray-100 pt-4">
+                              {event.dates?.map((dateObj: any, index: number) => (
+                                <div key={index} className="bg-gray-50/50 p-4 rounded-xl border border-gray-100 shadow-sm">
+                                  <div className="font-bold text-[#1a3d2b] text-xs uppercase tracking-widest mb-3 border-b border-gray-100 pb-2">
+                                    {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                  </div>
+                                  <div className="space-y-3">
+                                    {((event.dateSlots && event.dateSlots[dateObj]) || event.slots)?.map((slot: any, slotIdx: number) => {
+                                      const booked = slot.booked || 0;
+                                      const total = slot.capacity;
+                                      const percentage = Math.round((booked / total) * 100);
+                                      return (
+                                        <div key={slotIdx} className="flex justify-between items-center text-xs bg-white border border-gray-100 p-2 rounded-lg">
+                                          <div className="flex items-center gap-2">
+                                            <span className="font-bold text-[#1a3d2b]">{slot.time}</span>
+                                          </div>
+                                          <div className="flex items-center gap-3">
+                                            <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                              <div className="h-full bg-[#c9841a]" style={{ width: `${percentage}%` }} />
+                                            </div>
+                                            <span className="font-bold text-[#1a3d2b] w-12 text-right text-[10px] uppercase tracking-widest">{booked} / {total}</span>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                              {(!event.dates || event.dates.length === 0) && (
+                                <div className="text-center text-[#1a3d2b]/40 py-4 text-[10px] font-bold uppercase tracking-widest bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                  No dates scheduled yet. Use Full Page Editor to add dates and slots.
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         ))
