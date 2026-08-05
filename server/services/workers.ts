@@ -12,7 +12,8 @@ import { Waitlist } from "../models/Waitlist";
 export const notificationWorker = new Worker(
   "notifications",
   async (job) => {
-    const { type, bookingId } = job.data;
+    const type = job.name;
+    const { bookingId } = job.data;
     logger.info("Processing notification job", { jobId: job.id, type, bookingId });
 
     switch (type) {
