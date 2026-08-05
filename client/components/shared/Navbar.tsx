@@ -58,13 +58,8 @@ export function Navbar() {
               {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
             </button>
             <Link to="/login">
-              <Button variant="ghost" className="text-sm font-semibold">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/register">
               <Button className="text-sm font-semibold shadow-md transition-transform hover:-translate-y-0.5">
-                Get Started
+                Admin Portal
               </Button>
             </Link>
           </div>
@@ -103,12 +98,7 @@ export function Navbar() {
             ))}
             <div className="mt-4 flex flex-col gap-2 pt-4 border-t border-border">
               <Link to="/login" onClick={() => setIsOpen(false)}>
-                <Button variant="outline" className="w-full justify-center">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/register" onClick={() => setIsOpen(false)}>
-                <Button className="w-full justify-center">Get Started</Button>
+                <Button className="w-full justify-center">Admin Portal</Button>
               </Link>
             </div>
           </div>

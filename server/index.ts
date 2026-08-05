@@ -23,7 +23,7 @@ process.on("unhandledRejection", (reason: any) => {
 });
 import eventRoutes from "./routes/eventRoutes";
 import bookingRoutes from "./routes/bookingRoutes";
-import paymentRoutes from "./routes/paymentRoutes";
+
 import adminRoutes from "./routes/adminRoutes";
 import authRoutes from "./routes/authRoutes";
 import engineRoutes from "./routes/engineRoutes";
@@ -140,8 +140,6 @@ export function createServer() {
     })
   );
 
-  // ─── Razorpay webhook: raw body BEFORE express.json() ─────────────────────
-  app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 
   // ─── Regular JSON body parsing ──────────────────────────────────────────
   app.use("/api", express.json({ limit: "10mb" }));
@@ -215,7 +213,6 @@ export function createServer() {
   app.use("/api/auth", authRoutes);
   app.use("/api/events", cacheRoute(300), eventRoutes); // 5 min cache for events
   app.use("/api/bookings", bookingRoutes);
-  app.use("/api/payments", paymentRoutes);
   app.use("/api/admin", adminRoutes);
   app.use("/api/waitlist", waitlistRoutes);
   app.use("/api/analytics", analyticsRoutes);
@@ -249,10 +246,7 @@ export function createServer() {
     /^\/forgot-password$/,
     /^\/verify-otp$/,
     /^\/reset-password$/,
-    /^\/slots$/,
-    /^\/booking-form$/,
-    /^\/payment$/,
-    /^\/success$/,
+
     /^\/dashboard$/,
     /^\/admin$/,
     /^\/reception$/,

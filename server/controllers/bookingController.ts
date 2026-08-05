@@ -35,7 +35,12 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       numberOfGuests: z.number().int().min(1, "At least 1 guest is required"),
       totalAmount: z.number().min(0, "Total amount must be positive"),
       idempotencyKey: z.string().optional(),
-      guestDetails: z.any()
+      guestDetails: z.object({
+        fullName: z.string().min(1, "Guest name is required"),
+        phone: z.string().min(1, "Phone number is required"),
+        email: z.string().email("Valid email is required"),
+        city: z.string().min(1, "Remarks/City is required")
+      })
     });
 
     const parsed = createBookingSchema.safeParse(req.body);
@@ -232,6 +237,75 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// @desc    Bulk Import manual bookings (Admin only)
+// @route   POST /api/bookings/bulk
+// @access  Private (Admin)
+// ─────────────────────────────────────────────────────────────────────────────
+export const bulkImportBookings = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { bookings } = req.body;
+    if (!Array.isArray(bookings) || bookings.length === 0) {
+      return res.status(400).json({ success: false, error: "Valid bookings array is required." });
+    }
+
+    const createdBookings = [];
+    const errors = [];
+
+    for (let i = 0; i < bookings.length; i++) {
+      try {
+        const { eventId, date, slotTime, numberOfGuests, guestDetails, paymentMode } = bookings[i];
+        
+        if (!guestDetails || !guestDetails.fullName || !guestDetails.email) {
+          throw new Error("Guest Name and Email are mandatory");
+        }
+
+        const event = await Event.findById(eventId);
+        if (!event) throw new Error("Event not found");
+
+        const pax = Number(numberOfGuests) || 1;
+        const totalAmount = pax * event.basePrice;
+
+        const booking = await Booking.create({
+          user: req.user._id, // Set admin as the creator
+          event: eventId,
+          date,
+          slotTime,
+          guestDetails: { ...guestDetails, paymentMode: paymentMode || "Cash" },
+          numberOfGuests: pax,
+          totalAmount: totalAmount,
+          bookingStatus: "Confirmed",
+          paymentStatus: "Completed",
+          bookingSource: "bulk_import",
+        });
+
+        // Queue ticket delivery email
+        await addNotificationJob("booking_confirmation", {
+          bookingId: booking._id.toString(),
+        });
+
+        createdBookings.push(booking);
+      } catch (err: any) {
+        errors.push({ row: i + 1, guest: bookings[i]?.guestDetails?.fullName || "Unknown", error: err.message });
+      }
+    }
+
+    logger.info("Bulk import completed", {
+      adminId: req.user._id,
+      successCount: createdBookings.length,
+      errorCount: errors.length
+    });
+
+    res.status(201).json({ 
+      success: true, 
+      data: { createdCount: createdBookings.length, errors } 
+    });
+  } catch (error: any) {
+    logger.error("Bulk booking import failed", { error: error.message });
+    next(error);
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // @desc    Get logged in user bookings
 // @route   GET /api/bookings/my-bookings
 // @access  Private
@@ -333,36 +407,14 @@ export const cancelBooking = async (req: Request, res: Response, next: NextFunct
     booking.cancelledAt = new Date();
     booking.cancelReason = req.body.reason || "User requested cancellation";
 
-    // If payment was completed, initiate refund tracking
+    // If payment was completed, track refund status (manual refund needed)
     if (booking.paymentStatus === "Completed") {
       booking.refundStatus = "pending";
-      try {
-        const { getRazorpayInstance } = await import("./paymentController");
-        const razorpay = getRazorpayInstance();
-        
-        if (booking.razorpayPaymentId) {
-          const refund = await razorpay.payments.refund(booking.razorpayPaymentId, {
-            amount: Math.round(booking.totalAmount * 100),
-            notes: {
-              bookingId: booking._id.toString(),
-              reason: booking.cancelReason || "User requested cancellation"
-            }
-          });
-          booking.refundId = refund.id;
-          booking.refundStatus = "processed";
-          logger.info("Refund initiated successfully", {
-            bookingId: booking._id,
-            amount: booking.totalAmount,
-            refundId: refund.id
-          });
-        }
-      } catch (err: any) {
-        booking.refundStatus = "failed";
-        logger.error("Refund failed", {
-          bookingId: booking._id,
-          error: err.message
-        });
-      }
+      booking.cancelReason = req.body.reason || "User requested cancellation - Manual refund required";
+      logger.info("Manual refund marked as pending", {
+        bookingId: booking._id,
+        amount: booking.totalAmount,
+      });
     }
 
     await booking.save();

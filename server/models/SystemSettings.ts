@@ -78,18 +78,18 @@ const systemSettingsSchema = new mongoose.Schema(
           {
             name: "Booking",
             items: [
-              { q: "How do I book a seat?", a: "Select your preferred date and time slot on the Slots page, fill in your guest details, and complete the payment via Razorpay. You'll receive an e-ticket instantly by email." },
+              { q: "How do I book a seat?", a: "Please contact our staff directly by calling 90350 05335. All bookings are handled manually by our team to ensure the best experience." },
               { q: "Can I book for a group?", a: "Yes! You can book for up to the maximum seat capacity per slot. For large groups over 20 people, please contact us directly via the Contact page for a dedicated arrangement." },
-              { q: "Is my booking confirmed immediately?", a: "Yes. Upon successful payment, your booking is instantly confirmed and an e-ticket PDF is available for download from your dashboard." },
-              { q: "What if a slot is full?", a: "You'll be automatically added to the waitlist. If a seat opens up due to a cancellation, you'll be notified and given priority access." },
+              { q: "Is my booking confirmed immediately?", a: "Your booking will be confirmed by our team over the phone, and an e-ticket PDF will be sent to your email." },
+              { q: "What if a slot is full?", a: "Our team will guide you to the next available slot or date when you call to book." },
             ]
           },
           {
             name: "Payments & Refunds",
             items: [
-              { q: "What payment methods are accepted?", a: "We accept all major UPI apps, credit/debit cards, and net banking via Razorpay — India's most trusted payment gateway." },
-              { q: "How do I cancel and get a refund?", a: "You can cancel from your dashboard up to the day before your booking date. Refunds are processed within 5–7 business days back to your original payment method." },
-              { q: "Can I reschedule instead of cancelling?", a: "Absolutely. From your dashboard, you can reschedule to any available slot without incurring an extra charge, subject to seat availability." },
+              { q: "What payment methods are accepted?", a: "We accept all major UPI apps, cash, credit/debit cards, and bank transfers at the venue or via direct payment link provided by our staff." },
+              { q: "How do I cancel and get a refund?", a: "Please call us at 90350 05335 to cancel your booking. Refunds are processed manually by our administration team." },
+              { q: "Can I reschedule instead of cancelling?", a: "Absolutely. Contact our team and we will help you reschedule to any available slot without incurring an extra charge, subject to seat availability." },
             ]
           },
           {
@@ -131,7 +131,7 @@ const systemSettingsSchema = new mongoose.Schema(
         default: [
           { iconName: "Database", title: "Information We Collect", content: ["Personal information you provide when registering or booking: name, email address, phone number, and city.", "Booking details including selected dates, time slots, number of guests, and payment transaction references.", "Usage data such as pages visited and features used, collected in aggregate to improve our service."] },
           { iconName: "Eye", title: "How We Use Your Information", content: ["To process and confirm your bookings, and to send you transactional emails such as booking confirmations and e-tickets.", "To manage your account, process refunds, and handle support requests.", "To send you important updates about the festival or changes to your booking. We do not send unsolicited marketing emails."] },
-          { iconName: "Share2", title: "Sharing of Information", content: ["We do not sell, trade, or rent your personal information to third parties.", "We share payment information only with Razorpay, our secure payment gateway, which is PCI-DSS compliant. We do not store raw card details.", "We may disclose information to law enforcement if required by law or to protect the rights and safety of our guests and staff."] },
+          { iconName: "Share2", title: "Sharing of Information", content: ["We do not sell, trade, or rent your personal information to third parties.", "We process payments securely. We do not store raw card details.", "We may disclose information to law enforcement if required by law or to protect the rights and safety of our guests and staff."] },
           { iconName: "Lock", title: "Data Security & Your Rights", content: ["We use industry-standard encryption (TLS/HTTPS) and secure MongoDB Atlas infrastructure to protect your data.", "You have the right to access, correct, or delete your personal information at any time by contacting us.", "You may request the deletion of your account and all associated data by sending an email to privacy@suvaialaya.com."] }
         ]
       }
@@ -143,8 +143,8 @@ const systemSettingsSchema = new mongoose.Schema(
       sections: {
         type: [{ iconName: String, title: String, content: [String] }],
         default: [
-          { iconName: "FileText", title: "Booking and Payment", content: ["All bookings are subject to availability and confirmation upon successful payment.", "Prices are inclusive of applicable taxes unless stated otherwise.", "Payments are securely processed by Razorpay. Suvaialaya does not store credit card information."] },
-          { iconName: "RefreshCcw", title: "Cancellations and Refunds", content: ["Cancellations made 24 hours prior to the booked slot are eligible for a full refund minus a 5% gateway processing fee.", "Refunds will be processed to the original payment method within 5-7 business days.", "No-shows or cancellations within 24 hours of the slot are non-refundable."] },
+          { iconName: "FileText", title: "Booking and Payment", content: ["All bookings are subject to availability and confirmation by our staff.", "Prices are inclusive of applicable taxes unless stated otherwise.", "Payments are collected securely by our staff. Suvaialaya does not store credit card information."] },
+          { iconName: "RefreshCcw", title: "Cancellations and Refunds", content: ["Cancellations made 24 hours prior to the booked slot are eligible for a full refund.", "Refunds will be processed manually by our team within 5-7 business days.", "No-shows or cancellations within 24 hours of the slot are non-refundable."] },
           { iconName: "ShieldAlert", title: "Code of Conduct", content: ["Guests are expected to behave respectfully towards staff and other guests.", "Management reserves the right to refuse service or remove individuals who violate the code of conduct, without refund.", "Outside food and beverages are strictly prohibited."] }
         ]
       }

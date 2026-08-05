@@ -8,6 +8,9 @@ import { BrandMark } from "@/components/landing/BrandMark";
 import { Link, useNavigate } from "react-router-dom";
 import { MaduraiPreloader } from "@/components/landing/MaduraiPreloader";
 import { SuvaiBot } from "@/components/landing/SuvaiBot";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { PhoneCall, Copy } from "lucide-react";
+import { toast } from "sonner";
 
 const BRAND_IMG = "/temple-bg.png";
 
@@ -226,7 +229,13 @@ export default function Index() {
   const [landingSettings, setLandingSettings] = useState<any>(null);
   const [menuHighlights, setMenuHighlights] = useState<any[]>(MENU_HIGHLIGHTS); // Default to static, override with DB
   const [specials, setSpecials] = useState<any[]>(SPECIALS); // Default to static, override with DB
+  const [showCallModal, setShowCallModal] = useState(false);
   const navigate = useNavigate();
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(PHONE);
+    toast.success("Phone number copied to clipboard!");
+  };
 
   React.useEffect(() => {
     // Fetch Event Data for dynamic pricing
@@ -283,6 +292,38 @@ export default function Index() {
 
   return (
     <main className="bg-white text-[#1a3d2b] font-sans min-h-screen overflow-x-hidden">
+      <Dialog open={showCallModal} onOpenChange={setShowCallModal}>
+        <DialogContent className="sm:max-w-md border-0 bg-white shadow-2xl p-0 overflow-hidden">
+          <div className="bg-[#1a3d2b] p-6 text-center border-b border-[#c9841a]/30">
+            <div className="mx-auto w-12 h-12 bg-[#c9841a] rounded-full flex items-center justify-center mb-4 shadow-lg ring-4 ring-[#c9841a]/20">
+              <PhoneCall size={20} className="text-white" />
+            </div>
+            <DialogTitle className="text-2xl font-display font-bold text-white mb-1">Make a Reservation</DialogTitle>
+            <DialogDescription className="text-white/80 text-sm">
+              Contact our admin team to book your table.
+            </DialogDescription>
+          </div>
+          
+          <div className="p-6">
+            <div className="bg-gray-50 border border-gray-100 rounded-xl p-6 text-center space-y-4 mb-6">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#1a3d2b]/50">Direct Line</p>
+              <div className="flex items-center justify-center gap-3">
+                <span className="font-display font-bold text-3xl text-[#1a3d2b] tracking-wide">{PHONE}</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="w-full flex items-center justify-center gap-2 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white font-bold py-3.5 rounded-xl transition-all shadow-md">
+                <PhoneCall size={18} /> Open Phone Dialer
+              </a>
+              <button onClick={handleCopyPhone} className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border-2 border-[#1a3d2b]/10 text-[#1a3d2b] font-bold py-3.5 rounded-xl transition-all">
+                <Copy size={18} /> Copy Phone Number
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <AnimatePresence>
         {!done && <MaduraiPreloader onComplete={() => setDone(true)} />}
       </AnimatePresence>
@@ -297,13 +338,13 @@ export default function Index() {
       >
         <BrandMark size="md" />
         <div className="hidden md:flex items-center gap-8">
-          {[{ label: "Home", href: "/" }, { label: "Menu", href: "/menu" }, { label: "Gallery", href: "/gallery" }, { label: "About", href: "/about" }].map(({ label, href }) => (
+          {[{ label: "Home", href: "/" }, { label: "Menu", href: "/menu" }, { label: "Gallery", href: "/gallery" }, { label: "About", href: "/about" }, { label: "Staff Login", href: "/login" }].map(({ label, href }) => (
             <Link key={label} to={href} className="text-xs font-semibold tracking-widest uppercase text-[#1a3d2b]/60 hover:text-[#1a3d2b] transition-colors">{label}</Link>
           ))}
         </div>
-        <button onClick={() => navigate("/slots")} className="flex items-center gap-2 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white text-xs font-bold uppercase tracking-widest px-6 py-2.5 rounded-full transition-colors">
-          <Ticket size={13} /> Book Now
-        </button>
+        <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="flex items-center gap-2 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white text-xs font-bold uppercase tracking-widest px-6 py-2.5 rounded-full transition-colors">
+          <Ticket size={13} /> Call to Book
+        </a>
       </motion.nav>
 
       {/* ── HERO ── */}
@@ -373,10 +414,10 @@ export default function Index() {
           </motion.div>
 
           <motion.div custom={4} variants={fade} initial="hidden" animate="show" className="flex flex-col sm:flex-row gap-4 mb-12">
-            <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/slots")} className="group flex items-center justify-center gap-3 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors shadow-lg">
-              <Ticket size={16} /> Reserve Your Seat
+            <motion.a whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="group flex items-center justify-center gap-3 bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors shadow-lg">
+              <Ticket size={16} /> Reserve via Call
               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            </motion.a>
             <motion.button whileHover={{ scale: 1.05, rotateX: 2, rotateY: -2 }} style={{ perspective: 1000 }} onClick={() => navigate("/menu")} className="group flex items-center justify-center gap-3 bg-white/80 backdrop-blur-sm border-2 border-[#1a3d2b]/30 hover:border-[#1a3d2b] text-[#1a3d2b] font-bold px-8 py-4 rounded-xl text-sm tracking-wide transition-colors shadow-sm">
               <UtensilsCrossed size={16} /> View Full Menu
             </motion.button>
@@ -415,9 +456,9 @@ export default function Index() {
                 <p className="text-[#1a3d2b] font-bold text-sm">A Grand Event is Coming!</p>
                 <p className="text-[#1a3d2b]/60 font-medium text-xs mt-0.5">Stay tuned for exclusive announcements</p>
               </div>
-              <button onClick={() => navigate("/slots")} className="flex items-center gap-1.5 bg-[#c9841a] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#a66d15] transition-colors shadow-md">
-                Reserve <ChevronRight size={13} />
-              </button>
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="flex items-center gap-1.5 bg-[#c9841a] text-white text-xs font-bold px-4 py-2.5 rounded-lg hover:bg-[#a66d15] transition-colors shadow-md">
+                Call Us <ChevronRight size={13} />
+              </a>
             </div>
           </motion.div>
         </motion.div>
@@ -445,9 +486,9 @@ export default function Index() {
               </div>
             ))}
           </div>
-          <button onClick={() => navigate("/slots")} className="inline-flex items-center gap-2 bg-[#1a3d2b] text-white font-bold px-8 py-3.5 rounded-full text-sm tracking-wide hover:bg-[#2d6a4f] transition-colors">
-            Stay Tuned — Book Early Access <ArrowRight size={14} />
-          </button>
+          <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="inline-flex items-center gap-2 bg-[#1a3d2b] text-white font-bold px-8 py-3.5 rounded-full text-sm tracking-wide hover:bg-[#2d6a4f] transition-colors">
+            Stay Tuned — Call for Info <ArrowRight size={14} />
+          </a>
         </motion.div>
       </section>
 
@@ -508,8 +549,7 @@ export default function Index() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ perspective: 1000 }}>
             {specials.map(({ name, price, desc, tag }, i) => (
               <motion.div key={name} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                whileHover={{ rotateX: 2, rotateY: -2, scale: 1.02 }}
-                onClick={() => navigate("/slots")} className="group cursor-pointer bg-white border border-gray-200 hover:border-[#1a3d2b]/40 rounded-xl p-6 transition-all shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
+                onClick={() => setShowCallModal(true)} className="group cursor-pointer bg-white border border-gray-200 hover:border-[#1a3d2b]/40 rounded-xl p-6 transition-all shadow-[0_4px_15px_rgb(0,0,0,0.02)]">
                 <div className="flex items-start justify-between mb-2">
                   <div>
                     <span className="inline-block bg-[#1a3d2b]/10 text-[#1a3d2b] text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-1">{tag}</span>
@@ -532,10 +572,10 @@ export default function Index() {
           <p className="text-white/70 text-sm mb-6">From the Heart of Madurai · To the Soul of Bangalore</p>
           
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-10">
-            <button onClick={() => navigate("/slots")} className="inline-flex items-center gap-3 bg-white text-[#1a3d2b] font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide hover:bg-gray-100 transition-colors w-full md:w-auto justify-center">
+            <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="inline-flex items-center gap-3 bg-white text-[#1a3d2b] font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide hover:bg-gray-100 transition-colors w-full md:w-auto justify-center">
               <Ticket size={16} /> Make a Reservation <ArrowRight size={14} />
-            </button>
-            <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="inline-flex items-center gap-3 bg-transparent border border-white/30 text-white font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide hover:bg-white/10 transition-colors w-full md:w-auto justify-center">
+            </a>
+            <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="inline-flex items-center gap-3 bg-transparent border border-white/30 text-white font-bold px-8 py-3.5 rounded-xl text-sm tracking-wide hover:bg-white/10 transition-colors w-full md:w-auto justify-center">
               Order Now: {PHONE}
             </a>
           </div>
@@ -557,7 +597,7 @@ export default function Index() {
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/suvaialaya-logo.png" alt="Suvaialaya" className="h-10 w-10 object-contain rounded-lg bg-white/10 p-1" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                <img src="/logo.png" alt="Suvaialaya" className="h-10 w-10 object-contain rounded-lg bg-white/10 p-1" onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 <div>
                   <p className="text-white font-display font-bold text-sm tracking-widest uppercase">Suvaialaya</p>
                   <p className="text-white/40 text-[10px] uppercase tracking-widest">South Indian Cuisine</p>
@@ -566,7 +606,7 @@ export default function Index() {
               <p className="text-xs leading-relaxed text-white/50">
                 Authentic Madurai flavors brought to your city. From legendary Biryani to grand Kari Virundhu feasts.
               </p>
-              <a href={`tel:${PHONE.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 mt-4 text-[#c9841a] text-xs font-bold hover:text-[#e8a030] transition-colors">
+              <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="inline-flex items-center gap-2 mt-4 text-[#c9841a] text-xs font-bold hover:text-[#e8a030] transition-colors">
                 📞 {PHONE}
               </a>
             </div>
@@ -591,12 +631,17 @@ export default function Index() {
               <p className="text-white text-[10px] font-bold uppercase tracking-widest mb-4">My Account</p>
               <ul className="space-y-3">
                 {[
-                  { label: "Book a Seat", href: "/slots" },
-                  { label: "My Bookings", href: "/dashboard" },
-                  { label: "Login", href: "/login" },
-                  { label: "Register", href: "/register" },
-                ].map(({ label, href }) => (
-                  <li key={label}><Link to={href} className="text-xs hover:text-white transition-colors">{label}</Link></li>
+                  { label: "Book a Seat", href: "#", action: "call" },
+                  { label: "My Bookings", href: "#", action: "call" },
+                  { label: "Admin Portal", href: "/login" },
+                ].map(({ label, href, action }) => (
+                  <li key={label}>
+                    {action === "call" ? (
+                      <a href="#" onClick={(e) => { e.preventDefault(); setShowCallModal(true); }} className="text-xs hover:text-white transition-colors">{label}</a>
+                    ) : (
+                      <a href={href} className="text-xs hover:text-white transition-colors">{label}</a>
+                    )}
+                  </li>
                 ))}
               </ul>
             </div>

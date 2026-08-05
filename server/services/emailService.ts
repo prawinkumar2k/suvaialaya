@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { Booking } from '../models/Booking';
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
+import { Resend } from 'resend';
 
 // ─── Lazy transporter factory ─────────────────────────────────────────────────
 // Created on first use so that env vars are guaranteed to be loaded.
@@ -24,8 +25,8 @@ function getTransporter(): nodemailer.Transporter {
 
 
 export const sendBookingConfirmationEmail = async (bookingId: string, type: 'confirmation' | 'cancellation' = 'confirmation') => {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.log(`[Email Service] SMTP credentials not configured. Skipping email send (${type}) for booking:`, bookingId);
+  if (!process.env.RESEND_API_KEY && (!process.env.SMTP_USER || !process.env.SMTP_PASS)) {
+    console.log(`[Email Service] Neither Resend nor SMTP credentials configured. Skipping email send (${type}) for booking:`, bookingId);
     return;
   }
 
@@ -161,13 +162,24 @@ export const sendBookingConfirmationEmail = async (bookingId: string, type: 'con
       }
     }
 
-    await getTransporter().sendMail({
-      from: `"Suvaialaya Reservations" <${process.env.SMTP_USER}>`,
-      to: userEmail,
-      subject: emailSubject,
-      html: emailHtml,
-      attachments: attachments.length > 0 ? attachments : undefined,
-    });
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({
+        from: `Suvaialaya Reservations <onboarding@resend.dev>`,
+        to: userEmail,
+        subject: emailSubject,
+        html: emailHtml,
+        attachments: attachments.length > 0 ? attachments : undefined,
+      });
+    } else {
+      await getTransporter().sendMail({
+        from: `"Suvaialaya Reservations" <${process.env.SMTP_USER}>`,
+        to: userEmail,
+        subject: emailSubject,
+        html: emailHtml,
+        attachments: attachments.length > 0 ? attachments : undefined,
+      });
+    }
 
     console.log(`[Email Service] ${type} email sent successfully to ${userEmail}`);
   } catch (error) {
@@ -176,8 +188,8 @@ export const sendBookingConfirmationEmail = async (bookingId: string, type: 'con
 };
 
 export const sendPasswordResetOTPEmail = async (email: string, otp: string): Promise<void> => {
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    throw new Error(`SMTP credentials not configured. Cannot send OTP to ${email}`);
+  if (!process.env.RESEND_API_KEY && (!process.env.SMTP_USER || !process.env.SMTP_PASS)) {
+    throw new Error(`Email credentials not configured. Cannot send OTP to ${email}`);
   }
 
   const emailHtml = `
@@ -196,13 +208,23 @@ export const sendPasswordResetOTPEmail = async (email: string, otp: string): Pro
     </div>
   `;
 
-  // This will throw if SMTP fails — caller handles error
-  await getTransporter().sendMail({
-    from: `"Suvaialaya Support" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: "Your Password Reset OTP — Suvaialaya",
-    html: emailHtml,
-  });
+  // This will throw if it fails — caller handles error
+  if (process.env.RESEND_API_KEY) {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: `Suvaialaya Support <onboarding@resend.dev>`,
+      to: email,
+      subject: "Your Password Reset OTP — Suvaialaya",
+      html: emailHtml,
+    });
+  } else {
+    await getTransporter().sendMail({
+      from: `"Suvaialaya Support" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Your Password Reset OTP — Suvaialaya",
+      html: emailHtml,
+    });
+  }
 
   console.log(`[Email Service] ✅ Password reset OTP sent to ${email}`);
 };

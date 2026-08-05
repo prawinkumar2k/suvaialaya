@@ -42,6 +42,25 @@ export default function AdminDashboard() {
   const [editBookingOpen, setEditBookingOpen] = useState(false);
   const [editBookingData, setEditBookingData] = useState<any>(null);
 
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
+  const [bulkImportEventId, setBulkImportEventId] = useState("");
+  const [bulkImportDate, setBulkImportDate] = useState("");
+  const [bulkImportSlotTime, setBulkImportSlotTime] = useState("");
+  const [bulkImportPaymentMode, setBulkImportPaymentMode] = useState("Cash");
+
+  const [createBookingOpen, setCreateBookingOpen] = useState(false);
+  const [createBookingData, setCreateBookingData] = useState<any>({
+    eventId: "",
+    date: "",
+    slotTime: "",
+    fullName: "",
+    email: "",
+    phone: "",
+    numberOfGuests: 1,
+    paymentMode: "Cash",
+    remarks: ""
+  });
+
   const navigate = useNavigate();
 
   const userString = localStorage.getItem("user");
@@ -140,6 +159,153 @@ export default function AdminDashboard() {
     } catch (error: any) {
       toast.error(error.response?.data?.error || "Failed to update booking");
     }
+  };
+
+  const submitCreateBooking = async () => {
+    try {
+      const event = events.find(e => e._id === createBookingData.eventId);
+      if (!event) {
+        toast.error("Please select an event");
+        return;
+      }
+      if (!createBookingData.fullName || !createBookingData.phone || !createBookingData.email || !createBookingData.remarks) {
+        toast.error("Please provide all mandatory details (Name, Phone, Email, City)");
+        return;
+      }
+
+      const totalAmount = event.basePrice * createBookingData.numberOfGuests;
+
+      const payload = {
+        event: createBookingData.eventId,
+        date: createBookingData.date,
+        slotTime: createBookingData.slotTime,
+        numberOfGuests: Number(createBookingData.numberOfGuests),
+        totalAmount,
+        guestDetails: {
+          fullName: createBookingData.fullName,
+          email: createBookingData.email,
+          phone: createBookingData.phone,
+          city: createBookingData.remarks
+        }
+      };
+
+      const response = await axios.post("/api/bookings", payload, { headers: { Authorization: `Bearer ${token}` } });
+      
+      if (response.data.success) {
+        const newBookingId = response.data.data._id;
+        // Instantly mark as completed/paid since admin collected it
+        await axios.put(`/api/bookings/${newBookingId}`, {
+           paymentStatus: "Completed",
+           bookingStatus: "Confirmed",
+           guestDetails: { ...payload.guestDetails, paymentMode: createBookingData.paymentMode }
+        }, { headers: { Authorization: `Bearer ${token}` } });
+
+        const bookingsRes = await axios.get("/api/bookings", { headers: { Authorization: `Bearer ${token}` } });
+        setBookings(bookingsRes.data.data);
+
+        toast.success("Booking created successfully!");
+        setCreateBookingOpen(false);
+        setCreateBookingData({
+          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "", numberOfGuests: 1, paymentMode: "Cash", remarks: ""
+        });
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || "Failed to create booking");
+    }
+  };
+
+  const handleBulkImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!bulkImportEventId || !bulkImportDate || !bulkImportSlotTime) {
+      toast.error("Please select an Event, Date, and Slot Time first before uploading CSV.");
+      e.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target?.result as string;
+        const rows = text.split('\n').map(row => row.trim()).filter(row => row);
+        
+        if (rows.length < 2) {
+          toast.error("CSV file must contain a header row and at least one data row.");
+          return;
+        }
+
+        const headers = rows[0].split(',').map(h => h.trim().toLowerCase());
+        const expectedHeaders = ['guest name', 'phone', 'email', 'city', 'guests'];
+        const isValidFormat = expectedHeaders.every(h => headers.includes(h));
+        
+        if (!isValidFormat) {
+          toast.error("Invalid CSV format. Please download the template and use exact column headers.");
+          return;
+        }
+
+        const bookingsPayload = [];
+        for (let i = 1; i < rows.length; i++) {
+          const cols = rows[i].split(',').map(col => col.trim());
+          const getCol = (name: string) => cols[headers.indexOf(name)] || "";
+
+          bookingsPayload.push({
+            eventId: bulkImportEventId,
+            date: bulkImportDate,
+            slotTime: bulkImportSlotTime,
+            numberOfGuests: Number(getCol('guests')) || 1,
+            paymentMode: bulkImportPaymentMode,
+            guestDetails: {
+              fullName: getCol('guest name'),
+              phone: getCol('phone'),
+              email: getCol('email'),
+              city: getCol('city')
+            }
+          });
+        }
+
+        const loadingToast = toast.loading(`Importing ${bookingsPayload.length} bookings...`);
+        const response = await axios.post("/api/bookings/bulk", { bookings: bookingsPayload }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        toast.dismiss(loadingToast);
+
+        if (response.data.success) {
+          const { createdCount, errors } = response.data.data;
+          toast.success(`Successfully imported ${createdCount} bookings!`);
+          if (errors && errors.length > 0) {
+            console.error("Bulk Import Errors:", errors);
+            toast.error(`${errors.length} bookings failed (see console logs). Check mandatory fields like email.`);
+          }
+          
+          const bookingsRes = await axios.get("/api/bookings", { headers: { Authorization: `Bearer ${token}` } });
+          setBookings(bookingsRes.data.data);
+          
+          setBulkImportOpen(false);
+          setBulkImportEventId("");
+          setBulkImportDate("");
+          setBulkImportSlotTime("");
+        }
+      } catch (error: any) {
+        toast.dismiss();
+        toast.error(error.response?.data?.error || "Failed to process CSV file.");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  };
+
+  const downloadBulkTemplate = () => {
+    const csvContent = "Guest Name,Phone,Email,City,Guests\nJohn Doe,1234567890,john@example.com,Madurai,2\nJane Smith,0987654321,jane@example.com,Chennai,4";
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "suvaialaya_bulk_import_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleRemoveSlot = (event: any, slotIdx: number) => {
@@ -326,9 +492,6 @@ export default function AdminDashboard() {
             <Link to="/reception" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
               <Users size={16} /> Open Reception
             </Link>
-            <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
-              <ScanLine size={16} /> Open Scanner
-            </Link>
             <div className="h-10 w-10 rounded-full bg-[#1a3d2b]/5 border-2 border-[#1a3d2b]/10 flex items-center justify-center font-display font-bold text-[#1a3d2b] shadow-inner">
               {adminInitials}
             </div>
@@ -424,10 +587,13 @@ export default function AdminDashboard() {
                   <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h2 className="font-display font-bold text-xl text-[#1a3d2b]">Recent Bookings</h2>
                     <div className="flex items-center gap-4">
+                      <button onClick={() => setCreateBookingOpen(true)} className="text-[9px] font-bold uppercase tracking-widest text-white bg-[#1a3d2b] px-4 py-2 rounded-full hover:bg-[#2d6a4f] transition-colors shadow-md flex items-center gap-2">
+                        <Plus size={12} /> Create Booking
+                      </button>
                       <button onClick={handleExportCSV} className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b] bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
                         Export CSV
                       </button>
-                      <button className="text-[9px] font-bold uppercase tracking-widest text-[#c9841a] hover:text-[#1a3d2b] transition-colors">View All &rarr;</button>
+                      <button onClick={() => setActiveTab('bookings')} className="text-[9px] font-bold uppercase tracking-widest text-[#c9841a] hover:text-[#1a3d2b] transition-colors">View All &rarr;</button>
                     </div>
                   </div>
                   <div className="overflow-x-auto">
@@ -530,9 +696,17 @@ export default function AdminDashboard() {
                 >
                   <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                     <h2 className="font-display font-bold text-xl text-[#1a3d2b]">Complete Ledger</h2>
-                    <button onClick={handleExportCSV} className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b] bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
-                      Export Full CSV
-                    </button>
+                    <div className="flex items-center gap-4">
+                      <button onClick={() => setBulkImportOpen(true)} className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b] bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
+                        <PackageOpen size={12} /> Bulk Import (CSV)
+                      </button>
+                      <button onClick={() => setCreateBookingOpen(true)} className="text-[9px] font-bold uppercase tracking-widest text-white bg-[#1a3d2b] px-4 py-2 rounded-full hover:bg-[#2d6a4f] transition-colors shadow-md flex items-center gap-2">
+                        <Plus size={12} /> Create Booking
+                      </button>
+                      <button onClick={handleExportCSV} className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b] bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors shadow-sm">
+                        Export Full CSV
+                      </button>
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
@@ -559,11 +733,11 @@ export default function AdminDashboard() {
                           <tr key={b._id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-5 font-bold text-[#1a3d2b]">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
                             <td className="px-6 py-5 text-[#1a3d2b]/80 font-medium">
-                              <div>{b.user?.name || b.guestDetails?.fullName || "Guest"}</div>
+                              <div>{b.guestDetails?.fullName || b.user?.name || "Guest"}</div>
                               {b.guestDetails?.city && <div className="text-[9px] text-[#1a3d2b]/50 font-bold uppercase tracking-widest mt-0.5">{b.guestDetails.city}</div>}
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs">
-                              <div>{b.user?.email || b.guestDetails?.email || "N/A"}</div>
+                              <div>{b.guestDetails?.email || b.user?.email || "N/A"}</div>
                               <div className="font-bold mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs font-bold">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
@@ -928,6 +1102,128 @@ export default function AdminDashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Create Booking Dialog */}
+      <Dialog open={createBookingOpen} onOpenChange={setCreateBookingOpen}>
+        <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manual Booking Entry</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Event</label>
+              <select
+                value={createBookingData.eventId}
+                onChange={(e) => setCreateBookingData({...createBookingData, eventId: e.target.value})}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              >
+                <option value="">Select Event</option>
+                {events.map((ev: any) => (
+                  <option key={ev._id} value={ev._id}>{ev.title}</option>
+                ))}
+              </select>
+            </div>
+            {createBookingData.eventId && (
+              <>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-bold text-[#1a3d2b]">Date</label>
+                  <select
+                    value={createBookingData.date}
+                    onChange={(e) => setCreateBookingData({...createBookingData, date: e.target.value, slotTime: ""})}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                  >
+                    <option value="">Select Date</option>
+                    {events.find((e:any) => e._id === createBookingData.eventId)?.dates?.map((d: string) => (
+                      <option key={d} value={d}>{new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-bold text-[#1a3d2b]">Time Slot</label>
+                  <select
+                    value={createBookingData.slotTime}
+                    onChange={(e) => setCreateBookingData({...createBookingData, slotTime: e.target.value})}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+                    disabled={!createBookingData.date}
+                  >
+                    <option value="">Select Slot</option>
+                    {events.find((e:any) => e._id === createBookingData.eventId)?.slots?.map((s: any) => (
+                      <option key={s.time} value={s.time}>{s.time} (Capacity: {s.capacity})</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Guest Name</label>
+              <input
+                type="text"
+                value={createBookingData.fullName}
+                onChange={(e) => setCreateBookingData({...createBookingData, fullName: e.target.value})}
+                placeholder="Required"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Phone Number</label>
+              <input
+                type="text"
+                value={createBookingData.phone}
+                onChange={(e) => setCreateBookingData({...createBookingData, phone: e.target.value})}
+                placeholder="Required"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Email</label>
+              <input
+                type="email"
+                value={createBookingData.email}
+                onChange={(e) => setCreateBookingData({...createBookingData, email: e.target.value})}
+                placeholder="Required (e-ticket sent here)"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Number of Persons</label>
+              <input
+                type="number"
+                min="1"
+                value={createBookingData.numberOfGuests}
+                onChange={(e) => setCreateBookingData({...createBookingData, numberOfGuests: e.target.value})}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Payment Mode</label>
+              <select
+                value={createBookingData.paymentMode}
+                onChange={(e) => setCreateBookingData({...createBookingData, paymentMode: e.target.value})}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              >
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI / QR Code</option>
+                <option value="Card">Credit/Debit Card</option>
+                <option value="Bank">Bank Transfer</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Remarks / City</label>
+              <input
+                type="text"
+                value={createBookingData.remarks}
+                onChange={(e) => setCreateBookingData({...createBookingData, remarks: e.target.value})}
+                placeholder="Required"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <button onClick={() => setCreateBookingOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
+            <button onClick={submitCreateBooking} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Confirm & Create</button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Booking Dialog */}
       <Dialog open={editBookingOpen} onOpenChange={setEditBookingOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -1082,6 +1378,71 @@ export default function AdminDashboard() {
             <button onClick={() => setEditDateOpen(false)} className="px-4 py-2 rounded-lg text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
             <button onClick={submitEditDate} className="bg-[#1a3d2b] text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-[#2d6a4f] transition-colors">Save Changes</button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* ── BULK IMPORT DIALOG ── */}
+      <Dialog open={bulkImportOpen} onOpenChange={setBulkImportOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl text-[#1a3d2b]">Bulk Import Bookings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Select Event</label>
+              <select value={bulkImportEventId} onChange={e => {
+                setBulkImportEventId(e.target.value);
+                setBulkImportDate("");
+                setBulkImportSlotTime("");
+              }} className="w-full p-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#c9841a]">
+                <option value="">-- Choose an Event --</option>
+                {events.map(e => <option key={e._id} value={e._id}>{e.title}</option>)}
+              </select>
+            </div>
+            
+            {bulkImportEventId && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Date</label>
+                  <select value={bulkImportDate} onChange={e => setBulkImportDate(e.target.value)} className="w-full p-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#c9841a]">
+                    <option value="">-- Date --</option>
+                    {events.find(e => e._id === bulkImportEventId)?.dates.map((d: string) => (
+                      <option key={d} value={d}>{new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Slot</label>
+                  <select value={bulkImportSlotTime} onChange={e => setBulkImportSlotTime(e.target.value)} className="w-full p-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#c9841a]">
+                    <option value="">-- Time --</option>
+                    {events.find(e => e._id === bulkImportEventId)?.slots.map((s: any) => (
+                      <option key={s.time} value={s.time}>{s.time}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Payment Mode</label>
+                  <select value={bulkImportPaymentMode} onChange={e => setBulkImportPaymentMode(e.target.value)} className="w-full p-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:border-[#c9841a]">
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-orange-50 p-3 rounded-lg border border-orange-100 mt-2">
+              <p className="text-xs text-orange-800">
+                <strong>Format Required:</strong> Please download the exact template before importing. E-Tickets are sent immediately via email when imported.
+              </p>
+              <button onClick={downloadBulkTemplate} className="mt-2 text-xs font-bold text-[#c9841a] hover:underline flex items-center gap-1">
+                <FileText size={14} /> Download CSV Template
+              </button>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1 block">Upload CSV</label>
+              <input type="file" accept=".csv" onChange={handleBulkImportCSV} className="w-full p-2 text-sm border border-gray-200 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#1a3d2b]/10 file:text-[#1a3d2b] hover:file:bg-[#1a3d2b]/20 cursor-pointer" />
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

@@ -17,21 +17,9 @@ import About from "@/pages/About";
 import Menu from "@/pages/Menu";
 import Gallery from "@/pages/Gallery";
 import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import ForgotPassword from "@/pages/ForgotPassword";
-import VerifyOTP from "@/pages/VerifyOTP";
-import ResetPassword from "@/pages/ResetPassword";
 
-import SlotSelection from "@/pages/SlotSelection";
-import BookingForm from "@/pages/BookingForm";
-import Payment from "@/pages/Payment";
-import BookingSuccess from "@/pages/BookingSuccess";
-import UserDashboard from "@/pages/UserDashboard";
+
 import AdminDashboard from "@/pages/AdminDashboard";
-import QRScanner from "@/pages/QRScanner";
-import TicketVerification from "@/pages/TicketVerification";
-
-import ReceptionDashboard from "@/pages/ReceptionDashboard";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { AuraCursor } from "@/components/shared/AuraCursor";
 
@@ -59,24 +47,11 @@ export default function App() {
           
           {/* Authentication UI */}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Booking Flow UI */}
-          <Route path="/slots" element={<SlotSelection />} />
-          <Route path="/booking-form" element={<BookingForm />} />
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/success" element={<BookingSuccess />} />
+          {/* Booking flow is now strictly manual via Admin Portal */}
 
           {/* Dashboards */}
-          <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/reception" element={<ReceptionDashboard />} />
-
-          <Route path="/scanner" element={<QRScanner />} />
-          <Route path="/ticket/:id" element={<TicketVerification />} />
           
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />

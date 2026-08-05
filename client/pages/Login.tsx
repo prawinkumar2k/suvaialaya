@@ -69,10 +69,7 @@ export default function Login() {
           Welcome back
         </h2>
         <p className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-[#c9841a] hover:text-[#1a3d2b] transition-colors">
-            Register here
-          </Link>
+          Admin Access Only
         </p>
       </div>
 
@@ -116,11 +113,6 @@ export default function Login() {
                   Remember me
                 </label>
               </div>
-              <div className="text-[10px] font-bold uppercase tracking-widest">
-                <Link to="/forgot-password" className="text-[#1a3d2b]/50 hover:text-[#c9841a] transition-colors">
-                  Forgot password?
-                </Link>
-              </div>
             </div>
 
             <button type="submit" className="w-full mt-4 rounded-xl bg-[#1a3d2b] px-8 py-4 text-[11px] font-bold uppercase tracking-widest text-white hover:bg-[#2d6a4f] transition-all flex items-center justify-center gap-2" disabled={isLoading}>
@@ -131,10 +123,8 @@ export default function Login() {
           {/* Development Quick Login */}
           <div className="mt-8 pt-6 border-t border-gray-100">
             <p className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]/40 mb-4 text-center">Quick Login (Dev)</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => handleAutoFill("admin@suvaialaya.com", "admin123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Admin</button>
-              <button type="button" onClick={() => handleAutoFill("scanner@suvaialaya.com", "scanner123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Reception</button>
-              <button type="button" onClick={() => handleAutoFill("john@example.com", "password123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70 col-span-2">Guest</button>
+            <div className="grid grid-cols-1 gap-2">
+              <button type="button" onClick={() => handleAutoFill("admin@suvaialaya.com", "admin123")} className="text-[10px] font-bold uppercase tracking-widest py-2 bg-gray-50 hover:bg-gray-100 rounded border border-gray-200 text-[#1a3d2b]/70">Admin Credentials</button>
             </div>
           </div>
         </motion.div>
