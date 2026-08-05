@@ -163,7 +163,10 @@ export const sendBookingConfirmationEmail = async (bookingId: string, type: 'con
         // Logo
         const logoX = W / 2; const logoY = 22;
         try {
-          const logoPath = path.resolve(process.cwd(), 'client', 'public', 'logo.png');
+          // Check production path first (dist/spa/logo.png), then fallback to dev path
+          const prodPath = path.resolve(process.cwd(), 'dist', 'spa', 'logo.png');
+          const devPath = path.resolve(process.cwd(), 'client', 'public', 'logo.png');
+          const logoPath = fs.existsSync(prodPath) ? prodPath : devPath;
           const logoBuf = fs.readFileSync(logoPath);
           const logoBase64 = `data:image/png;base64,${logoBuf.toString('base64')}`;
           doc.addImage(logoBase64, "PNG", logoX - 11, logoY - 11, 22, 22);
