@@ -156,20 +156,20 @@ export function createServer() {
   app.use(metricsMiddleware);
 
   // ─── Rate Limiting ─────────────────────────────────────────────────────────
-  // Shared store configuration for massive scale (PM2 / Kubernetes)
-  const rateLimitStore = process.env.NODE_ENV === "production" 
+  const createRateLimitStore = (prefix: string) => process.env.NODE_ENV === "production" 
     ? new RedisStore({
+        prefix: prefix,
         sendCommand: (...args: string[]) => {
           const client = getRedisClient();
           return client.call(args[0], ...args.slice(1)) as any;
         },
       })
-    : undefined; // undefined falls back to default MemoryStore
+    : undefined;
 
   app.use(
     "/api/",
     rateLimit({
-      store: rateLimitStore,
+      store: createRateLimitStore("rl:api:"),
       windowMs: 15 * 60 * 1000,
       max: 300,
       message: { success: false, error: "Too many requests" },
@@ -181,7 +181,7 @@ export function createServer() {
   app.use(
     "/api/auth/login",
     rateLimit({
-      store: rateLimitStore,
+      store: createRateLimitStore("rl:login:"),
       windowMs: 15 * 60 * 1000,
       max: 20,
       skipSuccessfulRequests: true,
@@ -192,7 +192,7 @@ export function createServer() {
   app.use(
     "/api/auth/register",
     rateLimit({
-      store: rateLimitStore,
+      store: createRateLimitStore("rl:register:"),
       windowMs: 60 * 60 * 1000,
       max: 5,
       message: { success: false, error: "Too many registrations from this IP" },
@@ -202,7 +202,7 @@ export function createServer() {
   app.use(
     "/api/bookings",
     rateLimit({
-      store: rateLimitStore,
+      store: createRateLimitStore("rl:bookings:"),
       windowMs: 60 * 1000,
       max: 10,
       message: { success: false, error: "Too many booking requests" },
