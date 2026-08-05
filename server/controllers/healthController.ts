@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { getRedisClient } from "../lib/redis";
 import { metricsRegistry } from "../lib/metrics";
 import { logger } from "../lib/logger";
+import v8 from "node:v8";
 
 // ─── Service health status type ───────────────────────────────────────────────
 type HealthStatus = "healthy" | "degraded" | "unhealthy";
@@ -128,15 +129,19 @@ async function checkRedis(): Promise<ServiceHealth> {
 
 function checkNodeMemory(): ServiceHealth {
   const mem = process.memoryUsage();
+  const heapStats = v8.getHeapStatistics();
   const heapUsedMB = Math.round(mem.heapUsed / 1024 / 1024);
   const heapTotalMB = Math.round(mem.heapTotal / 1024 / 1024);
-  const usagePercent = (mem.heapUsed / mem.heapTotal) * 100;
+  const maxHeapMB = Math.round(heapStats.heap_size_limit / 1024 / 1024);
+  
+  // Calculate percentage against the ABSOLUTE limit, not the currently allocated heap.
+  const usagePercent = (mem.heapUsed / heapStats.heap_size_limit) * 100;
   const rssMB = Math.round(mem.rss / 1024 / 1024);
 
   return {
     status: usagePercent > 90 ? "unhealthy" : usagePercent > 75 ? "degraded" : "healthy",
-    message: `Heap: ${heapUsedMB}MB / ${heapTotalMB}MB (${usagePercent.toFixed(0)}%)`,
-    details: { heapUsedMB, heapTotalMB, rssMB, usagePercent: `${usagePercent.toFixed(1)}%` },
+    message: `Heap: ${heapUsedMB}MB / ${maxHeapMB}MB (${usagePercent.toFixed(0)}%)`,
+    details: { heapUsedMB, heapTotalMB, maxHeapMB, rssMB, usagePercent: `${usagePercent.toFixed(1)}%` },
   };
 }
 
