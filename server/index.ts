@@ -148,7 +148,14 @@ export function createServer() {
   // ─── NoSQL Injection Prevention ────────────────────────────────────────────
   // mongoSanitize() mutates req.query which is read-only in Vite's connect server, so we only run it in production
   if (process.env.NODE_ENV === "production") {
-    app.use(mongoSanitize());
+    app.use((req, res, next) => {
+      ['body', 'params', 'headers'].forEach((k) => {
+        if ((req as any)[k]) {
+          (req as any)[k] = mongoSanitize.sanitize((req as any)[k]);
+        }
+      });
+      next();
+    });
   }
 
   // ─── Observability: Request logging + Prometheus metrics ──────────────────
