@@ -842,24 +842,33 @@ export default function AdminDashboard() {
                                     {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                                   </div>
                                   <div className="space-y-3">
-                                    {((event.dateSlots && event.dateSlots[dateObj]) || event.slots)?.map((slot: any, slotIdx: number) => {
-                                      const booked = slot.booked || 0;
-                                      const total = slot.capacity;
-                                      const percentage = Math.round((booked / total) * 100);
-                                      return (
-                                        <div key={slotIdx} className="flex justify-between items-center text-xs bg-white border border-gray-100 p-2 rounded-lg">
-                                          <div className="flex items-center gap-2">
-                                            <span className="font-bold text-[#1a3d2b]">{slot.time}</span>
-                                          </div>
-                                          <div className="flex items-center gap-3">
-                                            <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                              <div className="h-full bg-[#c9841a]" style={{ width: `${percentage}%` }} />
+                                    {((event.dateSlots && event.dateSlots[dateObj]) || event.slots)?.length > 0 ? (
+                                      ((event.dateSlots && event.dateSlots[dateObj]) || event.slots).map((slot: any, slotIdx: number) => {
+                                        const booked = slot.booked || 0;
+                                        const total = slot.capacity;
+                                        const percentage = Math.round((booked / total) * 100);
+                                        return (
+                                          <div key={slotIdx} className="flex justify-between items-center text-xs bg-white border border-gray-100 p-2 rounded-lg group">
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-bold text-[#1a3d2b]">{slot.time}</span>
                                             </div>
-                                            <span className="font-bold text-[#1a3d2b] w-12 text-right text-[10px] uppercase tracking-widest">{booked} / {total}</span>
+                                            <div className="flex items-center gap-3">
+                                              <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                <div className="h-full bg-[#c9841a]" style={{ width: `${percentage}%` }} />
+                                              </div>
+                                              <span className="font-bold text-[#1a3d2b] w-12 text-right text-[10px] uppercase tracking-widest">{booked} / {total}</span>
+                                              <button onClick={() => setEditingEventId(event._id)} className="text-[#c9841a] hover:bg-[#c9841a]/10 p-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100" title="Edit Slots in Full Page Editor">
+                                                <Settings size={14} />
+                                              </button>
+                                            </div>
                                           </div>
-                                        </div>
-                                      );
-                                    })}
+                                        );
+                                      })
+                                    ) : (
+                                      <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 text-center py-2 border border-dashed border-gray-200 rounded-lg">
+                                        No slots added yet. <button onClick={() => setEditingEventId(event._id)} className="text-[#c9841a] hover:underline">Add Slots</button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               ))}
