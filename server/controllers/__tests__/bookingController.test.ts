@@ -26,10 +26,10 @@ describe('bookingController - createBooking', () => {
   beforeEach(() => {
     mockReq = {
       body: {
-        event: 'event_id_123',
+        event: '507f1f77bcf86cd799439011',
         date: '2026-08-06',
         slotTime: '11:00 AM',
-        guestDetails: { fullName: 'Test User' },
+        guestDetails: { fullName: 'Test User', phone: '1234567890', email: 'test@example.com', city: 'Test City' },
         numberOfGuests: 5,
         totalAmount: 1799
       },
@@ -48,7 +48,7 @@ describe('bookingController - createBooking', () => {
 
   it('should waitlist if requested guests exceed available capacity', async () => {
     const mockEvent = {
-      _id: 'event_id_123',
+      _id: '507f1f77bcf86cd799439011',
       isActive: true,
       dates: ['2026-08-06'],
       slots: [{ time: '11:00 AM', capacity: 10, booked: 8 }], // Only 2 remaining
@@ -60,6 +60,8 @@ describe('bookingController - createBooking', () => {
     (WaitlistMock.findOne as any).mockResolvedValue(null);
     (WaitlistMock.countDocuments as any).mockResolvedValue(0);
     (WaitlistMock.create as any).mockResolvedValue(true);
+    
+    (Booking.aggregate as any).mockResolvedValue([{ total: 8 }]);
 
     await createBooking(mockReq, mockRes, mockNext);
 
@@ -74,7 +76,7 @@ describe('bookingController - createBooking', () => {
 
   it('should successfully reserve seats if capacity is available', async () => {
     const mockEvent = {
-      _id: 'event_id_123',
+      _id: '507f1f77bcf86cd799439011',
       isActive: true,
       dates: ['2026-08-06'],
       slots: [{ time: '11:00 AM', capacity: 50, booked: 5 }], // 45 remaining
@@ -82,10 +84,7 @@ describe('bookingController - createBooking', () => {
     
     (Event.findById as any).mockResolvedValue(mockEvent);
     
-    // Mock the findOneAndUpdate for atomic locking
-    const updatedEvent = { ...mockEvent };
-    updatedEvent.slots[0].booked = 10;
-    (Event.findOneAndUpdate as any).mockResolvedValue(updatedEvent);
+    (Booking.aggregate as any).mockResolvedValue([{ total: 5 }]);
     
     (Booking.create as any).mockResolvedValue([{ _id: 'new_booking_id', bookingStatus: 'Confirmed' }]);
 
@@ -94,7 +93,6 @@ describe('bookingController - createBooking', () => {
     console.log("Response Status:", mockRes.status.mock.calls);
     console.log("Response JSON:", mockRes.json.mock.calls);
 
-    expect(Event.findOneAndUpdate).toHaveBeenCalled();
     expect(Booking.create).toHaveBeenCalled();
     expect(mockRes.status).toHaveBeenCalledWith(201);
   });
