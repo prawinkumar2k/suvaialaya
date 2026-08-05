@@ -20,6 +20,7 @@ import Login from "@/pages/Login";
 
 
 import AdminDashboard from "@/pages/AdminDashboard";
+import Scanner from "@/pages/Scanner";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { AuraCursor } from "@/components/shared/AuraCursor";
 
@@ -52,6 +53,7 @@ export default function App() {
 
           {/* Dashboards */}
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/scanner" element={<Scanner />} />
           
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />

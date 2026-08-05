@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
+import fs from 'fs';
+import path from 'path';
 import { Booking } from '../models/Booking';
+import '../models/User';
+import '../models/Event';
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 import { Resend } from 'resend';
@@ -95,66 +99,145 @@ export const sendBookingConfirmationEmail = async (bookingId: string, type: 'con
     // Generate PDF Ticket only for confirmations
     if (!isCancellation) {
       try {
-        const doc = new jsPDF();
-        
-        // Header
-        doc.setFillColor(15, 59, 40); // Dark Green
-        doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(24);
-        doc.text("SUVAIALAYA", 105, 20, { align: "center" });
-        doc.setFontSize(12);
-        doc.setTextColor(212, 175, 55); // Gold
-        doc.text("OFFICIAL E-TICKET", 105, 30, { align: "center" });
+        const W = 90;
+        const H = 190;
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [W, H] });
+        const green  = "#1a3d2b";
+        const gold   = "#c9841a";
+        const cream  = "#FDFCF9";
+        const cream2 = "#F8F5EF";
+        const gray   = "#5A6070";
 
-        // Booking Details
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(12);
-        doc.text("Booking Details", 20, 60);
-        doc.setLineWidth(0.5);
-        doc.line(20, 62, 190, 62);
+        // Helper functions
+        const drawOrnamentH = (x: number, y: number, length: number) => {
+          const step = 6; const half = 2.2; const count = Math.floor(length / step);
+          for (let i = 0; i < count; i++) {
+            const cx = x + i * step + step / 2;
+            doc.setDrawColor(green); doc.setLineWidth(0.25);
+            doc.lines([[half, half], [half, -half], [-half, -half], [-half, half]], cx - half, y, [1, 1], "S", true);
+            doc.setFillColor(gold); doc.setLineWidth(0); const s = half * 0.5;
+            doc.lines([[s, s], [s, -s], [-s, -s], [-s, s]], cx - s, y, [1, 1], "F", true);
+            doc.setFillColor(green); doc.circle(cx, y, 0.5, "F");
+          }
+        };
 
-        doc.setFontSize(10);
-        doc.text(`Booking ID:`, 20, 75);
-        doc.text(`${booking._id}`, 60, 75);
-        
-        doc.text(`Guest Name:`, 20, 85);
-        doc.text(`${userName}`, 60, 85);
-        
-        doc.text(`Event Date:`, 20, 95);
-        doc.text(`${booking.date}`, 60, 95);
-        
-        doc.text(`Time Slot:`, 20, 105);
-        doc.text(`${booking.slotTime}`, 60, 105);
-        
-        doc.text(`Party Size:`, 20, 115);
-        doc.text(`${booking.numberOfGuests} Pax`, 60, 115);
-        
-        doc.text(`Amount Paid:`, 20, 125);
-        doc.text(`INR ${booking.totalAmount}`, 60, 125);
+        const drawOrnamentV = (x: number, y: number, length: number) => {
+          const step = 6; const half = 2.2; const count = Math.floor(length / step);
+          for (let i = 0; i < count; i++) {
+            const cy = y + i * step + step / 2;
+            doc.setDrawColor(green); doc.setLineWidth(0.25);
+            doc.lines([[half, half], [half, -half], [-half, -half], [-half, half]], x - half, cy, [1, 1], "S", true);
+            doc.setFillColor(gold); doc.setLineWidth(0); const s = half * 0.5;
+            doc.lines([[s, s], [s, -s], [-s, -s], [-s, s]], x - s, cy, [1, 1], "F", true);
+            doc.setFillColor(green); doc.circle(x, cy, 0.5, "F");
+          }
+        };
+
+        // Format data
+        const dateObj = new Date(booking.date);
+        const bookingDate = dateObj.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+        const dayStr = dateObj.getDate().toString().padStart(2, "0");
+        const monthStr = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
+        const slotHour = (booking.slotTime ?? "11:00").split(":")[0].padStart(2, "0");
+        const rawId = booking._id.toString();
+        const shortId = rawId.slice(-4).toUpperCase();
+        const ticketId = `${dayStr}${monthStr}${slotHour}-${shortId}`;
+        const pax = booking.numberOfGuests ?? 1;
+        const slot = booking.slotTime ?? "11:00 AM";
+
+        // Background
+        doc.setFillColor(cream);
+        doc.rect(0, 0, W, H, "F");
+
+        // Borders
+        doc.setDrawColor(gold); doc.setLineWidth(0.7); doc.rect(3, 3, W - 6, H - 6);
+        doc.setLineWidth(0.2); doc.rect(4.5, 4.5, W - 9, H - 9);
+        drawOrnamentH(7, 7, W - 14); drawOrnamentH(7, H - 7, W - 14);
+        drawOrnamentV(7, 7, H - 14); drawOrnamentV(W - 7, 7, H - 14);
+
+        for (const [cx, cy] of [[7, 7], [W - 7, 7], [W - 7, H - 7], [7, H - 7]]) {
+          doc.setFillColor(gold); doc.circle(cx, cy, 1.8, "F");
+          doc.setFillColor(cream); doc.circle(cx, cy, 0.7, "F");
+        }
+
+        // Logo
+        const logoX = W / 2; const logoY = 22;
+        try {
+          const logoPath = path.resolve(process.cwd(), 'client', 'public', 'logo.png');
+          const logoBuf = fs.readFileSync(logoPath);
+          const logoBase64 = `data:image/png;base64,${logoBuf.toString('base64')}`;
+          doc.addImage(logoBase64, "PNG", logoX - 11, logoY - 11, 22, 22);
+        } catch (e) {
+          doc.setFillColor("#1a3d2b"); doc.circle(logoX, logoY, 10, "F");
+          doc.setTextColor("#fff8ec"); doc.setFont("helvetica", "bold"); doc.setFontSize(7);
+          doc.text("S", logoX, logoY + 2.5, { align: "center" });
+        }
+
+        // Header text
+        doc.setTextColor(gold); doc.setFont("helvetica", "bold"); doc.setFontSize(5.5);
+        doc.text("THE  MADURAI  VIRUNDHU", W / 2, 38, { align: "center", charSpace: 0.5 });
+        doc.setDrawColor(gold); doc.setLineWidth(0.3); doc.line(W / 2 - 14, 41, W / 2 + 14, 41);
+        doc.setFillColor(gold); doc.circle(W / 2, 41, 0.9, "F");
+
+        doc.setTextColor(green); doc.setFont("helvetica", "bold"); doc.setFontSize(20);
+        doc.text("SEAT", W / 2, 49, { align: "center" });
+        doc.text("RESERVED", W / 2, 59, { align: "center" });
+        doc.setDrawColor(gold); doc.setLineWidth(0.2); doc.line(W / 2 - 16, 63, W / 2 + 16, 63);
+
+        // Status
+        doc.setFont("helvetica", "normal"); doc.setFontSize(5.5); doc.setTextColor(gray);
+        doc.text("STATUS:", 26, 69);
+        doc.setTextColor(gold); doc.setFont("helvetica", "bold"); doc.text("CONFIRMED", 41, 69);
+        doc.setTextColor(gray); doc.setFont("helvetica", "normal"); doc.text("GUESTS:", 26, 74);
+        doc.setTextColor(gold); doc.setFont("helvetica", "bold"); doc.text(`${pax}  PAX`, 41, 74);
+
+        // Tear line 1
+        doc.setDrawColor("#c9841a"); doc.setLineWidth(0.2); doc.setLineDashPattern([2, 2], 0);
+        doc.line(8, 80, W - 8, 80); doc.setLineDashPattern([], 0);
+
+        // Details
+        doc.setFillColor(cream2); doc.roundedRect(10, 84, W - 20, 28, 2, 2, "F");
+        const rows = [
+          { label: "DATE", value: bookingDate, x: 15, y: 91 },
+          { label: "TIME", value: slot, x: 56, y: 91 },
+          { label: "VENUE", value: "Suvaialaya Restaurant", x: 15, y: 104 },
+        ];
+        for (const { label, value, x, y } of rows) {
+          doc.setFont("helvetica", "normal"); doc.setFontSize(5); doc.setTextColor(gray); doc.text(label, x, y);
+          doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(green); doc.text(value, x, y + 5);
+        }
+
+        // Tear line 2
+        doc.setDrawColor("#c9841a"); doc.setLineWidth(0.2); doc.setLineDashPattern([2, 2], 0);
+        doc.line(8, 118, W - 8, 118); doc.setLineDashPattern([], 0);
 
         // QR Code
+        const qrSize = 34; const qrX = (W - qrSize) / 2; const qrY = 124;
         const qrPayload = JSON.stringify({ id: booking._id.toString(), ts: Date.now() });
         const qrDataUrl = await QRCode.toDataURL(qrPayload, {
-          errorCorrectionLevel: 'H',
-          margin: 1,
-          width: 200,
-          color: { dark: '#0F3B28', light: '#FFFFFF' }
+          errorCorrectionLevel: 'H', margin: 1, width: 200, color: { dark: green, light: "#FFFFFF" }
         });
-        
-        // Add QR code to right side
-        doc.addImage(qrDataUrl, 'PNG', 130, 70, 60, 60);
+        doc.setFillColor("#FFFFFF"); doc.setDrawColor(green); doc.setLineWidth(0.3);
+        doc.roundedRect(qrX - 2, qrY - 2, qrSize + 4, qrSize + 4, 1.5, 1.5, "FD");
+        doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
+
+        const idY = qrY + qrSize + 7;
+        doc.setFillColor("#EEF5EC"); doc.setDrawColor(green); doc.setLineWidth(0.2);
+        doc.roundedRect(20, idY - 4.5, W - 40, 7, 2, 2, "FD");
+        doc.setFont("helvetica", "normal"); doc.setFontSize(5); doc.setTextColor(gray);
+        doc.text("ID:", W / 2 - 3, idY, { align: "right" });
+        doc.setFont("helvetica", "bold"); doc.setFontSize(6); doc.setTextColor(gold); doc.text(ticketId, W / 2 - 2, idY);
 
         // Footer
-        doc.setFontSize(10);
-        doc.setTextColor(150, 150, 150);
-        doc.text("Please present this QR code at the reception for check-in.", 105, 160, { align: "center" });
-        doc.text("Suvaialaya Restaurant · Madurai, Tamil Nadu", 105, 170, { align: "center" });
+        doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(green);
+        doc.text("Suvaialaya Welcomes You", W / 2, 174, { align: "center" });
+        doc.setFont("helvetica", "normal"); doc.setFontSize(4.5); doc.setTextColor(gray);
+        doc.text("Present this ticket at the entrance  •  Madurai", W / 2, 178, { align: "center" });
 
         const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
         
         attachments.push({
-          filename: `Suvaialaya_Ticket_${booking._id}.pdf`,
+          filename: `Suvaialaya_Ticket_${ticketId}.pdf`,
           content: pdfBuffer,
         });
       } catch (pdfErr) {

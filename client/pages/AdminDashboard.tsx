@@ -489,6 +489,9 @@ export default function AdminDashboard() {
           </div>
           <div className="flex items-center gap-6">
 
+            <Link to="/scanner" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white bg-[#c9841a] px-4 py-2 rounded-xl shadow-sm hover:bg-[#b07216] transition-all">
+              <ScanLine size={16} /> QR Scanner
+            </Link>
             <Link to="/reception" className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b] border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-all">
               <Users size={16} /> Open Reception
             </Link>
@@ -621,11 +624,11 @@ export default function AdminDashboard() {
                           <tr key={b._id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-5 font-bold text-[#1a3d2b]">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
                             <td className="px-6 py-5 text-[#1a3d2b]/80 font-medium">
-                              <div>{b.user?.name || b.guestDetails?.fullName || "Guest"}</div>
+                              <div>{b.guestDetails?.fullName || b.user?.name || "Guest"}</div>
                               {b.guestDetails?.city && <div className="text-[9px] text-[#1a3d2b]/50 font-bold uppercase tracking-widest mt-0.5">{b.guestDetails.city}</div>}
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs">
-                              <div>{b.user?.email || b.guestDetails?.email || "N/A"}</div>
+                              <div>{b.guestDetails?.email || b.user?.email || "N/A"}</div>
                               <div className="font-bold mt-0.5">{b.guestDetails?.phone || "N/A"}</div>
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs font-bold">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
@@ -633,9 +636,10 @@ export default function AdminDashboard() {
                             <td className="px-6 py-5">
                               <span className={`px-3 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest
                                 ${b.bookingStatus === 'Confirmed' ? 'bg-[#c9841a]/10 text-[#c9841a] border-[#c9841a]/20' : 
+                                  b.bookingStatus === 'Attended' ? 'bg-green-50 text-green-600 border-green-200' : 
                                   b.bookingStatus === 'Pending' ? 'bg-orange-50 text-orange-500 border-orange-100' : 
                                   'bg-red-50 text-red-500 border-red-100'}`}>
-                                {b.bookingStatus}
+                                {b.bookingStatus === 'Confirmed' ? 'TICKET SENT' : b.bookingStatus === 'Attended' ? 'CHECKED IN' : b.bookingStatus}
                               </span>
                             </td>
                             <td className="px-6 py-5 text-right relative">
@@ -745,9 +749,10 @@ export default function AdminDashboard() {
                             <td className="px-6 py-5">
                               <span className={`px-3 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest
                                 ${b.bookingStatus === 'Confirmed' ? 'bg-[#c9841a]/10 text-[#c9841a] border-[#c9841a]/20' : 
+                                  b.bookingStatus === 'Attended' ? 'bg-green-50 text-green-600 border-green-200' : 
                                   b.bookingStatus === 'Pending' ? 'bg-orange-50 text-orange-500 border-orange-100' : 
                                   'bg-red-50 text-red-500 border-red-100'}`}>
-                                {b.bookingStatus}
+                                {b.bookingStatus === 'Confirmed' ? 'TICKET SENT' : b.bookingStatus === 'Attended' ? 'CHECKED IN' : b.bookingStatus}
                               </span>
                             </td>
                             <td className="px-6 py-5 text-right relative">

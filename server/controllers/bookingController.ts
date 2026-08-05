@@ -471,10 +471,20 @@ export const checkInBooking = async (req: Request, res: Response, next: NextFunc
     }
 
     if (booking.paymentStatus !== "Completed") {
-      return res.status(400).json({
-        success: false,
-        error: "Payment not completed — DENY ENTRY",
-      });
+      // If payment is required, expect payment details in the request body
+      const { paymentMethod, paymentCompleted } = req.body;
+      if (!paymentCompleted) {
+        return res.status(400).json({
+          success: false,
+          error: "Payment not completed — DENY ENTRY",
+          requiresPayment: true,
+          booking: booking
+        });
+      }
+      booking.paymentStatus = "Completed";
+      if (paymentMethod) {
+        booking.paymentMethod = paymentMethod;
+      }
     }
 
     booking.bookingStatus = "Attended";

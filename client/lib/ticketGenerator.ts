@@ -141,7 +141,7 @@ export const generatePremiumTicket = async (
     };
 
     const logoX = W / 2;
-    const logoY = 24;
+    const logoY = 22;
 
     const logoBase64 = await loadImageBase64("/logo.png");
     if (logoBase64) {
@@ -159,54 +159,54 @@ export const generatePremiumTicket = async (
     doc.setTextColor(gold);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(5.5);
-    doc.text("THE  MADURAI  VIRUNDHU", W / 2, 39, { align: "center", charSpace: 0.5 });
+    doc.text("THE  MADURAI  VIRUNDHU", W / 2, 38, { align: "center", charSpace: 0.5 });
 
     // Gold divider
     doc.setDrawColor(gold);
     doc.setLineWidth(0.3);
-    doc.line(W / 2 - 14, 41.5, W / 2 + 14, 41.5);
-    doc.setFillColor(gold); doc.circle(W / 2, 41.5, 0.9, "F");
+    doc.line(W / 2 - 14, 41, W / 2 + 14, 41);
+    doc.setFillColor(gold); doc.circle(W / 2, 41, 0.9, "F");
 
     // Big title
     doc.setTextColor(green);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text("SEAT", W / 2, 50, { align: "center" });
-    doc.text("RESERVED", W / 2, 60, { align: "center" });
+    doc.text("SEAT", W / 2, 49, { align: "center" });
+    doc.text("RESERVED", W / 2, 59, { align: "center" });
 
     // Second divider
     doc.setDrawColor(gold);
     doc.setLineWidth(0.2);
-    doc.line(W / 2 - 16, 64, W / 2 + 16, 64);
+    doc.line(W / 2 - 16, 63, W / 2 + 16, 63);
 
     // Status / Guests
     doc.setFont("helvetica", "normal");
     doc.setFontSize(5.5);
     doc.setTextColor(gray);
-    doc.text("STATUS:", 26, 70);
+    doc.text("STATUS:", 26, 69);
     doc.setTextColor(gold); doc.setFont("helvetica", "bold");
-    doc.text("CONFIRMED", 41, 70);
+    doc.text("CONFIRMED", 41, 69);
 
     doc.setTextColor(gray);  doc.setFont("helvetica", "normal");
-    doc.text("GUESTS:", 26, 75);
+    doc.text("GUESTS:", 26, 74);
     doc.setTextColor(gold);  doc.setFont("helvetica", "bold");
-    doc.text(`${pax}  PAX`, 41, 75);
+    doc.text(`${pax}  PAX`, 41, 74);
 
     // ── Tear line ─────────────────────────────────────────────────────────
     doc.setDrawColor("#c9841a");
     doc.setLineWidth(0.2);
     doc.setLineDashPattern([2, 2], 0);
-    doc.line(8, 82, W - 8, 82);
+    doc.line(8, 80, W - 8, 80);
     doc.setLineDashPattern([], 0);
 
     // ── Details section ───────────────────────────────────────────────────
     doc.setFillColor(cream2);
-    doc.roundedRect(10, 86, W - 20, 30, 2, 2, "F");
+    doc.roundedRect(10, 84, W - 20, 28, 2, 2, "F");
 
     const rows = [
-      { label: "DATE",  value: bookingDate, x: 15, y: 93 },
-      { label: "TIME",  value: slot,        x: 56, y: 93 },
-      { label: "VENUE", value: "Suvaialaya Restaurant", x: 15, y: 108 },
+      { label: "DATE",  value: bookingDate, x: 15, y: 91 },
+      { label: "TIME",  value: slot,        x: 56, y: 91 },
+      { label: "VENUE", value: "Suvaialaya Restaurant", x: 15, y: 104 },
     ];
     for (const { label, value, x, y } of rows) {
       doc.setFont("helvetica", "normal"); doc.setFontSize(5); doc.setTextColor(gray);
@@ -219,13 +219,13 @@ export const generatePremiumTicket = async (
     doc.setDrawColor("#c9841a");
     doc.setLineWidth(0.2);
     doc.setLineDashPattern([2, 2], 0);
-    doc.line(8, 122, W - 8, 122);
+    doc.line(8, 118, W - 8, 118);
     doc.setLineDashPattern([], 0);
 
     // ── QR Code ───────────────────────────────────────────────────────────
     const qrSize = 34;
     const qrX = (W - qrSize) / 2;
-    const qrY = 130;
+    const qrY = 124;
 
     const qrDataUrl = await QRCode.toDataURL(ticketId, {
       width: 200, margin: 1,
@@ -238,7 +238,7 @@ export const generatePremiumTicket = async (
     doc.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize);
 
     // Ticket ID pill
-    const idY = qrY + qrSize + 8;
+    const idY = qrY + qrSize + 7;
     doc.setFillColor("#EEF5EC");
     doc.setDrawColor(green); doc.setLineWidth(0.2);
     doc.roundedRect(20, idY - 4.5, W - 40, 7, 2, 2, "FD");
@@ -249,9 +249,9 @@ export const generatePremiumTicket = async (
 
     // ── Footer ────────────────────────────────────────────────────────────
     doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(green);
-    doc.text("Suvaialaya Welcomes You", W / 2, H - 12, { align: "center" });
+    doc.text("Suvaialaya Welcomes You", W / 2, 174, { align: "center" });
     doc.setFont("helvetica", "normal"); doc.setFontSize(4.5); doc.setTextColor(gray);
-    doc.text("Present this ticket at the entrance  •  Madurai", W / 2, H - 7, { align: "center" });
+    doc.text("Present this ticket at the entrance  •  Madurai", W / 2, 178, { align: "center" });
 
     // ── Save or Return ───────────────────────────────────────────────────
     if (options.returnBase64) {
