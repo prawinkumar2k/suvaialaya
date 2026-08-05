@@ -125,13 +125,14 @@ export function createServer() {
   // ─── CORS ─────────────────────────────────────────────────────────────────
   const allowedOrigins = (process.env.ALLOWED_ORIGINS || "http://localhost:8080").split(",");
   app.use(
+    "/api",
     cors({
       origin: (origin, callback) => {
-        if (process.env.NODE_ENV !== "production" || !origin || allowedOrigins.includes(origin)) {
+        if (process.env.NODE_ENV !== "production" || !origin || allowedOrigins.includes(origin) || allowedOrigins.some(o => origin.startsWith(o.trim()))) {
           callback(null, true);
         } else {
           logger.warn("CORS blocked", { origin });
-          callback(new Error("Not allowed by CORS"));
+          callback(null, false); // Do not throw error (which causes 500), just deny CORS headers
         }
       },
       credentials: true,
