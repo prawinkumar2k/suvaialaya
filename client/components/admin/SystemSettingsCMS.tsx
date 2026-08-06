@@ -159,6 +159,26 @@ export function SystemSettingsCMS() {
           />
         </div>
         <div>
+          <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Event Dates</label>
+          <input 
+            type="text" 
+            value={settings.festival?.dates || ""} 
+            onChange={(e) => handleChange("festival", "dates", e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" 
+            placeholder="e.g. August 7, 8 & 9, 2026"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Event Hours</label>
+          <input 
+            type="text" 
+            value={settings.festival?.hours || ""} 
+            onChange={(e) => handleChange("festival", "hours", e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" 
+            placeholder="e.g. 11 AM - 11 PM"
+          />
+        </div>
+        <div>
           <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Contact Phone</label>
           <input 
             type="text" 
