@@ -66,13 +66,57 @@ export const getSettings = async (req: Request, res: Response) => {
 
 export const updateSettings = async (req: Request, res: Response) => {
   try {
-    const { landing, aboutPage, galleryPage, menuPage, ...rest } = req.body;
+    const {
+      landing,
+      aboutPage,
+      galleryPage,
+      menuPage,
+      festival,
+      contactPage,
+      faqPage,
+      organizersPage,
+      welcomeItems,
+      returnGifts,
+      contactPhone,
+      ...rest
+    } = req.body;
+
+    // Build a $set object for all nested sections so we do deep-merge, not replacement
+    const setPayload: Record<string, any> = { ...rest };
+
+    if (festival) {
+      Object.keys(festival).forEach(k => {
+        setPayload[`festival.${k}`] = festival[k];
+      });
+    }
+    if (contactPage) {
+      Object.keys(contactPage).forEach(k => {
+        setPayload[`contactPage.${k}`] = contactPage[k];
+      });
+    }
+    if (faqPage) {
+      Object.keys(faqPage).forEach(k => {
+        setPayload[`faqPage.${k}`] = faqPage[k];
+      });
+    }
+    if (organizersPage) {
+      Object.keys(organizersPage).forEach(k => {
+        setPayload[`organizersPage.${k}`] = organizersPage[k];
+      });
+    }
+    if (welcomeItems !== undefined) setPayload["welcomeItems"] = welcomeItems;
+    if (returnGifts !== undefined) setPayload["returnGifts"] = returnGifts;
+    if (contactPhone !== undefined) setPayload["contactPhone"] = contactPhone;
 
     let settings = await SystemSettings.findOne();
     if (!settings) {
-      settings = await SystemSettings.create(rest);
+      settings = await SystemSettings.create(req.body);
     } else {
-      settings = await SystemSettings.findOneAndUpdate({}, rest, { new: true, runValidators: true });
+      settings = await SystemSettings.findOneAndUpdate(
+        {},
+        { $set: setPayload },
+        { new: true, runValidators: true }
+      );
     }
 
     if (landing) {
@@ -130,8 +174,8 @@ export const updateSettings = async (req: Request, res: Response) => {
         heroDescription: menuPage.heroDescription
       }, { upsert: true });
     }
-    
-    // Fetch updated to return correctly
+
+    // Return freshly aggregated settings
     return getSettings(req, res);
   } catch (error: any) {
     console.error("Error updating settings:", error);
