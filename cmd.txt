@@ -1,0 +1,4 @@
+cd /opt/suvaialaya
+git fetch origin main
+git reset --hard origin/main
+docker compose -f docker-compose.hostinger.yml up --build -d

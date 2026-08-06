@@ -66,3 +66,56 @@
 {"error":"Missing parameter name at index 1: *; visit https://git.new/pathToRegexpError for info","level":"error","message":"Background services startup failed","service":"suvaialaya-api","timestamp":"2026-08-05T16:07:33.850Z"}
 {"database":"suvaialaya","host":"127.0.0.1","level":"info","message":"MongoDB connected","poolSize":50,"service":"suvaialaya-api","timestamp":"2026-08-05T16:07:33.868Z"}
 {"count":19,"level":"info","message":"Feature flags seeded","service":"suvaialaya-api","timestamp":"2026-08-05T16:07:34.023Z"}
+{"level":"info","message":"Prometheus metrics registry initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.095Z"}
+{"level":"info","message":"BullMQ queues initialized","queues":["notifications","qr-generation","seat-release","waitlist"],"service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.164Z"}
+{"level":"info","message":"All BullMQ workers initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.433Z"}
+{"database":"suvaialaya","host":"127.0.0.1","level":"info","message":"MongoDB connected","poolSize":50,"service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.482Z"}
+{"level":"info","message":"SRE memory watchdog started (30s interval, 500MB threshold)","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.699Z"}
+{"level":"info","message":"SRE queue monitor started (60s interval)","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.700Z"}
+{"level":"info","message":"SRE waitlist monitor started (120s interval)","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.702Z"}
+{"level":"info","message":"Backup scheduler started (MongoDB with local rotation/auditing, Redis BGSAVE)","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.791Z"}
+{"level":"info","message":"SRE NoShow detector started (hourly)","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.795Z"}
+{"level":"info","message":"All SRE background jobs started","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.796Z"}
+{"count":19,"level":"info","message":"Feature flags seeded","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.986Z"}
+{"level":"info","message":"All background services initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:44:03.987Z"}
+{"durationMs":33,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T18:46:36.513Z","url":"/assets/index-missing.css","userAgent":"Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8875"}
+{"level":"info","message":"Prometheus metrics registry initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:51.419Z"}
+{"level":"info","message":"BullMQ queues initialized","queues":["notifications","qr-generation","seat-release","waitlist"],"service":"suvaialaya-api","timestamp":"2026-08-05T18:48:51.528Z"}
+{"level":"info","message":"All BullMQ workers initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:51.784Z"}
+{"database":"suvaialaya","host":"127.0.0.1","level":"info","message":"MongoDB connected","poolSize":50,"service":"suvaialaya-api","timestamp":"2026-08-05T18:48:51.816Z"}
+{"level":"info","message":"SRE memory watchdog started (30s interval, 500MB threshold)","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.000Z"}
+{"level":"info","message":"SRE queue monitor started (60s interval)","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.001Z"}
+{"level":"info","message":"SRE waitlist monitor started (120s interval)","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.002Z"}
+{"level":"info","message":"Backup scheduler started (MongoDB with local rotation/auditing, Redis BGSAVE)","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.101Z"}
+{"level":"info","message":"SRE NoShow detector started (hourly)","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.106Z"}
+{"level":"info","message":"All SRE background jobs started","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.108Z"}
+{"count":19,"level":"info","message":"Feature flags seeded","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.232Z"}
+{"level":"info","message":"All background services initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:48:52.233Z"}
+{"level":"info","message":"Prometheus metrics registry initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.002Z"}
+{"level":"info","message":"BullMQ queues initialized","queues":["notifications","qr-generation","seat-release","waitlist"],"service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.071Z"}
+{"level":"info","message":"All BullMQ workers initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.288Z"}
+{"database":"suvaialaya","host":"127.0.0.1","level":"info","message":"MongoDB connected","poolSize":50,"service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.316Z"}
+{"level":"info","message":"SRE memory watchdog started (30s interval, 500MB threshold)","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.448Z"}
+{"level":"info","message":"SRE queue monitor started (60s interval)","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.449Z"}
+{"level":"info","message":"SRE waitlist monitor started (120s interval)","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.450Z"}
+{"level":"info","message":"Backup scheduler started (MongoDB with local rotation/auditing, Redis BGSAVE)","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.514Z"}
+{"level":"info","message":"SRE NoShow detector started (hourly)","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.517Z"}
+{"level":"info","message":"All SRE background jobs started","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.517Z"}
+{"count":19,"level":"info","message":"Feature flags seeded","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.597Z"}
+{"level":"info","message":"All background services initialized","service":"suvaialaya-api","timestamp":"2026-08-05T18:49:08.597Z"}
+{"durationMs":8,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T18:49:09.595Z","url":"/assets/index-missing.js","userAgent":"Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8875"}
+{"durationMs":8,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T18:51:33.353Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":4,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T18:51:33.389Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":11,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T18:51:33.425Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"error":"Stream isn't writeable and enableOfflineQueue options is false","level":"error","message":"Redis BGSAVE failed","service":"suvaialaya-api","timestamp":"2026-08-05T19:00:00.016Z"}
+{"backupType":"redis","error":"Stream isn't writeable and enableOfflineQueue options is false","level":"warn","message":"ALERT FIRED","service":"suvaialaya-api","severity":"critical","timestamp":"2026-08-05T19:00:00.017Z","title":"Backup Failed"}
+{"error":"Stream isn't writeable and enableOfflineQueue options is false","level":"error","message":"Redis BGSAVE failed","service":"suvaialaya-api","timestamp":"2026-08-05T19:00:00.021Z"}
+{"error":"Stream isn't writeable and enableOfflineQueue options is false","level":"error","message":"Redis BGSAVE failed","service":"suvaialaya-api","timestamp":"2026-08-05T19:00:00.047Z"}
+{"backupType":"redis","error":"Stream isn't writeable and enableOfflineQueue options is false","level":"warn","message":"ALERT FIRED","service":"suvaialaya-api","severity":"critical","timestamp":"2026-08-05T19:00:00.047Z","title":"Backup Failed"}
+{"backupType":"redis","error":"Stream isn't writeable and enableOfflineQueue options is false","level":"warn","message":"ALERT FIRED","service":"suvaialaya-api","severity":"critical","timestamp":"2026-08-05T19:00:00.051Z","title":"Backup Failed"}
+{"durationMs":6,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T19:25:57.724Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":3,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T19:25:58.740Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":10,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T20:23:14.220Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":8,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T20:23:15.238Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":8,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T20:23:16.263Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}
+{"durationMs":5,"ip":"::1","level":"info","message":"HTTP Request","method":"GET","service":"suvaialaya-api","statusCode":200,"timestamp":"2026-08-05T20:23:17.289Z","url":"/","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"}

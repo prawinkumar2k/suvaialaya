@@ -24,201 +24,7 @@ const fade = {
 
 const PHONE = "90350 05335";
 
-const MENU_HIGHLIGHTS = [
-  {
-    category: "Biryani",
-    img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=800&q=80",
-    items: [
-      { name: "Chicken Biryani — Seeraga Samba", price: "₹269" },
-      { name: "Mutton Biryani — Seeraga Samba", price: "₹369" },
-      { name: "Chicken Varuval Biryani", price: "₹269" },
-      { name: "Mutton Varuval Biryani", price: "₹369" },
-      { name: "Chicken 65 Biryani", price: "₹269" },
-      { name: "Egg Biryani", price: "₹219" },
-    ],
-  },
-  {
-    category: "Meals",
-    img: "https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=800&q=80",
-    items: [
-      { name: "Kongu Thokku Meals", price: "₹399", note: "4 Types of Thokku (Chicken, Kaadai, Prawns, Nethili Karuvada) · Fish Curry · Mutton Gravy · Rice · Day Spl Chicken 2pc · Egg · Poriyal · Rasam · Curd · Gulkand · Banana" },
-      { name: "Chicken Meals", price: "₹295", note: "Ponni Rice · Parotta · Chicken Gravy · 2 Spl Starters · Egg · Rasam · Curd · Papad · Gulkand · Banana" },
-      { name: "Mutton Meals", price: "₹395", note: "Ponni Rice · Bun Parotta · Mutton Gravy · Chicken/Mutton Starters · Egg · Rasam · Curd · Papad · Sweet" },
-      { name: "Fish Meals", price: "₹385", note: "Ponni Rice · Chapathi · Fish Curry · Fish Fry · Prawn 65 · Sambar · Poriyal · Rasam · Curd · Papad · Sweet · Gulkand · Banana" },
-      { name: "Veg Meals", price: "₹191", note: "Ponni Rice · Chapathi · Veg Gravy · Poriyal · Koottu · Sambar · Vatha Kulambu · Rasam · Curd · Papad · Sweet · Gulkand · Banana" },
-      { name: "Dry Nuts Curds Rice", price: "₹139" },
-      { name: "Jeera Rice", price: "₹149" },
-    ],
-  },
-  {
-    category: "Chicken Starters",
-    img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&q=80",
-    items: [
-      { name: "Day Special Starters", price: "₹259" },
-      { name: "Chettinad Chicken Chukka", price: "₹259" },
-      { name: "Chicken Milagu Varuval", price: "₹259" },
-      { name: "Karaikudi Chicken Ghee Roast", price: "₹269" },
-      { name: "Chicken 65 — Boneless", price: "₹219" },
-      { name: "Chicken Lollipop (5 pc)", price: "₹249" },
-      { name: "Chicken Manchurian", price: "₹249" },
-      { name: "Chicken 555", price: "₹249" },
-      { name: "Dragon Chicken", price: "₹249" },
-      { name: "Japan Chicken", price: "₹259" },
-      { name: "Lemon Chicken", price: "₹249" },
-      { name: "Monica Chicken", price: "₹229" },
-      { name: "Dynamite Chicken", price: "₹229" },
-    ],
-  },
-  {
-    category: "Mutton Starters",
-    img: "https://images.unsplash.com/photo-1574653853027-5382a3d23a15?w=800&q=80",
-    items: [
-      { name: "Mutton Kola Urundai (1 pc)", price: "₹69" },
-      { name: "Mutton Nei Chukka", price: "₹369" },
-      { name: "Mutton Milagu Varuval", price: "₹369" },
-      { name: "Karaikudi Mutton Ghee Roast", price: "₹369" },
-      { name: "Mutton Boti Fry / Semi Gravy", price: "₹229" },
-      { name: "Mutton Nalli Ghee Roast / Semi Gravy (2pc)", price: "₹359" },
-    ],
-  },
-  {
-    category: "Seafood",
-    img: "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=800&q=80",
-    items: [
-      { name: "Tawa Vanjaram Fry", price: "₹229" },
-      { name: "Meen Polichathu — Vanjaram", price: "₹259" },
-      { name: "Prawn (65 / Pepper Dry / Manchurian)", price: "₹269/289/289" },
-      { name: "Tawa Squid / Prawn", price: "₹399/299" },
-      { name: "Butter Garlic Prawns / Squid", price: "₹329/399" },
-      { name: "BBQ Fish", price: "SR" },
-      { name: "Tandoori Fish", price: "SR" },
-      { name: "Jambu Prawns", price: "SR" },
-      { name: "Tiger Prawns", price: "SR" },
-      { name: "Crab Roast", price: "SR" },
-    ],
-  },
-  {
-    category: "Tandoori",
-    img: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=800&q=80",
-    items: [
-      { name: "Tandoori Chicken Platter", price: "₹1199" },
-      { name: "Tandoori Chicken (Half/Full)", price: "₹349/649" },
-      { name: "BBQ Chicken (Half/Full)", price: "₹349/649" },
-      { name: "Al Faham Chicken (Half/Full)", price: "₹359/659" },
-      { name: "Chicken Tikka", price: "₹299" },
-      { name: "Hariyali Chicken Tikka", price: "₹319" },
-      { name: "Malai Chicken Tikka", price: "₹319" },
-      { name: "Kalmi Kabab (1 pc)", price: "₹99" },
-      { name: "Tangdi Kabab (1 pc)", price: "₹99" },
-    ],
-  },
-  {
-    category: "Veg Starters",
-    img: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80",
-    items: [
-      { name: "Panneer Tikka", price: "₹299" },
-      { name: "Panneer (65 / Manchurian / Pepper Dry)", price: "₹229/249/249" },
-      { name: "Mushroom (65 / Manchurian / Pepper Dry)", price: "₹219/239/239" },
-      { name: "Gobi (65 / Manchurian / Pepper Dry)", price: "₹219/239/239" },
-      { name: "Dragon Panneer", price: "₹249" },
-      { name: "Butter Garlic Mushroom", price: "₹259" },
-    ],
-  },
-  {
-    category: "Curries",
-    img: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&q=80",
-    items: [
-      { name: "Chicken Butter Masala", price: "₹289" },
-      { name: "Panner Butter Masala", price: "₹249" },
-      { name: "Panner Tikka Masala", price: "₹359" },
-      { name: "Chicken Tikka Masala", price: "₹389" },
-      { name: "Kadai (Chicken/Panner/Mushroom)", price: "₹299/249/239" },
-      { name: "Chicken Chettinad Masala", price: "₹269" },
-      { name: "Mutton Thani Kulambu", price: "₹349" },
-      { name: "Mutton Chettinad Masala", price: "₹359" },
-      { name: "Mutton Pepper Masala", price: "₹369" },
-      { name: "Mutton Vengaya Kari", price: "₹359" },
-      { name: "Prawn Masala", price: "₹339" },
-      { name: "Meen Kuzhambu", price: "₹269" },
-    ],
-  },
-  {
-    category: "Breads & Parotta",
-    img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80",
-    items: [
-      { name: "Bun / Nool Parrota + Mutton Vengaya Curry", price: "₹449" },
-      { name: "Bun / Nool Parrota + Mutton Nalli Semi Gravy", price: "₹449" },
-      { name: "Bun / Nool Parrota + Mutton Boti Semi Gravy", price: "₹349" },
-      { name: "Bun Parrota", price: "₹100" },
-      { name: "Nool Parrota", price: "₹110" },
-      { name: "Egg Parrota", price: "₹120" },
-      { name: "Parotta", price: "₹80" },
-      { name: "Chapathi", price: "₹80" },
-      { name: "Roti (Plain/Butter)", price: "₹45/65" },
-      { name: "Naan (Plain/Butter/Garlic)", price: "₹55/65/70" },
-      { name: "Kulcha (Plain/Butter/Panner)", price: "₹49/59/99" },
-    ],
-  },
-  {
-    category: "Tiffin & Breakfast",
-    img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=800&q=80",
-    items: [
-      { name: "Idly (3 pc)", price: "₹70" },
-      { name: "Ghee Masala Dosa", price: "₹139" },
-      { name: "Ghee Kara Dosa", price: "₹129" },
-      { name: "Ghee Roast", price: "₹119" },
-      { name: "Ghee Podi Dosa", price: "₹129" },
-      { name: "Plain Paper Roast", price: "₹119" },
-      { name: "Uthappam (Plain/Ghee/Onion)", price: "₹89/119/109" },
-      { name: "Idiyappam (Coconut Milk/Veg Kuruma)", price: "₹100" },
-      { name: "Pazhaya Soru — Non-veg", price: "₹199", note: "2 types of Non-veg Thokku, Chinna Vengayam, Pachamilaga" },
-      { name: "Non-Veg Mini Tiffin", price: "₹199", note: "Idly, Set Dosa, Parrota, Egg, Chicken Gravy, Mutton Gravy, Chutney" },
-      { name: "Kari Dosa (Chicken/Mutton)", price: "₹229/299" },
-      { name: "Kothu Idly (Chicken/Egg)", price: "₹189/169" },
-      { name: "Kothu Idiyappam (Chicken/Egg)", price: "₹189/169" },
-    ],
-  },
-  {
-    category: "Desserts",
-    img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80",
-    items: [
-      { name: "Madurai Jigarthanda", price: "₹139" },
-      { name: "Elaneer Payasam", price: "₹129" },
-      { name: "Gulab Jamun with Ice Cream", price: "₹120" },
-      { name: "Rose Milk", price: "₹80" },
-      { name: "Coconut Pudding", price: "₹99" },
-      { name: "FS with Ice Cream", price: "₹139" },
-      { name: "Fruit Mixer with Badam Milk", price: "₹109" },
-    ],
-  },
-];
-
-const SPECIALS = [
-  {
-    name: "Kongu Thokku Meals",
-    price: "₹399",
-    tag: "Signature",
-    desc: "4 Types of Thokku (Chicken, Kaadai, Prawns, Nethili Karuvada) · Fish Curry · Mutton Gravy · Rice · Day Spl Chicken 2pc · Egg · Poriyal · Rasam · Curd · Gulkand · Banana",
-  },
-  {
-    name: "Chicken 8 Meal Combo",
-    price: "₹399",
-    tag: "Best Value",
-    desc: "Sweet · Mini Chicken Biryani · Bun Parotta · Chicken Gravy · 2 Chicken Starters · Boiled Egg · Onion Raita",
-  },
-  {
-    name: "Mutton 8 Meal Combo",
-    price: "₹499",
-    tag: "Feast",
-    desc: "Sweet · Mini Mutton Biryani · Bun Parotta · Mutton Gravy · Mutton Varuval · Chicken Starters · Boiled Egg · Onion Raita",
-  },
-  {
-    name: "Tandoori Chicken Platter",
-    price: "₹1199",
-    tag: "Grand",
-    desc: "Full Tandoori Chicken · BBQ Chicken · Al Faham Chicken · Chicken Tikka · Hariyali Tikka · Malai Tikka — the ultimate celebration feast",
-  },
-];
+import { MENU_HIGHLIGHTS, SPECIALS } from "@/data/menu";
 
 import axios from "axios";
 
@@ -227,6 +33,7 @@ export default function Index() {
   const [activeMenu, setActiveMenu] = useState(0);
   const [basePrice, setBasePrice] = useState(1499);
   const [landingSettings, setLandingSettings] = useState<any>(null);
+  const [festivalSettings, setFestivalSettings] = useState<any>(null);
   const [menuHighlights, setMenuHighlights] = useState<any[]>(MENU_HIGHLIGHTS); // Default to static, override with DB
   const [specials, setSpecials] = useState<any[]>(SPECIALS); // Default to static, override with DB
   const [showCallModal, setShowCallModal] = useState(false);
@@ -250,10 +57,15 @@ export default function Index() {
     // Fetch Settings
     axios.get("/api/settings")
       .then((res) => {
-        if (res.data.success && res.data.data.landing) {
-          setLandingSettings(res.data.data.landing);
-          if (res.data.data.landing.specials && res.data.data.landing.specials.length > 0) {
-            setSpecials(res.data.data.landing.specials);
+        if (res.data.success && res.data.data) {
+          if (res.data.data.festival) {
+            setFestivalSettings(res.data.data.festival);
+          }
+          if (res.data.data.landing) {
+            setLandingSettings(res.data.data.landing);
+            if (res.data.data.landing.specials && res.data.data.landing.specials.length > 0) {
+              setSpecials(res.data.data.landing.specials);
+            }
           }
         }
       })
@@ -403,9 +215,9 @@ export default function Index() {
 
           <motion.div custom={3} variants={fade} initial="hidden" animate="show" className="flex flex-wrap gap-3 mb-8">
             {[
-              { icon: MapPin, text: "Bommasandra, Bengaluru" },
-              { icon: Clock, text: "Open: 11 AM – 11 PM" },
-              { icon: CalendarDays, text: "Grand Event Coming Soon" },
+              { icon: MapPin, text: festivalSettings?.venue || "Bommasandra, Bengaluru" },
+              { icon: Clock, text: `Open: ${festivalSettings?.hours || "11 AM – 11 PM"}` },
+              { icon: CalendarDays, text: festivalSettings?.dates || "August 7, 8 & 9, 2026" },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-2 text-xs text-[#1a3d2b]/70 font-bold bg-white/70 backdrop-blur-md border border-[#1a3d2b]/10 px-3 py-1.5 rounded-full shadow-sm">
                 <Icon size={12} className="text-[#c9841a]" /> {text}

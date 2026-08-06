@@ -4,6 +4,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { ArrowLeft, Leaf, UtensilsCrossed, Loader2 } from "lucide-react";
 import { BrandMark } from "@/components/landing/BrandMark";
+import { MENU_HIGHLIGHTS } from "@/data/menu";
 
 function OrnamentalDivider() {
   return (
@@ -16,7 +17,12 @@ function OrnamentalDivider() {
 }
 
 export default function Menu() {
-  const [menuHighlights, setMenuHighlights] = useState<any[]>([]);
+  // Convert default hierarchical MENU_HIGHLIGHTS to flat array for default state
+  const defaultFlatMenu = MENU_HIGHLIGHTS.flatMap(cat => 
+    cat.items.map(item => ({ ...item, category: cat.category }))
+  );
+  
+  const [menuHighlights, setMenuHighlights] = useState<any[]>(defaultFlatMenu);
   const [welcomeItems, setWelcomeItems] = useState<any[]>([]);
   const [returnGifts, setReturnGifts] = useState<any[]>([]);
   const [menuPageSettings, setMenuPageSettings] = useState<any>(null);
@@ -28,7 +34,7 @@ export default function Menu() {
       axios.get("/api/settings")
     ])
     .then(([menuRes, settingsRes]) => {
-      if (menuRes.data.success) {
+      if (menuRes.data.success && menuRes.data.data.length > 0) {
         setMenuHighlights(menuRes.data.data);
       }
       if (settingsRes.data.success) {

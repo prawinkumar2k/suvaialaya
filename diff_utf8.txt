@@ -1,0 +1,186 @@
+﻿commit 37759a5d9a34cc7480015ab2c5d698b0f014232a
+Author: CHRISTYPUNITHA <154300792+prawinkumar2k@users.noreply.github.com>
+Date:   Thu Aug 6 02:16:39 2026 +0530
+
+    Fix EventEditor UI and missing lucide imports
+
+diff --git a/client/pages/AdminDashboard.tsx b/client/pages/AdminDashboard.tsx
+index 93f085a..4089f6e 100644
+--- a/client/pages/AdminDashboard.tsx
++++ b/client/pages/AdminDashboard.tsx
+@@ -1,6 +1,6 @@
+ import { useState, useEffect } from "react";
+ import { Link, useNavigate } from "react-router-dom";
+-import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, UtensilsCrossed, FileText, UserCog, PackageOpen } from "lucide-react";
++import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, UtensilsCrossed, FileText, UserCog, PackageOpen, Calendar, Clock } from "lucide-react";
+ import { motion } from "framer-motion";
+ import { BrandMark } from "@/components/landing/BrandMark";
+ import { toast } from "sonner";
+@@ -12,6 +12,7 @@ import { MenuCMS } from "@/components/admin/MenuCMS";
+ import { SystemSettingsCMS } from "@/components/admin/SystemSettingsCMS";
+ import { StaffCMS } from "@/components/admin/StaffCMS";
+ import { AddonCMS } from "@/components/admin/AddonCMS";
++import { EventEditor } from "@/components/admin/EventEditor";
+ 
+ export default function AdminDashboard() {
+   const [activeTab, setActiveTab] = useState("overview");
+@@ -49,6 +50,7 @@ export default function AdminDashboard() {
+   const [bulkImportPaymentMode, setBulkImportPaymentMode] = useState("Cash");
+ 
+   const [createBookingOpen, setCreateBookingOpen] = useState(false);
++  const [editingEventId, setEditingEventId] = useState<string | null>(null);
+   const [createBookingData, setCreateBookingData] = useState<any>({
+     eventId: "",
+     date: "",
+@@ -789,100 +791,66 @@ export default function AdminDashboard() {
+ 
+             {activeTab === "events" && (
+               <div className="space-y-8 max-w-7xl mx-auto" style={{ perspective: 1000 }}>
+-                <div>
+-                  <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Events & Slots</h1>
+-                  <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Manage your venue schedule</p>
+-                </div>
+-                <div className="grid gap-8 grid-cols-1">
+-                  {events.length === 0 ? (
+-                    <div className="col-span-full text-center py-20 border border-dashed border-gray-200 rounded-2xl bg-gray-50">
+-                      <p className="text-[#1a3d2b]/40 uppercase tracking-widest font-bold text-[10px]">No Events Found</p>
++                {editingEventId ? (
++                  <EventEditor 
++                    event={events.find((e: any) => e._id === editingEventId)}
++                    token={token || ""}
++                    onUpdate={(updated) => setEvents(events.map((e: any) => e._id === updated._id ? updated : e))}
++                    onCancel={() => setEditingEventId(null)}
++                  />
++                ) : (
++                  <>
++                    <div>
++                      <h1 className="font-display text-4xl font-bold text-[#1a3d2b]">Events & Slots</h1>
++                      <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60">Manage your venue schedule</p>
+                     </div>
+-                  ) : (
+-                    events.map((event) => (
+-                      <motion.div 
+-                        key={event._id} 
+-                        whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
+-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+-                        className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)] group relative overflow-hidden"
+-                      >
+-                        <div className="absolute top-0 right-0 p-4 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
+-                          <CalendarDays size={100} className="text-[#1a3d2b]" />
++                    <div className="grid gap-8 grid-cols-1">
++                      {events.length === 0 ? (
++                        <div className="col-span-full text-center py-20 border border-dashed border-gray-200 rounded-2xl bg-gray-50">
++                          <p className="text-[#1a3d2b]/40 uppercase tracking-widest font-bold text-[10px]">No Events Found</p>
+                         </div>
+-                        <div className="flex justify-between items-start mb-4 relative z-10">
+-                          <div>
+-                            <h3 className="font-display text-xl font-bold text-[#1a3d2b] flex items-center gap-2">
+-                              {event.title}
++                      ) : (
++                        events.map((event) => (
++                          <motion.div 
++                            key={event._id} 
++                            whileHover={{ scale: 1.02, rotateX: 2, rotateY: -2 }}
++                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
++                            className="bg-white border border-gray-100 rounded-2xl p-6 shadow-[0_4px_15px_rgb(0,0,0,0.02)] group relative overflow-hidden"
++                          >
++                            <div className="absolute top-0 right-0 p-4 opacity-[0.02] pointer-events-none group-hover:opacity-[0.05] transition-opacity">
++                              <CalendarDays size={100} className="text-[#1a3d2b]" />
++                            </div>
++                            <div className="flex justify-between items-start relative z-10">
++                              <div>
++                                <h3 className="font-display text-xl font-bold text-[#1a3d2b] flex items-center gap-2">
++                                  {event.title}
++                                </h3>
++                                <p className="text-[10px] uppercase tracking-widest text-[#1a3d2b]/60 mt-1 font-bold">{event.venue}</p>
++                              </div>
+                               <button 
+-                                onClick={() => { setEditEventData(event); setEditEventOpen(true); }}
+-                                className="text-[#c9841a] hover:bg-[#c9841a]/10 p-1.5 rounded-md transition-colors"
+-                                title="Edit Event Details"
++                                onClick={() => setEditingEventId(event._id)}
++                                className="bg-[#1a3d2b] hover:bg-[#2d6a4f] text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center gap-2"
+                               >
+-                                <Settings size={14} />
+-                              </button>
+-                            </h3>
+-                            <p className="text-[10px] uppercase tracking-widest text-[#1a3d2b]/60 mt-1 font-bold">{event.venue}</p>
+-                          </div>
+-                          <span className="text-[9px] font-bold uppercase tracking-widest bg-[#c9841a]/10 text-[#c9841a] px-3 py-1.5 rounded-full border border-[#c9841a]/20">₹{event.basePrice}</span>
+-                        </div>
+-                        <div className="space-y-4 relative z-10">
+-                          <div className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 mb-2">
+-                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#1a3d2b]">Manage Schedule</span>
+-                            <div className="flex gap-2">
+-                              <button onClick={() => handleAddDate(event)} className="bg-white border border-gray-200 text-[#1a3d2b] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest hover:bg-gray-50 shadow-sm flex items-center gap-1">
+-                                <Plus size={10} /> Date
+-                              </button>
+-                              <button onClick={() => handleAddSlot(event)} className="bg-white border border-gray-200 text-[#1a3d2b] text-[9px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest hover:bg-gray-50 shadow-sm flex items-center gap-1">
+-                                <Plus size={10} /> Slot
++                                <Settings size={14} /> Full Page Editor
+                               </button>
+                             </div>
+-                          </div>
+-                          {event.dates?.map((dateObj: any, index: number) => (
+-                            <div key={index} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+-                              <div className="font-bold text-[#1a3d2b] text-xs uppercase tracking-widest mb-3 border-b border-gray-100 pb-2 flex justify-between items-center group/date">
+-                                <div className="flex items-center gap-2">
+-                                  {new Date(dateObj).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+-                                  <button onClick={() => { setEditDateData({ eventId: event._id, oldDate: dateObj, newDate: dateObj }); setEditDateOpen(true); }} className="text-[#c9841a] hover:bg-[#c9841a]/10 p-1 rounded-md transition-colors opacity-0 group-hover/date:opacity-100" title="Edit Date">
+-                                    <Settings size={12} />
+-                                  </button>
+-                                </div>
+-                                <button onClick={() => handleRemoveDate(event, dateObj)} className="text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-colors" title="Remove Date">
+-                                  <XCircle size={14} />
+-                                </button>
++                            
++                            <div className="mt-6 flex gap-6 text-sm font-bold text-[#1a3d2b]/70 border-t border-gray-100 pt-4">
++                              <div className="flex items-center gap-2">
++                                <Calendar size={16} className="text-[#c9841a]" />
++                                {event.dates?.length || 0} Dates Scheduled
+                               </div>
+-                              <div className="space-y-3">
+-                                {((event.dateSlots && event.dateSlots[dateObj]) || event.slots)?.map((slot: any, slotIdx: number) => {
+-                                  const booked = slot.booked || 0;
+-                                  const total = slot.capacity;
+-                                  const percentage = Math.round((booked / total) * 100);
+-                                  return (
+-                                    <div key={slotIdx} className="flex justify-between items-center text-xs group/slot bg-gray-50 p-2 rounded-lg">
+-                                      <div className="flex items-center gap-2">
+-                                        <button onClick={() => handleRemoveSlot(event, slotIdx)} className="text-red-400 hover:text-red-600 transition-colors opacity-0 group-hover/slot:opacity-100 p-1 rounded-md hover:bg-red-50" title="Delete Slot">
+-                                          <XCircle size={12} />
+-                                        </button>
+-                                        <button onClick={() => { setEditSlotData({ eventId: event._id, slotIdx, time: slot.time, capacity: slot.capacity.toString() }); setEditSlotOpen(true); }} className="text-[#c9841a] hover:text-[#c9841a] transition-colors opacity-0 group-hover/slot:opacity-100 p-1 rounded-md hover:bg-[#c9841a]/10" title="Edit Slot">
+-                                          <Settings size={12} />
+-                                        </button>
+-                                        <span className="font-bold text-[#1a3d2b]">{slot.time}</span>
+-                                      </div>
+-                                      <div className="flex items-center gap-3">
+-                                        <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+-                                          <div className="h-full bg-[#c9841a]" style={{ width: `${percentage}%` }} />
+-                                        </div>
+-                                        <span className="font-bold text-[#1a3d2b] w-12 text-right text-[10px] uppercase tracking-widest">{booked} / {total}</span>
+-                                      </div>
+-                                    </div>
+-                                  );
+-                                })}
++                              <div className="flex items-center gap-2">
++                                <Clock size={16} className="text-[#c9841a]" />
++                                {event.slots?.length || 0} Daily Slots
+                               </div>
+                             </div>
+-                          ))}
+-                        </div>
+-                      </motion.div>
+-                    ))
+-                  )}
+-                </div>
++                          </motion.div>
++                        ))
++                      )}
++                    </div>
++                  </>
++                )}
+               </div>
+             )}
+ 
