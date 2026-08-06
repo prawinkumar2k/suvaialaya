@@ -123,33 +123,6 @@ export function SystemSettingsCMS() {
           />
         </div>
         <div>
-          <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Tagline</label>
-          <input 
-            type="text" 
-            value={settings.festival?.tagline || ""} 
-            onChange={(e) => handleChange("festival", "tagline", e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" 
-          />
-        </div>
-        <div>
-          <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Hero Eyebrow Text</label>
-          <input 
-            type="text" 
-            value={settings.festival?.eyebrow || ""} 
-            onChange={(e) => handleChange("festival", "eyebrow", e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" 
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Description</label>
-          <textarea 
-            value={settings.festival?.description || ""} 
-            onChange={(e) => handleChange("festival", "description", e.target.value)}
-            rows={3}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-xs" 
-          />
-        </div>
-        <div>
           <label className="block text-[10px] font-bold uppercase tracking-widest text-[#1a3d2b]/60 mb-2">Venue Address</label>
           <input 
             type="text" 
