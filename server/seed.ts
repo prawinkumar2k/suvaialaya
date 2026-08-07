@@ -59,7 +59,7 @@ async function seedDatabase() {
       title: "Madurai Kari Virunthu",
       description: "An authentic Madurai style non-veg feast showcasing our rich culinary heritage.",
       venue: "Suvaialaya Restaurant, Madurai",
-      basePrice: 1499,
+      basePrice: 1199,
       dates: [
         "2026-08-01", "2026-08-02", "2026-08-03", 
         "2026-08-04", "2026-08-05", "2026-08-06", 

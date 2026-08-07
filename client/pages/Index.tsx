@@ -31,7 +31,7 @@ import axios from "axios";
 export default function Index() {
   const [done, setDone] = useState(false);
   const [activeMenu, setActiveMenu] = useState(0);
-  const [basePrice, setBasePrice] = useState(1499);
+  const [basePrice, setBasePrice] = useState(1199);
   const [landingSettings, setLandingSettings] = useState<any>(null);
   const [festivalSettings, setFestivalSettings] = useState<any>(null);
   const [menuHighlights, setMenuHighlights] = useState<any[]>(MENU_HIGHLIGHTS); // Default to static, override with DB

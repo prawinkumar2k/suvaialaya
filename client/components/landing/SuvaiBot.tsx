@@ -31,7 +31,7 @@ export function SuvaiBot() {
     { id: "msg-0", sender: "bot", text: "Vanakkam! I'm SuvaiBot. Ask me anything about our menu, making a reservation, or our software architecture!" }
   ]);
   const [input, setInput] = useState("");
-  const [basePrice, setBasePrice] = useState(1499); // Fallback price
+  const [basePrice, setBasePrice] = useState(1199); // Fallback price
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

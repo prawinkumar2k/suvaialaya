@@ -20,7 +20,7 @@ const menuHighlights = [
   { name: "Bun / Nool Parotta", category: "Tawa Breads", description: "Madurai's famous fluffy, layered bun parotta.", price: 49, isVeg: true },
   { name: "Kari Dosa (Chicken / Mutton)", category: "Non-veg Tiffin", description: "Soft dosa layered with rich minced meat curry.", price: 199, isVeg: false },
   { name: "Kothu Parotta", category: "Parotta", description: "Minced parotta tossed with spices, egg, and meat gravy.", price: 179, isVeg: false },
-  { name: "Mutton 8 Meal Combo", category: "Special Combo", description: "Sweet, Mini Mutton Briyani, Bun Parrota, Mutton Gravy, Mutton Varuval, Chicken Starters, Boiled egg and Onion Raita.", price: 1499, isVeg: false },
+  { name: "Mutton 8 Meal Combo", category: "Special Combo", description: "Sweet, Mini Mutton Briyani, Bun Parrota, Mutton Gravy, Mutton Varuval, Chicken Starters, Boiled egg and Onion Raita.", price: 1199, isVeg: false },
   { name: "Madurai Jigarthanda", category: "Desserts", description: "The city's beloved cool, silky dessert to end the feast.", price: 119, isVeg: true },
   { name: "Elaneer Payasam", category: "Desserts", description: "Tender coconut sweet pudding.", price: 99, isVeg: true }
 ];
