@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import axios from "axios";
-import { UserPlus, Calendar, Clock, Users, IndianRupee, Mail, Phone, MapPin, CreditCard } from "lucide-react";
+import { UserPlus, Calendar, Clock, Users, IndianRupee, Mail, Phone, MapPin, CreditCard, Tag } from "lucide-react";
 
 export const ManualRegistration = ({ events, token, onSuccess }: { events: any[], token: string, onSuccess: () => void }) => {
   const [formData, setFormData] = useState({
@@ -16,18 +16,30 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
     amountPaid: "",
     paymentMode: "Cash",
     remarks: "",
+    discount: "",
+    discountType: "flat", // "flat" = ₹ | "percent" = %
     checkInNow: true
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedEvent = events.find((e) => e._id === formData.eventId);
 
-  const calculateDefaultAmount = () => {
-    if (selectedEvent && formData.numberOfGuests > 0) {
-      return selectedEvent.basePrice * formData.numberOfGuests;
-    }
-    return 0;
-  };
+  // ── Core price calculations ──────────────────────────────────────
+  const baseTotal = selectedEvent ? selectedEvent.basePrice * Number(formData.numberOfGuests) : 0;
+
+  const discountValue = formData.discount !== "" ? Number(formData.discount) : 0;
+  const discountAmount =
+    formData.discountType === "percent"
+      ? Math.round((baseTotal * discountValue) / 100)
+      : discountValue;
+
+  const effectiveTotal =
+    formData.totalAmount !== ""
+      ? Number(formData.totalAmount)
+      : Math.max(0, baseTotal - discountAmount);
+
+  const amountPaidNum = formData.amountPaid !== "" ? Number(formData.amountPaid) : effectiveTotal;
+  const balanceDue = Math.max(0, effectiveTotal - amountPaidNum);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -52,19 +64,15 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
 
     setIsSubmitting(true);
     try {
-      const defaultAmount = calculateDefaultAmount();
-      const finalTotalAmount = formData.totalAmount !== "" ? Number(formData.totalAmount) : defaultAmount;
-      const finalAmountPaid = formData.amountPaid !== "" ? Number(formData.amountPaid) : finalTotalAmount;
-      const balanceAmount = finalTotalAmount - finalAmountPaid;
-
       const payload = {
         event: formData.eventId,
         date: formData.date,
         slotTime: formData.slotTime,
         numberOfGuests: Number(formData.numberOfGuests),
-        totalAmount: finalTotalAmount,
-        amountPaid: finalAmountPaid,
-        balanceAmount: balanceAmount,
+        totalAmount: effectiveTotal,
+        amountPaid: amountPaidNum,
+        balanceAmount: balanceDue,
+        bookingSource: "admin",
         guestDetails: {
           fullName: formData.fullName,
           email: formData.email || "no-email@suvaialaya.com",
@@ -77,17 +85,21 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
 
       if (response.data.success) {
         const newBookingId = response.data.data._id;
-        const finalPaymentStatus = balanceAmount <= 0 ? "Completed" : finalAmountPaid > 0 ? "Partial" : "Pending";
-        
+        const finalPaymentStatus = balanceDue <= 0 ? "Completed" : amountPaidNum > 0 ? "Partial" : "Pending";
+
         await axios.put(`/api/bookings/${newBookingId}`, {
-           paymentStatus: finalPaymentStatus,
-           bookingStatus: formData.checkInNow ? "Attended" : "Confirmed",
-           guestDetails: { ...payload.guestDetails, paymentMode: formData.paymentMode }
+          paymentStatus: finalPaymentStatus,
+          bookingStatus: formData.checkInNow ? "Attended" : "Confirmed",
+          amountPaid: amountPaidNum,
+          balanceAmount: balanceDue,
+          guestDetails: { ...payload.guestDetails, paymentMode: formData.paymentMode }
         }, { headers: { Authorization: `Bearer ${token}` } });
 
         toast.success("Registration completed successfully!");
         setFormData({
-          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "", numberOfGuests: 1, totalAmount: "", amountPaid: "", paymentMode: "Cash", remarks: "", checkInNow: true
+          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "",
+          numberOfGuests: 1, totalAmount: "", amountPaid: "", paymentMode: "Cash",
+          remarks: "", discount: "", discountType: "flat", checkInNow: true
         });
         onSuccess();
       }
@@ -111,7 +123,7 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
 
       <div className="bg-white border border-gray-100 rounded-2xl p-6 sm:p-8 shadow-[0_4px_15px_rgb(0,0,0,0.02)] relative overflow-hidden">
         <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
-          
+
           {/* Event Selection */}
           <div>
             <h3 className="text-lg font-bold text-[#1a3d2b] border-b border-gray-100 pb-2 mb-4">Event Details</h3>
@@ -127,7 +139,7 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
                   </select>
                 </div>
               </div>
-              
+
               {formData.eventId && (
                 <>
                   <div>
@@ -186,7 +198,7 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 flex items-center gap-1"><IndianRupee size={12}/> Total Amount</label>
-                <input type="number" name="totalAmount" min="0" value={formData.totalAmount} onChange={handleInputChange} placeholder={`Auto (₹${calculateDefaultAmount()})`} className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-[#c9841a] font-bold text-[#1a3d2b]" />
+                <input type="number" name="totalAmount" min="0" value={formData.totalAmount} onChange={handleInputChange} placeholder={`Auto (₹${baseTotal})`} className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-[#c9841a] font-bold text-[#1a3d2b]" />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 flex items-center gap-1"><IndianRupee size={12}/> Advance Paid</label>
@@ -202,17 +214,67 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
                 </select>
               </div>
             </div>
-            
-            <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100 flex justify-between items-center">
-               <div className="text-sm font-bold text-orange-800">
-                  Total calculation summary based on inputs.
-               </div>
-               <div className="text-right">
-                  <div className="text-xs uppercase tracking-widest text-orange-600 font-bold">Balance Due</div>
-                  <div className="font-display text-2xl text-orange-700 font-bold">
-                     ₹{Math.max(0, (formData.totalAmount !== "" ? Number(formData.totalAmount) : calculateDefaultAmount()) - (formData.amountPaid !== "" ? Number(formData.amountPaid) : (formData.totalAmount !== "" ? Number(formData.totalAmount) : calculateDefaultAmount())))}
+
+            {/* Discount Row */}
+            <div className="mt-5">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                <Tag size={12}/> Discount <span className="text-gray-400 normal-case font-normal tracking-normal">(optional)</span>
+              </label>
+              <div className="flex gap-3 items-center">
+                <div className="flex rounded-xl border border-gray-200 overflow-hidden text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, discountType: "flat" }))}
+                    className={`px-4 py-2.5 transition-colors ${formData.discountType === "flat" ? "bg-[#1a3d2b] text-white" : "bg-gray-50 text-[#1a3d2b]/60 hover:bg-gray-100"}`}
+                  >₹ Flat</button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, discountType: "percent" }))}
+                    className={`px-4 py-2.5 transition-colors ${formData.discountType === "percent" ? "bg-[#1a3d2b] text-white" : "bg-gray-50 text-[#1a3d2b]/60 hover:bg-gray-100"}`}
+                  >% Off</button>
+                </div>
+                <input
+                  type="number"
+                  name="discount"
+                  min="0"
+                  max={formData.discountType === "percent" ? "100" : undefined}
+                  value={formData.discount}
+                  onChange={handleInputChange}
+                  placeholder={formData.discountType === "percent" ? "e.g. 10 for 10% off" : "e.g. 200 for ₹200 off"}
+                  className="flex-1 p-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:border-[#c9841a] font-bold text-[#1a3d2b]"
+                />
+                {discountAmount > 0 && (
+                  <span className="text-xs font-bold text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-xl whitespace-nowrap">
+                    −₹{discountAmount} saved
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Summary Box */}
+            <div className="mt-5 p-4 bg-orange-50 rounded-xl border border-orange-100">
+              <div className="flex justify-between items-start flex-wrap gap-3">
+                <div className="space-y-1 text-sm">
+                  {baseTotal > 0 && (
+                    <div className="text-[#1a3d2b]/60 font-medium">
+                      Base: ₹{baseTotal.toLocaleString()}
+                      {discountAmount > 0 && (
+                        <span className="ml-2 text-green-600 font-bold">− ₹{discountAmount} discount</span>
+                      )}
+                    </div>
+                  )}
+                  <div className="font-bold text-[#1a3d2b]">
+                    Payable: ₹{effectiveTotal.toLocaleString()}
                   </div>
-               </div>
+                  {amountPaidNum > 0 && amountPaidNum < effectiveTotal && (
+                    <div className="text-xs text-[#c9841a] font-bold">Advance paid: ₹{amountPaidNum}</div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <div className="text-xs uppercase tracking-widest text-orange-600 font-bold">Balance Due</div>
+                  <div className="font-display text-2xl text-orange-700 font-bold">₹{balanceDue}</div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 flex items-center gap-3">
@@ -231,8 +293,8 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
           </div>
 
           <div className="pt-4 flex justify-end">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="bg-[#1a3d2b] text-white px-8 py-3 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all disabled:opacity-70 flex items-center gap-2 uppercase tracking-widest"
             >

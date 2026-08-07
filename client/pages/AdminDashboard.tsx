@@ -633,7 +633,10 @@ export default function AdminDashboard() {
                           <tr key={b._id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-5 font-bold text-[#1a3d2b]">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
                             <td className="px-6 py-5 text-[#1a3d2b]/80 font-medium">
-                              <div>{b.guestDetails?.fullName || b.user?.name || "Guest"}</div>
+                              <div className="flex items-center gap-2">
+                                {b.guestDetails?.fullName || b.user?.name || "Guest"}
+                                {b.bookingSource === 'admin' && <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[8px] font-bold uppercase border border-blue-200">On-Spot</span>}
+                              </div>
                               {b.guestDetails?.city && <div className="text-[9px] text-[#1a3d2b]/50 font-bold uppercase tracking-widest mt-0.5">{b.guestDetails.city}</div>}
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs">
@@ -742,6 +745,7 @@ export default function AdminDashboard() {
                           <th className="px-6 py-4 font-bold">Contact Info</th>
                           <th className="px-6 py-4 font-bold">Slot</th>
                           <th className="px-6 py-4 font-bold text-center">Pax</th>
+                          <th className="px-6 py-4 font-bold">Paid / Balance</th>
                           <th className="px-6 py-4 font-bold">Status</th>
                           <th className="px-6 py-4 font-bold text-right rounded-tr-xl">Actions</th>
                         </tr>
@@ -758,7 +762,10 @@ export default function AdminDashboard() {
                           <tr key={b._id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-5 font-bold text-[#1a3d2b]">{b._id.substring(b._id.length - 8).toUpperCase()}</td>
                             <td className="px-6 py-5 text-[#1a3d2b]/80 font-medium">
-                              <div>{b.guestDetails?.fullName || b.user?.name || "Guest"}</div>
+                              <div className="flex items-center gap-2">
+                                {b.guestDetails?.fullName || b.user?.name || "Guest"}
+                                {b.bookingSource === 'admin' && <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[8px] font-bold uppercase border border-blue-200">On-Spot</span>}
+                              </div>
                               {b.guestDetails?.city && <div className="text-[9px] text-[#1a3d2b]/50 font-bold uppercase tracking-widest mt-0.5">{b.guestDetails.city}</div>}
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs">
@@ -767,6 +774,11 @@ export default function AdminDashboard() {
                             </td>
                             <td className="px-6 py-5 text-[#1a3d2b]/70 text-xs font-bold">{new Date(b.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {b.slotTime}</td>
                             <td className="px-6 py-5 text-center font-bold text-[#1a3d2b]">{b.numberOfGuests}</td>
+                            <td className="px-6 py-5 text-xs">
+                              <div className="font-bold text-green-700">₹{b.amountPaid ?? 0} paid</div>
+                              {(b.balanceAmount ?? 0) > 0 && <div className="font-bold text-orange-600 mt-0.5">₹{b.balanceAmount} due</div>}
+                              {(b.balanceAmount ?? 0) <= 0 && <div className="text-[9px] text-gray-400 font-bold uppercase mt-0.5">Cleared</div>}
+                            </td>
                             <td className="px-6 py-5">
                               <span className={`px-3 py-1.5 rounded-full border text-[9px] font-bold uppercase tracking-widest
                                 ${b.bookingStatus === 'Confirmed' ? 'bg-[#c9841a]/10 text-[#c9841a] border-[#c9841a]/20' : 

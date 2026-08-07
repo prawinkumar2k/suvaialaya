@@ -42,7 +42,8 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
         phone: z.string().min(1, "Phone number is required"),
         email: z.string().email("Valid email is required"),
         city: z.string().min(1, "Remarks/City is required")
-      })
+      }),
+      bookingSource: z.string().optional()
     });
 
     const parsed = createBookingSchema.safeParse(req.body);
@@ -60,6 +61,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       amountPaid,
       balanceAmount,
       idempotencyKey,
+      bookingSource,
     } = parsed.data;
 
     // ─── Idempotency Check — prevents duplicate bookings on network retry ────
@@ -530,16 +532,19 @@ export const updateBooking = async (req: Request, res: Response, next: NextFunct
       return res.status(404).json({ success: false, error: "Booking not found" });
     }
 
-    const { guestDetails, paymentStatus, bookingStatus, numberOfGuests } = req.body;
+    const { guestDetails, paymentStatus, bookingStatus, amountPaid, balanceAmount } = req.body;
 
     if (guestDetails) {
       booking.guestDetails = { ...booking.guestDetails, ...guestDetails };
     }
     if (paymentStatus) booking.paymentStatus = paymentStatus;
     if (bookingStatus) booking.bookingStatus = bookingStatus;
-    
-    // Changing numberOfGuests would require atomic capacity checks on the event, 
-    // so we skip it for now unless properly implemented. We just allow guest detail updates.
+    if (amountPaid !== undefined) booking.amountPaid = amountPaid;
+    if (balanceAmount !== undefined) booking.balanceAmount = balanceAmount;
+    if (bookingStatus === "Attended" && !booking.checkedInAt) {
+      booking.checkedInAt = new Date();
+      booking.checkedInBy = req.user._id;
+    }
     
     await booking.save();
 
