@@ -103,9 +103,15 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
     const totalBooked = bookingsAgg[0]?.total || 0;
     const remainingSeats = slot.capacity - totalBooked;
     if (remainingSeats < numberOfGuests) {
-      
+      // Admin users: just reject with clear message — no waitlist needed
+      if (["admin", "owner", "receptionist"].includes(req.user.role)) {
+        return res.status(409).json({
+          success: false,
+          error: `Not enough seats. Only ${remainingSeats} seat(s) remaining in this slot.`,
+        });
+      }
 
-      // ─── Auto-add to Waitlist ─────────────────────────────────────────────
+      // ─── Auto-add to Waitlist (customers only) ────────────────────────────
       const slotKey = `${eventId}:${date}:${slotTime}`;
       const existingWaitlist = await Waitlist.findOne({
         user: req.user._id,
@@ -146,38 +152,42 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       });
     }
 
-    // ─── 3. Acquire atomic Redis seat lock (NX = Only if Not Exists) ─────────
-    const lockAcquired = await acquireSeatLock(
-      eventId,
-      date,
-      slotTime,
-      req.user._id.toString(),
-      numberOfGuests
-    );
+    // ─── 3. Seat lock — skip for admin/owner (they can book same slot multiple times) ─
+    const isAdminBooking = ["admin", "owner", "receptionist"].includes(req.user.role);
+    let lockAcquired = true;
 
-    if (!lockAcquired) {
-      // Check if they are just retrying a payment for an already-locked booking
-      const existingPending = await Booking.findOne({
-        user: req.user._id,
-        event: eventId,
+    if (!isAdminBooking) {
+      lockAcquired = await acquireSeatLock(
+        eventId,
         date,
         slotTime,
-        paymentStatus: "Pending",
-        bookingStatus: "Confirmed",
-      });
+        req.user._id.toString(),
+        numberOfGuests
+      );
 
-      if (existingPending && existingPending.numberOfGuests === numberOfGuests) {
-        existingPending.totalAmount = totalAmount;
-        existingPending.guestDetails = guestDetails;
-        await existingPending.save();
-        return res.status(200).json({ success: true, data: existingPending });
+      if (!lockAcquired) {
+        const existingPending = await Booking.findOne({
+          user: req.user._id,
+          event: eventId,
+          date,
+          slotTime,
+          paymentStatus: "Pending",
+          bookingStatus: "Confirmed",
+        });
+
+        if (existingPending && existingPending.numberOfGuests === numberOfGuests) {
+          existingPending.totalAmount = totalAmount;
+          existingPending.guestDetails = guestDetails;
+          await existingPending.save();
+          return res.status(200).json({ success: true, data: existingPending });
+        }
+
+        logger.warn("Seat lock already held by user", { userId: req.user._id, slotTime });
+        return res.status(409).json({
+          success: false,
+          error: "You already have a pending reservation. Please complete your payment from the dashboard.",
+        });
       }
-
-      logger.warn("Seat lock already held by user", { userId: req.user._id, slotTime });
-      return res.status(409).json({
-        success: false,
-        error: "You already have a pending reservation. Please complete your payment from the dashboard.",
-      });
     }
 
     // ─── 4. Seat reservation check (using real-time aggregate) ───────────────
@@ -220,8 +230,10 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
         numberOfGuests,
       });
 
-      // ─── 7. Schedule auto seat-release if payment not completed in 10 min ─────
-      await scheduleSeatRelease(booking._id.toString(), SEAT_LOCK_TTL_SECONDS * 1000);
+      // ─── 7. Skip auto seat-release for admin bookings (no payment timer needed) ─
+      if (!isAdminBooking) {
+        await scheduleSeatRelease(booking._id.toString(), SEAT_LOCK_TTL_SECONDS * 1000);
+      }
 
       // ─── 8. Enqueue resilient notification (retries 5x, DLQ on failure) ───────
       await addNotificationJob("booking_confirmation", {
@@ -230,9 +242,9 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
 
       res.status(201).json({ success: true, data: booking });
     } catch (bookingError: any) {
-      // Rollback! If booking fails (e.g. schema validation), reverse the atomic increment and release lock
-      // Seat capacity is naturally managed by Booking documents now, no rollback needed on Event.    
-      await releaseSeatLock(eventId, date, slotTime, req.user._id.toString());
+      if (!isAdminBooking) {
+        await releaseSeatLock(eventId, date, slotTime, req.user._id.toString());
+      }
       throw bookingError;
     }
   } catch (error: any) {
