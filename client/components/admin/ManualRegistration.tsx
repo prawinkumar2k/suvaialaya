@@ -15,7 +15,8 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
     totalAmount: "",
     amountPaid: "",
     paymentMode: "Cash",
-    remarks: ""
+    remarks: "",
+    checkInNow: true
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,8 +30,13 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,13 +81,13 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
         
         await axios.put(`/api/bookings/${newBookingId}`, {
            paymentStatus: finalPaymentStatus,
-           bookingStatus: "Confirmed",
+           bookingStatus: formData.checkInNow ? "Attended" : "Confirmed",
            guestDetails: { ...payload.guestDetails, paymentMode: formData.paymentMode }
         }, { headers: { Authorization: `Bearer ${token}` } });
 
-        toast.success("Manual booking registered successfully!");
+        toast.success("Registration completed successfully!");
         setFormData({
-          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "", numberOfGuests: 1, totalAmount: "", amountPaid: "", paymentMode: "Cash", remarks: ""
+          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "", numberOfGuests: 1, totalAmount: "", amountPaid: "", paymentMode: "Cash", remarks: "", checkInNow: true
         });
         onSuccess();
       }
@@ -207,6 +213,20 @@ export const ManualRegistration = ({ events, token, onSuccess }: { events: any[]
                      ₹{Math.max(0, (formData.totalAmount !== "" ? Number(formData.totalAmount) : calculateDefaultAmount()) - (formData.amountPaid !== "" ? Number(formData.amountPaid) : (formData.totalAmount !== "" ? Number(formData.totalAmount) : calculateDefaultAmount())))}
                   </div>
                </div>
+            </div>
+
+            <div className="mt-6 flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="checkInNow"
+                name="checkInNow"
+                checked={formData.checkInNow}
+                onChange={handleInputChange}
+                className="w-5 h-5 text-[#1a3d2b] border-gray-300 rounded focus:ring-[#1a3d2b] focus:ring-2 accent-[#1a3d2b]"
+              />
+              <label htmlFor="checkInNow" className="text-sm font-bold text-[#1a3d2b] cursor-pointer">
+                Guest is here right now (Mark as Attended immediately)
+              </label>
             </div>
           </div>
 
