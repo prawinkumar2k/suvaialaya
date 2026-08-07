@@ -34,6 +34,8 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       slotTime: z.string().min(1, "Slot time is required"),
       numberOfGuests: z.number().int().min(1, "At least 1 guest is required"),
       totalAmount: z.number().min(0, "Total amount must be positive"),
+      amountPaid: z.number().min(0).optional(),
+      balanceAmount: z.number().min(0).optional(),
       idempotencyKey: z.string().optional(),
       guestDetails: z.object({
         fullName: z.string().min(1, "Guest name is required"),
@@ -55,6 +57,8 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       guestDetails,
       numberOfGuests,
       totalAmount,
+      amountPaid,
+      balanceAmount,
       idempotencyKey,
     } = parsed.data;
 
@@ -197,10 +201,12 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
             guestDetails,
             numberOfGuests,
             totalAmount,
+            amountPaid: amountPaid || 0,
+            balanceAmount: balanceAmount !== undefined ? balanceAmount : totalAmount,
             bookingStatus: "Confirmed",
             paymentStatus: "Pending",
             idempotencyKey: idempotencyKey || crypto.randomUUID(),
-            bookingSource: "web",
+            bookingSource: ["admin", "owner", "receptionist"].includes(req.user.role) ? "admin" : "web",
           },
         ]
       );

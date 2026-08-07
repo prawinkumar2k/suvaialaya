@@ -59,6 +59,8 @@ export default function AdminDashboard() {
     email: "",
     phone: "",
     numberOfGuests: 1,
+    totalAmount: "",
+    amountPaid: "",
     paymentMode: "Cash",
     remarks: ""
   });
@@ -176,7 +178,10 @@ export default function AdminDashboard() {
         return;
       }
 
-      const totalAmount = event.basePrice * createBookingData.numberOfGuests;
+      const calculatedAmount = event.basePrice * createBookingData.numberOfGuests;
+      const totalAmount = createBookingData.totalAmount !== "" ? Number(createBookingData.totalAmount) : calculatedAmount;
+      const amountPaid = createBookingData.amountPaid !== "" ? Number(createBookingData.amountPaid) : totalAmount;
+      const balanceAmount = totalAmount - amountPaid;
 
       const payload = {
         event: createBookingData.eventId,
@@ -184,6 +189,8 @@ export default function AdminDashboard() {
         slotTime: createBookingData.slotTime,
         numberOfGuests: Number(createBookingData.numberOfGuests),
         totalAmount,
+        amountPaid,
+        balanceAmount,
         guestDetails: {
           fullName: createBookingData.fullName,
           email: createBookingData.email,
@@ -196,9 +203,11 @@ export default function AdminDashboard() {
       
       if (response.data.success) {
         const newBookingId = response.data.data._id;
-        // Instantly mark as completed/paid since admin collected it
+        // Mark payment status based on amounts
+        const finalPaymentStatus = balanceAmount <= 0 ? "Completed" : amountPaid > 0 ? "Partial" : "Pending";
+        
         await axios.put(`/api/bookings/${newBookingId}`, {
-           paymentStatus: "Completed",
+           paymentStatus: finalPaymentStatus,
            bookingStatus: "Confirmed",
            guestDetails: { ...payload.guestDetails, paymentMode: createBookingData.paymentMode }
         }, { headers: { Authorization: `Bearer ${token}` } });
@@ -209,7 +218,7 @@ export default function AdminDashboard() {
         toast.success("Booking created successfully!");
         setCreateBookingOpen(false);
         setCreateBookingData({
-          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "", numberOfGuests: 1, paymentMode: "Cash", remarks: ""
+          eventId: "", date: "", slotTime: "", fullName: "", email: "", phone: "", numberOfGuests: 1, totalAmount: "", amountPaid: "", paymentMode: "Cash", remarks: ""
         });
       }
     } catch (error: any) {
@@ -1192,6 +1201,28 @@ export default function AdminDashboard() {
                 min="1"
                 value={createBookingData.numberOfGuests}
                 onChange={(e) => setCreateBookingData({...createBookingData, numberOfGuests: e.target.value})}
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Amount To Pay (Leave blank for auto)</label>
+              <input
+                type="number"
+                min="0"
+                value={createBookingData.totalAmount}
+                onChange={(e) => setCreateBookingData({...createBookingData, totalAmount: e.target.value})}
+                placeholder="Total Amount"
+                className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-bold text-[#1a3d2b]">Amount Paid Now</label>
+              <input
+                type="number"
+                min="0"
+                value={createBookingData.amountPaid}
+                onChange={(e) => setCreateBookingData({...createBookingData, amountPaid: e.target.value})}
+                placeholder="Amount Paid (Leave blank if fully paid)"
                 className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:border-[#c9841a] text-[#1a3d2b] font-bold text-sm"
               />
             </div>

@@ -41,6 +41,8 @@ const bookingSchema = new mongoose.Schema(
     guestDetails: guestDetailSchema,
     numberOfGuests: { type: Number, required: true, min: 1 },
     totalAmount: { type: Number, required: true },
+    amountPaid: { type: Number, default: 0 },
+    balanceAmount: { type: Number, default: 0 },
 
     // ─── Add-ons ────────────────────────────────────────────────────────────
     addons: [
@@ -54,7 +56,7 @@ const bookingSchema = new mongoose.Schema(
     // ─── Payment ────────────────────────────────────────────────────────────
     paymentStatus: {
       type: String,
-      enum: ["Pending", "Completed", "Failed", "Refunded"],
+      enum: ["Pending", "Partial", "Completed", "Failed", "Refunded"],
       default: "Pending",
       index: true,
     },
