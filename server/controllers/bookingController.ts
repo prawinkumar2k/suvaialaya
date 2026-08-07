@@ -95,6 +95,21 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       return res.status(400).json({ success: false, error: "Invalid slot selected" });
     }
 
+    // ─── 2a. Phone duplicate check — one booking per phone per event ──────────
+    if (guestDetails?.phone) {
+      const phoneExists = await Booking.findOne({
+        event: eventId,
+        "guestDetails.phone": guestDetails.phone,
+        bookingStatus: { $ne: "Cancelled" },
+      });
+      if (phoneExists) {
+        return res.status(409).json({
+          success: false,
+          error: `Phone number ${guestDetails.phone} already has a booking for this event. Each guest can only register once.`,
+        });
+      }
+    }
+
     // ─── 2. Check capacity ────────────────────────────────────────────────────
     const bookingsAgg = await Booking.aggregate([
       { $match: { event: new mongoose.Types.ObjectId(eventId), date, slotTime, bookingStatus: { $ne: 'Cancelled' } } },
