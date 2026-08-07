@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, UtensilsCrossed, FileText, UserCog, PackageOpen, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, LayoutDashboard, CalendarDays, Users, BarChart3, ScanLine, Settings, MoreVertical, CheckCircle2, TrendingUp, IndianRupee, Leaf, Loader2, CheckSquare, XCircle, Plus, UtensilsCrossed, FileText, UserCog, PackageOpen, Calendar, Clock, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
 import { BrandMark } from "@/components/landing/BrandMark";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import { SystemSettingsCMS } from "@/components/admin/SystemSettingsCMS";
 import { StaffCMS } from "@/components/admin/StaffCMS";
 import { AddonCMS } from "@/components/admin/AddonCMS";
 import { EventEditor } from "@/components/admin/EventEditor";
+import { ManualRegistration } from "@/components/admin/ManualRegistration";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -518,6 +519,7 @@ export default function AdminDashboard() {
           <nav className="flex flex-row lg:flex-col gap-2 p-5 overflow-x-auto lg:overflow-y-auto scrollbar-hide flex-1" style={{ perspective: 1000 }}>
             {[
               { id: "overview", icon: LayoutDashboard, label: "Overview & Reports" },
+              { id: "manual", icon: UserPlus, label: "Manual Registration" },
               { id: "events", icon: CalendarDays, label: "Events & Slots" },
               { id: "bookings", icon: Users, label: "All Bookings" },
               { id: "menu", icon: UtensilsCrossed, label: "Menu Management" },
@@ -692,6 +694,18 @@ export default function AdminDashboard() {
                   </div>
                 </motion.div>
               </div>
+            )}
+
+            {activeTab === "manual" && (
+              <ManualRegistration 
+                events={events} 
+                token={token || ""} 
+                onSuccess={() => {
+                  axios.get("/api/bookings", { headers: { Authorization: `Bearer ${token}` } }).then(res => {
+                    if(res.data.success) setBookings(res.data.data);
+                  });
+                }} 
+              />
             )}
 
             {activeTab === "bookings" && (
